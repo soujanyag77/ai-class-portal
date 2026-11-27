@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Classroom Portal · Class 7 &amp; Class 9</title>
+<link rel="stylesheet" href="portal.css">
+<style>
+.hub-wrap { max-width: 1120px; margin: 0 auto; padding: 18px 16px 40px; }
+.hero {
+  background: linear-gradient(135deg, #6c4cf1 0%, #4169e1 55%, #19b8d6 100%);
+  color: #fff;
+  border-radius: 24px;
+  padding: 26px 24px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 18px;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+@media (max-width: 820px) { .hero { grid-template-columns: 1fr; } }
+.hero h1 { margin: 0 0 8px; font-size: 2rem; line-height: 1.15; }
+.hero p { margin: 0 0 14px; opacity: 0.94; font-size: 1.05rem; }
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.stat-box {
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 16px;
+  padding: 12px;
+  text-align: center;
+}
+.stat-box b { display: block; font-size: 1.8rem; line-height: 1.1; }
+.stat-box span { font-size: 0.84rem; opacity: 0.9; }
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.cls-card {
+  background: var(--card);
+  border: 3px solid var(--line);
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.16s, border-color 0.16s;
+}
+.cls-card:hover { transform: translateY(-3px); }
+.cls-card.c7 { border-top: 8px solid #ff7a59; }
+.cls-card.c9 { border-top: 8px solid #1d70d6; }
+.cls-top { display: flex; align-items: center; gap: 14px; }
+.cls-ico {
+  font-size: 3rem;
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  flex-shrink: 0;
+}
+.cls-top h2 { margin: 0; font-size: 1.45rem; }
+.cls-top small { color: var(--mut); font-weight: 700; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  background: var(--bg);
+  border: 2px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.chip-link:hover { border-color: var(--a); }
+.go-btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  padding: 13px 18px;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
+  margin-top: auto;
+}
+.c7 .go-btn { background: linear-gradient(135deg, #ff7a59, #f4a000); }
+.c9 .go-btn { background: linear-gradient(135deg, #1d70d6, #6c4cf1); }
+
+.engage-strip {
+  margin-top: 18px;
+  background: var(--card);
+  border: 3px solid var(--line);
+  border-radius: 22px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+.engage-strip h3 { margin: 0 0 10px; }
+.engage-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.badges-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.hist-list { list-style: none; padding: 0; margin: 10px 0 0; }
+.hist-list li {
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: var(--bg);
+  margin-bottom: 6px;
+  font-size: 0.94rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+</style>
+</head>
+<body>
+<nav id="portal-nav"></nav>
+
+<main class="hub-wrap">
+  <section class="hero">
+    <div>
+      <h1>🤖 AI Interactive Classroom Portal</h1>
+      <p>Play together on the smartboard or laptops! Spin the student spotlight, run live hands-up polls, train real ML models, and unlock class badges.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="p-pill warm" onclick="Portal.openPicker('7')">🎲 Spin Student Picker</button>
+        <button class="p-pill" onclick="quickIcebreaker()">🙋 Quick Class Poll</button>
+      </div>
+    </div>
+    <div class="hero-stats" id="hero-stats"></div>
+  </section>
+
+  <section class="portal-grid">
+    <article class="cls-card c7">
+      <div class="cls-top">
+        <div class="cls-ico">🧪</div>
+        <div>
+          <h2>Class 7 · AI Adventure Lab</h2>
+          <small>Playful AI Foundations · Star &amp; Streak Missions</small>
+        </div>
+      </div>
+      <p style="margin:0;color:var(--mut)">Hands-on missions where every student draws, votes, labels data, builds an AI robot, and duels the AI in Doodle Studio!</p>
+      <div class="chips">
+        <a class="chip-link" href="class7.html#ai">🕵️ Is it AI?</a>
+        <a class="chip-link" href="class7.html#pat">🔮 Train &amp; Predict</a>
+        <a class="chip-link" href="class7.html#pix">🎨 Pixel Mystery</a>
+        <a class="chip-link" href="class7.html#train">🧠 Teach the Robot</a>
+        <a class="chip-link" href="class7.html#free">🖍️ Robot &amp; Doodle</a>
+      </div>
+      <a class="go-btn" href="class7.html">🚀 Enter Class 7 Lab</a>
+    </article>
+
+    <article class="cls-card c9">
+      <div class="cls-top">
+        <div class="cls-ico">⚔️</div>
+        <div>
+          <h2>Class 9 · AI Battle Arena</h2>
+          <small>CBSE AI (417) · 5-Round Team Showdown + ML Lab</small>
+        </div>
+      </div>
+      <p style="margin:0;color:var(--mut)">High-stakes team battle with bets, clue reveals, Mystery Boxes, 50/50 &amp; Ask-the-Class lifelines, and a 4-step ML + Confusion Matrix Lab!</p>
+      <div class="chips">
+        <a class="chip-link" href="class9.html#r0">R1 Spot the Trick</a>
+        <a class="chip-link" href="class9.html#r1">R2 Domain Detective</a>
+        <a class="chip-link" href="class9.html#r2">R3 Case File</a>
+        <a class="chip-link" href="class9.html#r3">R4 ML Lab</a>
+        <a class="chip-link" href="class9.html#r4">R5 Ethics Roulette</a>
+      </div>
+      <a class="go-btn" href="class9.html">⚡ Enter Class 9 Arena</a>
+    </article>
+  </section>
+
+  <section class="engage-strip">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <h3>🏅 Classroom Trophy Case &amp; Activity</h3>
+      <button class="p-pill" onclick="resetAll()">🗑️ Reset Scores &amp; Badges</button>
+    </div>
+    <div class="badges-grid" id="badges-grid"></div>
+    <h4 style="margin:14px 0 4px">📜 Recent Sessions</h4>
+    <ul class="hist-list" id="hist-list"></ul>
+  </section>
+</main>
+
+<script src="portal.js"></script>
+<script>
+Portal.mountBar("portal-nav", { active: "home", cls: "7" });
+
+function renderHub() {
+  const st = Portal.getState();
+  document.getElementById("hero-stats").innerHTML = `
+    <div class="stat-box"><b>⭐ ${st.c7Stars || 0}</b><span>Class 7 Stars</span></div>
+    <div class="stat-box"><b>⚔️ ${st.c9Games || 0}</b><span>Class 9 Battles</span></div>
+    <div class="stat-box"><b>🏆 ${st.c9Best || 0}</b><span>Top Team Score</span></div>
+    <div class="stat-box"><b>🏅 ${st.badges.length}/${Portal.BADGE_CATALOG.length}</b><span>Badges Unlocked</span></div>
+  `;
+
+  document.getElementById("badges-grid").innerHTML = Portal.BADGE_CATALOG.map(b => {
+    const ok = st.badges.includes(b.id);
+    return `<span class="badge-chip ${ok ? "earned" : ""}" title="${b.desc}">${ok ? b.icon : "🔒"} ${b.title}</span>`;
+  }).join("");
+
+  const hist = document.getElementById("hist-list");
+  if (!st.history.length) {
+    hist.innerHTML = `<li style="color:var(--mut)">No completed rounds yet — launch Class 7 or Class 9 to get started!</li>`;
+  } else {
+    hist.innerHTML = st.history.map(h => `<li><span><b>${h.cls}</b> · ${h.summary}</span><span style="color:var(--mut)">${h.at}</span></li>`).join("");
+  }
+}
+
+function quickIcebreaker() {
+  Portal.openPoll(
+    "Warmup Poll: Where do you use AI the most every day?",
+    ["📱 Face Unlock / Camera", "🎬 YouTube / Music Suggestions", "🗣️ Voice Assistant / Translate", "🎮 Games & Filters"]
+  );
+}
+
+function resetAll() {
+  Portal.resetStats();
+  Portal.toast("Scores & badges reset!");
+  renderHub();
+}
+
+renderHub();
+</script>
+</body>
+</html>

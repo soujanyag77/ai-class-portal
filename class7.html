@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Adventure Lab – Class 7</title>
+<link rel="stylesheet" href="portal.css">
+<style>
+body {
+  font-family: "Trebuchet MS", system-ui, -apple-system, sans-serif;
+}
+.sub-hdr {
+  max-width: 1020px;
+  margin: 12px auto 0;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sub-hdr h1 { margin: 0; font-size: 1.45rem; flex: 1; }
+.star-pill {
+  background: linear-gradient(135deg, #f7c600, #ff9900);
+  color: #1d1838;
+  font-weight: 900;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 1.05rem;
+}
+.spot-strip {
+  max-width: 1020px;
+  margin: 10px auto 0;
+  padding: 0 16px;
+}
+.spot-inner {
+  background: var(--card);
+  border: 2px dashed var(--a);
+  border-radius: 14px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-weight: 700;
+}
+main { max-width: 1020px; margin: 0 auto; padding: 14px 16px 36px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.tile {
+  background: var(--card);
+  border: 3px solid var(--line);
+  border-radius: 20px;
+  padding: 18px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+  box-shadow: var(--shadow);
+}
+.tile:hover { transform: translateY(-3px) scale(1.02); border-color: var(--a); }
+.tile b { display: block; font-size: 2.8rem; margin-bottom: 6px; }
+.tile small { color: var(--mut); font-weight: 600; }
+
+button.gbtn {
+  font: inherit;
+  font-weight: 800;
+  border: 0;
+  border-radius: 14px;
+  padding: 11px 18px;
+  background: var(--b);
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: transform 0.1s, opacity 0.15s;
+}
+button.gbtn:active { transform: scale(0.95); }
+button.gbtn:disabled { opacity: 0.5; cursor: default; }
+
+.card {
+  background: var(--card);
+  border: 3px solid var(--line);
+  border-radius: 22px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.big { font-size: 4.8rem; line-height: 1.1; margin: 6px 0; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; margin: 10px 0; }
+.msg { min-height: 2.8em; font-size: 1.12rem; font-weight: 700; margin-top: 8px; }
+.ok { color: var(--ok); }
+.no { color: var(--no); }
+.sw { width: 46px; height: 46px; border-radius: 50%; border: 4px solid var(--line); padding: 0; color: #000; font-size: 1.1rem; font-weight: 900; cursor: pointer; }
+.sw.on { border-color: var(--ink); transform: scale(1.15); }
+canvas { background: #fff; border: 4px solid var(--line); border-radius: 16px; max-width: 100%; touch-action: none; cursor: crosshair; }
+
+#px {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+  max-width: 500px;
+  margin: 10px auto;
+  touch-action: none;
+  user-select: none;
+}
+#px div {
+  aspect-ratio: 1;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #444;
+  background: #fff;
+  transition: transform 0.12s, background 0.15s;
+}
+#px div.pop { transform: scale(1.12); }
+
+.strip { background: var(--bg); border: 2px solid var(--line); border-radius: 14px; padding: 8px 12px; font-weight: 700; margin-bottom: 8px; }
+.hide { display: none !important; }
+.sh { stroke: #333; stroke-width: 3; fill: #fff; transition: fill 0.25s; }
+@keyframes bob { 50% { transform: translateY(-12px) rotate(2deg); } }
+.wake { animation: bob 0.6s infinite; }
+input.ginp { font: inherit; padding: 8px 12px; border-radius: 12px; border: 3px solid var(--line); font-size: 1.05rem; background: var(--bg); color: var(--ink); }
+
+.dgal { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; margin: 10px 0; }
+.dtile { background: var(--bg); border: 3px solid var(--line); border-radius: 14px; padding: 6px; font-size: 0.8rem; font-weight: 700; }
+.dtile b { display: block; font-size: 2rem; }
+.dtile.tg { border-color: var(--a); box-shadow: 0 0 0 3px var(--a); }
+.dtile.ai { border-color: var(--b); background: rgba(255, 122, 89, 0.2); }
+
+.bar { display: flex; align-items: center; gap: 8px; margin: 4px auto; max-width: 440px; text-align: left; font-size: 0.92rem; font-weight: 700; }
+.bar span { width: 145px; }
+.bar i { display: block; height: 13px; border-radius: 6px; background: var(--a); transition: width 0.25s; }
+
+.streak-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff7a59, #f4b400);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.9rem;
+}
+.mem-gal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.mem-item {
+  background: var(--bg);
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  padding: 4px 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.mem-item img { width: 38px; height: 38px; border-radius: 6px; background: #fff; border: 1px solid var(--line); }
+
+.prog-wrap {
+  max-width: 500px;
+  margin: 8px auto;
+  height: 14px;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.prog-fill { height: 100%; background: var(--ok); width: 0%; transition: width 0.2s; }
+</style>
+</head>
+<body>
+<nav id="portal-nav"></nav>
+
+<div class="sub-hdr">
+  <h1>🧪 AI Adventure Lab · Class 7</h1>
+  <span class="star-pill" id="stars">⭐ 0</span>
+  <button class="gbtn" style="background:var(--a)" onclick="home()">🏠 Missions</button>
+</div>
+
+<div class="spot-strip">
+  <div class="spot-inner">
+    <span id="spot-label">🎤 On Stage: Whole Class (or tap Pick Student to call someone up!)</span>
+    <button class="p-pill warm" onclick="Portal.openPicker('7', setSpotlight)">🎲 Pick Next Student</button>
+  </div>
+</div>
+
+<main>
+  <section id="s-home">
+    <p style="text-align:center;font-size:1.18rem;font-weight:700">Pick a mission, call students to the board, vote together &amp; collect ⭐ stars!</p>
+    <div class="grid">
+      <div class="tile" onclick="go('ai')"><b>🕵️</b>Is it AI?<br><small>Streak showdown + Class Poll</small></div>
+      <div class="tile" onclick="go('pat')"><b>🔮</b>Train &amp; Predict<br><small>Data → pattern → prediction</small></div>
+      <div class="tile" onclick="go('pix')"><b>🎨</b>Colour by Number<br><small>5 Mystery Pictures + Team Relay</small></div>
+      <div class="tile" onclick="go('train')"><b>🧠</b>Teach the Robot<br><small>Train &amp; see its memory live!</small></div>
+      <div class="tile" onclick="go('free')"><b>🖍️</b>AI Colour Lab<br><small>Robot battle + Doodle Studio</small></div>
+    </div>
+  </section>
+
+  <!-- Mission 1: Is it AI? -->
+  <section id="s-ai" class="hide">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">🕵️ Is it AI?</h2>
+        <div class="row" style="margin:0">
+          <span id="ai-streak" class="streak-badge hide">🔥 Streak: 0</span>
+          <button class="p-pill" id="ai-blitz-btn" onclick="toggleBlitz()">⏱️ Blitz: OFF</button>
+          <button class="p-pill" id="ai-poll-btn" onclick="pollAI()">🙋 Ask Class</button>
+        </div>
+      </div>
+      <div id="ai-tbar-wrap" class="prog-wrap hide"><div id="ai-tbar" class="prog-fill" style="background:var(--b)"></div></div>
+      <div class="big" id="ai-e"></div>
+      <div style="font-size:1.4rem;font-weight:700" id="ai-t"></div>
+      <div class="row" id="ai-b"></div>
+      <div class="msg" id="ai-m"></div>
+    </div>
+  </section>
+
+  <!-- Mission 2: Train & Predict -->
+  <section id="s-pat" class="hide">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">🔮 Train &amp; Predict</h2>
+        <button class="p-pill" onclick="pollPat()">🙋 Class Hypothesis Poll</button>
+      </div>
+      <div id="pt-body"></div>
+    </div>
+  </section>
+
+  <!-- Mission 3: Colour by Number -->
+  <section id="s-pix" class="hide">
+    <div class="card">
+      <h2>🎨 Colour by Number · Mystery Pixel Relay</h2>
+      <p style="margin:4px 0">Pick a colour code, then tap the matching numbers. Try <b>Team Relay</b> so Team 🔴 &amp; Team 🔵 race to reveal it!</p>
+      <div class="row">
+        <button class="p-pill primary" id="px-mode-btn" onclick="togglePxRelay()">👥 Mode: Whole Class</button>
+        <span id="px-relay-turn" class="strip hide" style="margin:0"></span>
+      </div>
+      <div class="row" id="pks"></div>
+      <div class="row" id="pal"></div>
+      <div class="prog-wrap"><div class="prog-fill" id="px-prog"></div></div>
+      <div id="px"></div>
+      <div class="msg" id="pxm"></div>
+    </div>
+  </section>
+
+  <!-- Mission 4: Teach the Robot -->
+  <section id="s-train" class="hide">
+    <div class="card">
+      <h2>🧠 Teach the Robot</h2>
+      <div class="strip">📥 Collect data → 🏷️ Label → 🧠 Train → 🔮 Predict → 📏 Evaluate</div>
+      <p>Have different students draw shapes, label them (teach each shape a few times), then draw a test shape and press <b>Guess</b>!</p>
+      <canvas id="tc" width="300" height="300"></canvas>
+      <div class="row">
+        <button class="gbtn" onclick="tAdd('⭕ Circle')">Teach: ⭕ Circle</button>
+        <button class="gbtn" onclick="tAdd('➕ Plus')">Teach: ➕ Plus</button>
+        <button class="gbtn" onclick="tAdd('🔺 Triangle')">Teach: 🔺 Triangle</button>
+      </div>
+      <div class="row">
+        <button class="gbtn" style="background:var(--ok)" onclick="tGuess()">🤖 Guess my drawing!</button>
+        <button class="gbtn" style="background:var(--a)" onclick="tClear()">🧽 Erase</button>
+        <button class="p-pill" onclick="tInit()">🗑️ Reset Robot Brain</button>
+      </div>
+      <div class="msg" id="tm"></div>
+      <div id="tbars"></div>
+      <div class="row" id="tfb"></div>
+      <div class="strip" id="tacc"></div>
+      <div id="tc-n"></div>
+      <div class="mem-gal" id="tmem"></div>
+    </div>
+  </section>
+
+  <!-- Mission 5: AI Colour Lab & Doodle Studio -->
+  <section id="s-free" class="hide">
+    <div class="card">
+      <h2>🖍️ AI Colour Lab: Build &amp; Wake Up Your AI Robot!</h2>
+      <div class="row">
+        <b id="tsc" style="font-size:1.45rem"></b>
+        <span id="tturn" class="strip" style="margin:0"></span>
+      </div>
+      <div class="strip" id="fm"></div>
+      <div style="height:12px;background:var(--line);border-radius:8px;overflow:hidden">
+        <div id="tfill" style="height:100%;width:100%;background:var(--ok);transition:width 1s linear"></div>
+      </div>
+      <div class="row" id="fc"></div>
+      <svg id="rob" viewBox="0 0 300 340" style="max-width:330px;width:100%">
+        <g stroke="#333" stroke-width="3" fill="#cfd6e0">
+          <rect x="60" y="185" width="45" height="18" rx="8"/>
+          <rect x="195" y="185" width="45" height="18" rx="8"/>
+          <rect x="115" y="272" width="26" height="48" rx="8"/>
+          <rect x="160" y="272" width="26" height="48" rx="8"/>
+          <rect x="145" y="45" width="10" height="25"/>
+          <rect x="95" y="75" width="110" height="95" rx="18"/>
+          <path d="M130 152h40" stroke-width="5"/>
+        </g>
+        <g id="rp3" onclick="fPart(3)" style="cursor:pointer"><circle class="sh" cx="150" cy="28" r="22"/><text x="150" y="37" text-anchor="middle" font-size="24">🔮</text></g>
+        <g id="rp2" onclick="fPart(2)" style="cursor:pointer"><ellipse class="sh" cx="150" cy="70" rx="42" ry="17"/><text x="150" y="79" text-anchor="middle" font-size="22">🧠</text></g>
+        <g id="rp0" onclick="fPart(0)" style="cursor:pointer"><circle class="sh" cx="125" cy="115" r="16"/><circle class="sh" cx="175" cy="115" r="16"/><circle cx="125" cy="115" r="5" fill="#222"/><circle cx="175" cy="115" r="5" fill="#222"/></g>
+        <g id="rp1" onclick="fPart(1)" style="cursor:pointer"><rect class="sh" x="76" y="100" width="19" height="40" rx="6"/><rect class="sh" x="205" y="100" width="19" height="40" rx="6"/><text x="85" y="95" text-anchor="middle" font-size="14">👂</text><text x="215" y="95" text-anchor="middle" font-size="14">👂</text></g>
+        <g id="rp4" onclick="fPart(4)" style="cursor:pointer"><rect class="sh" x="105" y="175" width="90" height="97" rx="12"/><text x="150" y="205" text-anchor="middle" font-size="24">💾</text></g>
+        <g id="rp5" onclick="fPart(5)" style="cursor:pointer"><circle class="sh" cx="150" cy="243" r="20"/><text x="150" y="251" text-anchor="middle" font-size="22">⚖️</text></g>
+      </svg>
+      <div class="msg" id="fm2"></div>
+      <div class="row hide" id="fwake">
+        <input class="ginp" id="rn" placeholder="Name your AI robot">
+        <button class="gbtn" onclick="fWake()">⚡ Wake it up!</button>
+        <button class="gbtn" style="background:var(--a)" onclick="fReset()">🔁 New robot</button>
+      </div>
+
+      <hr style="border:0;border-top:2px solid var(--line);margin:20px 0">
+      <h3>🎨 Doodle Studio: Draw it – the AI guesses!</h3>
+      <div class="strip">Pick a secret icon (or call a student up!), draw it, and watch the AI try to match your doodle!</div>
+      <div class="dgal" id="dgal"></div>
+      <div class="row">
+        <button class="gbtn" onclick="dPick()">🎲 Pick my icon!</button>
+        <b id="dpk" style="font-size:1.3rem">No icon yet</b>
+      </div>
+      <div class="row" id="dpal"></div>
+      <div class="row">
+        <button class="gbtn" style="background:var(--a)" onclick="dbw=5">Thin</button>
+        <button class="gbtn" style="background:var(--a)" onclick="dbw=12">Thick</button>
+        <button class="gbtn" style="background:var(--a)" onclick="dbw=26">Jumbo</button>
+        <button class="gbtn" onclick="drb=1">🌈 Rainbow</button>
+        <button class="gbtn" onclick="dUndo()">↩️ Undo</button>
+        <button class="gbtn" onclick="dClear()">🗑️ Clear</button>
+      </div>
+      <canvas id="dcv" width="480" height="360"></canvas>
+      <div class="row"><button class="gbtn" style="background:var(--ok)" onclick="dCheck()">🤖 Check my drawing!</button></div>
+      <div class="msg" id="dm"></div>
+      <div class="row" id="dyn"></div>
+      <div id="dbars"></div>
+      <div class="strip" id="dsc">📏 AI score: no drawings yet</div>
+    </div>
+  </section>
+</main>
+
+<script src="portal.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let stars = 0;
+const R = a => a[Math.floor(Math.random() * a.length)];
+const sh = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+function setSpotlight(text) {
+  $("spot-label").innerHTML = `🎤 On Stage: <b style="color:var(--a)">${text}</b>`;
+}
+
+Portal.mountBar("portal-nav", { active: "7", cls: "7", onPick: setSpotlight });
+
+function syncStars() {
+  $("stars").textContent = "⭐ " + stars + " (Total: " + (Portal.getState().c7Stars || 0) + ")";
+}
+function star(n = 1) {
+  stars += n;
+  Portal.addC7Stars(n);
+  syncStars();
+}
+syncStars();
+
+function go(n) {
+  clearInterval(aiTimer);
+  clearInterval(tid);
+  document.querySelectorAll("section").forEach(s => s.classList.add("hide"));
+  $("s-" + n).classList.remove("hide");
+  Portal.SFX.pop();
+  ({ ai: aiInit, pat: ptInit, pix: pxInit, train: tInit, free: fInit }[n])();
+}
+function home() {
+  clearInterval(aiTimer);
+  clearInterval(tid);
+  document.querySelectorAll("section").forEach(s => s.classList.add("hide"));
+  $("s-home").classList.remove("hide");
+}
+
+/* ---- Mission 1: Is it AI? ---- */
+const V = "👁️ Vision", L = "🗣️ Language", P = "🎯 Prediction", B = "🦾 Robotics";
+const POOL = [
+  ["📱", "Phone unlocks by recognising your face", 1, V, "It learned face patterns from many images."],
+  ["🎬", "Video app suggests what you may like next", 1, P, "It predicts your taste from what you watched."],
+  ["🗣️", "Assistant answers “What’s the weather?”", 1, L, "It turns speech into meaning using language AI."],
+  ["🚗", "Car sees lanes and brakes by itself", 1, V, "Cameras plus learning = computer vision."],
+  ["🌐", "App translates Telugu to English", 1, L, "It learned from huge amounts of text."],
+  ["🏥", "Software spots illness in X-ray pictures", 1, V, "Trained on thousands of labelled scans."],
+  ["🌧️", "Model predicts tomorrow’s rain from old data", 1, P, "It finds patterns in past weather data."],
+  ["🧹", "Robot vacuum maps the room and avoids chairs", 1, B, "Sensors plus learning help it move smartly."],
+  ["✉️", "Mail app filters spam by learning from examples", 1, P, "It learned what spam looks like."],
+  ["💬", "Chatbot writes a story from your idea", 1, L, "Generative AI learned patterns of language."],
+  ["🔦", "Torch turns on with a switch", 0, 0, "A fixed switch – no learning."],
+  ["🧮", "Calculator adds 2 + 2", 0, 0, "Fixed rules, same answer every time."],
+  ["🚦", "Traffic light changes every 60 seconds", 0, 0, "Just a timer – it doesn’t learn."],
+  ["🚪", "Door opens when a sensor detects motion", 0, 0, "Simple rule: motion → open. No learning."],
+  ["📊", "Spreadsheet adds up a column", 0, 0, "Follows a formula, learns nothing."],
+  ["♟️", "Toy plays only pre-programmed moves", 0, 0, "A fixed script – it never improves."],
+  ["⏰", "Alarm rings at 6:00 AM", 0, 0, "Does only what it was set to do."],
+  ["🎮", "Game character repeats the same path", 0, 0, "Hard-coded path, no learning."]
+];
+let aq = [], ai = 0, as = 0, streak = 0, blitz = false, aiTimer = null, aiLeft = 12;
+
+function toggleBlitz() {
+  blitz = !blitz;
+  $("ai-blitz-btn").textContent = blitz ? "⏱️ Blitz: ON (12s)" : "⏱️ Blitz: OFF";
+  $("ai-blitz-btn").classList.toggle("warm", blitz);
+  if (!blitz) { clearInterval(aiTimer); $("ai-tbar-wrap").classList.add("hide"); }
+  else if (ai < 8) startAiClock();
+}
+
+function startAiClock() {
+  clearInterval(aiTimer);
+  if (!blitz || ai >= 8) { $("ai-tbar-wrap").classList.add("hide"); return; }
+  $("ai-tbar-wrap").classList.remove("hide");
+  aiLeft = 12;
+  $("ai-tbar").style.width = "100%";
+  aiTimer = setInterval(() => {
+    if ($("s-ai").classList.contains("hide")) { clearInterval(aiTimer); return; }
+    aiLeft -= 0.25;
+    $("ai-tbar").style.width = Math.max(0, (aiLeft / 12) * 100) + "%";
+    if (aiLeft <= 0) {
+      clearInterval(aiTimer);
+      Portal.SFX.bad();
+      streak = 0;
+      updateStreak();
+      const q = aq[ai];
+      $("ai-m").innerHTML = `<span class="no">⏰ Time up!</span> It was <b>${q[2] ? "🤖 AI" : "🙂 Not AI"}</b>. ${q[4]}`;
+      $("ai-b").innerHTML = nx;
+    }
+  }, 250);
+}
+
+function updateStreak() {
+  const el = $("ai-streak");
+  if (streak >= 2) { el.classList.remove("hide"); el.textContent = `🔥 Streak: ${streak}x`; }
+  else el.classList.add("hide");
+}
+
+function aiInit() { aq = sh(POOL).slice(0, 8); ai = 0; as = 0; streak = 0; updateStreak(); aiShow(); }
+
+function aiShow() {
+  clearInterval(aiTimer);
+  if (ai >= 8) {
+    $("ai-tbar-wrap").classList.add("hide");
+    $("ai-e").textContent = "🏆";
+    $("ai-t").textContent = `Round over! You got ${as} / 8 correct.`;
+    $("ai-b").innerHTML = '<button class="gbtn" onclick="aiInit()">🔀 New random round</button>';
+    $("ai-m").textContent = "";
+    if (as >= 6) Portal.unlockBadge("c7_detective");
+    Portal.recordC7Milestone(`Is it AI? ${as}/8`);
+    Portal.confetti(35);
+    Portal.SFX.win();
+    return;
+  }
+  const q = aq[ai];
+  $("ai-e").textContent = q[0];
+  $("ai-t").textContent = (ai + 1) + "/8 · " + q[1];
+  $("ai-m").textContent = "";
+  $("ai-b").innerHTML = '<button class="gbtn" style="background:var(--a)" onclick="aiAns(1)">🤖 AI</button><button class="gbtn" onclick="aiAns(0)">🙂 Not AI</button>';
+  startAiClock();
+}
+const nx = '<button class="gbtn" onclick="ai++;aiShow()">Next ➡️</button>';
+
+function aiAns(v) {
+  clearInterval(aiTimer);
+  const q = aq[ai], r = v === q[2];
+  if (r) {
+    as++; streak++; updateStreak();
+    const bonus = streak >= 3 ? 2 : 1;
+    star(bonus);
+    Portal.SFX.good();
+    Portal.confetti(14);
+  } else {
+    streak = 0; updateStreak();
+    Portal.SFX.bad();
+  }
+  if (r && q[2]) {
+    $("ai-m").innerHTML = `<span class="ok">✅ Yes, AI! +${streak >= 3 ? 2 : 1} ⭐</span> Which AI skill is it?`;
+    $("ai-b").innerHTML = sh([q[3], ...sh([V, L, P, B].filter(x => x != q[3])).slice(0, 2)])
+      .map(x => `<button class="gbtn" style="background:var(--a)" onclick="aiDom('${x}')">${x}</button>`).join("");
+    return;
+  }
+  $("ai-m").innerHTML = (r ? '<span class="ok">✅ Correct! +1 ⭐</span> ' : '<span class="no">❌ Not quite.</span> ') + q[4];
+  $("ai-b").innerHTML = nx;
+}
+function aiDom(x) {
+  const q = aq[ai], r = x === q[3];
+  if (r) { star(); Portal.SFX.good(); } else Portal.SFX.bad();
+  $("ai-m").innerHTML = (r ? '<span class="ok">🌟 Right! +1 ⭐</span> ' : '<span class="no">It was ' + q[3] + '.</span> ') + q[4];
+  $("ai-b").innerHTML = nx;
+}
+function pollAI() {
+  if (ai >= 8) return;
+  Portal.openPoll(aq[ai][1], ["🤖 AI", "🙂 Not AI"]);
+}
+
+/* ---- Mission 2: Train & Predict ---- */
+let pr;
+const lab = p => pr.f == "c" ? p[0] == pr.v : p[1] == pr.v;
+const ptI = p => `<span style="font-size:${p[1] ? "3.6rem" : "1.6rem"}">${["🔴", "🔵"][p[0]]}</span>`;
+function ptInit() {
+  const all = [[0, 0], [0, 1], [1, 0], [1, 1]];
+  pr = { f: R(["c", "s"]), v: R([0, 1]), tr: sh([...all, R(all), R(all)]), te: sh(all).slice(0, 3), i: 0, m: "" };
+  ptShow();
+}
+function ptShow() {
+  let h = `<p>📚 <b>Training data</b> – the AI studies these labelled examples and hunts for a pattern:</p><div class="grid" style="grid-template-columns:repeat(6,1fr)">` +
+    pr.tr.map(p => `<div class="tile" style="padding:6px;cursor:default">${ptI(p)}<br><b class="${lab(p) ? "ok" : "no"}">${lab(p) ? "✅ Yes" : "❌ No"}</b></div>`).join("") + `</div>`;
+  if (pr.i < 3) h += `<p>🔮 <b>Prediction ${pr.i + 1}/3!</b> What label will the AI give this new one?</p><div class="big">${ptI(pr.te[pr.i])}</div><div class="row"><button class="gbtn" style="background:var(--ok)" onclick="ptA(1)">✅ Yes</button><button class="gbtn" onclick="ptA(0)">❌ No</button></div>`;
+  else if (pr.i == 3) h += `<p>🧩 Which <b>feature</b> did the AI use to decide?</p><div class="row"><button class="gbtn" onclick="ptF('c')">🎨 Colour</button><button class="gbtn" onclick="ptF('s')">📏 Size</button></div>`;
+  $("pt-body").innerHTML = h + `<div class="msg">${pr.m}</div>`;
+}
+function ptA(a) {
+  const r = (a == 1) == lab(pr.te[pr.i]);
+  if (r) { star(); Portal.SFX.good(); } else Portal.SFX.bad();
+  pr.m = r ? "✅ Correct! +1 ⭐" : "❌ Not quite – look at the pattern again.";
+  pr.i++; ptShow();
+}
+function ptF(f) {
+  const r = f == pr.f, n = pr.f == "c" ? "colour = " + ["red", "blue"][pr.v] : "size = " + ["small", "big"][pr.v];
+  if (r) { star(2); Portal.SFX.win(); Portal.confetti(26); Portal.unlockBadge("c7_predictor"); } else Portal.SFX.bad();
+  pr.i = 4;
+  pr.m = (r ? "🌟 Yes! +2 ⭐ " : "Not this time. ") + "The pattern (<b>feature</b>) was <b>" + n + "</b> → “Yes”. That is machine learning: <b>data → pattern → prediction</b>.<br><br><button class='gbtn' onclick='ptInit()'>🔀 New puzzle</button>";
+  ptShow();
+}
+function pollPat() {
+  if (!pr || pr.i >= 3) {
+    Portal.openPoll("Which feature decided the rule?", ["🎨 Colour", "📏 Size"]);
+  } else {
+    Portal.openPoll("What will the AI predict for this example?", ["✅ Yes", "❌ No"]);
+  }
+}
+
+/* ---- Mission 3: Colour by Number (with Team Relay & 5 Mysteries!) ---- */
+const PAL = [["sky", "#bfe3ff"], ["grey", "#9aa4b2"], ["cyan", "#19b8d6"], ["red", "#e23d3d"], ["yellow", "#f7c600"]];
+const PIC = [
+  ["🤖 Robot", ["0000440000", "0000110000", "0111111110", "0112112110", "0111111110", "0113333110", "0001111000", "0111221110", "0111221110", "0011001100"]],
+  ["💖 Heart", ["0000000000", "0330003300", "3333033333", "3333333333", "3333333333", "0333333330", "0033333300", "0003333000", "0000330000", "0000000000"]],
+  ["🚀 Rocket", ["0000330000", "0003333000", "0001111000", "0001221000", "0001221000", "0001111000", "0031111300", "0331111330", "0000440000", "0000040000"]],
+  ["🦉 Night Owl", ["0011001100", "0111111110", "0142112410", "0111441110", "0111111110", "0014444100", "0014444100", "0011441100", "0004004000", "0000000000"]],
+  ["🛸 Space UFO", ["0000220000", "0002222000", "0011111100", "0114114110", "1111111111", "0011111100", "0004004000", "0040000400", "0400000040", "0000000000"]]
+];
+let pk = 0, pc = 1, pd = 0, pn = 0, pxRelay = false, pxTeam = 0, pxLeft = 5, pxScores = [0, 0];
+
+function pxInit() {
+  $("pks").innerHTML = PIC.map((p, i) => `<button class="gbtn" onclick="pxLoad(${i})">🎁 Mystery ${i + 1}</button>`).join("");
+  $("pal").innerHTML = PAL.map((c, i) => `<button class="sw" id="pl${i}" style="background:${c[1]}" onclick="pxSel(${i})">${i}</button>`).join("");
+  pxSel(1);
+  pxLoad(0);
+}
+function togglePxRelay() {
+  pxRelay = !pxRelay;
+  $("px-mode-btn").textContent = pxRelay ? "⚔️ Mode: Team Relay (5 taps/turn)" : "👥 Mode: Whole Class";
+  $("px-relay-turn").classList.toggle("hide", !pxRelay);
+  pxUpdateRelayUI();
+}
+function pxUpdateRelayUI() {
+  if (!pxRelay) return;
+  $("px-relay-turn").innerHTML = `🔴 ${pxScores[0]} vs 🔵 ${pxScores[1]} · Turn: <b>Team ${pxTeam ? "🔵" : "🔴"}</b> (${pxLeft} left)`;
+}
+function pxSel(i) { pc = i; PAL.forEach((_, j) => $("pl" + j).classList.toggle("on", j == i)); Portal.SFX.pop(); }
+function pxLoad(k) {
+  pk = k; pn = 0; pxTeam = 0; pxLeft = 5; pxScores = [0, 0];
+  $("px-prog").style.width = "0%";
+  $("pxm").textContent = "❓ What is hiding? Colour every square to find out!";
+  $("px").innerHTML = PIC[k][1].join("").split("").map(v => `<div data-v="${v}">${v}</div>`).join("");
+  pxUpdateRelayUI();
+}
+function pxHit(e) {
+  const t = document.elementFromPoint(e.clientX, e.clientY);
+  if (!t || t.dataset.v === undefined || t.dataset.d) return;
+  if (+t.dataset.v == pc) {
+    t.dataset.d = 1;
+    t.style.background = PAL[pc][1];
+    t.style.color = "transparent";
+    t.classList.add("pop");
+    setTimeout(() => t.classList.remove("pop"), 150);
+    Portal.SFX.tick();
+    pn++;
+    $("px-prog").style.width = pn + "%";
+    if (pxRelay) {
+      pxScores[pxTeam]++;
+      if (--pxLeft <= 0) { pxTeam = 1 - pxTeam; pxLeft = 5; Portal.SFX.pop(); }
+      pxUpdateRelayUI();
+    }
+    if (pn == 100) {
+      star(3);
+      Portal.SFX.win();
+      Portal.confetti(40);
+      Portal.unlockBadge("c7_pixel");
+      Portal.recordC7Milestone(`Revealed ${PIC[pk][0]}`);
+      const relayWin = pxRelay ? `<br>🏆 ${pxScores[0] === pxScores[1] ? "Relay Tie!" : `Team ${pxScores[0] > pxScores[1] ? "🔴" : "🔵"} wins (${pxScores[0]}–${pxScores[1]})!`}` : "";
+      $("pxm").innerHTML = `🎉 It’s a <b>${PIC[pk][0]}</b>! +3 ⭐${relayWin}<br><small>Computers store pictures as numbers – every number is a colour code. AI “sees” by reading these numbers.</small>`;
+    }
+  } else {
+    t.style.background = "#ffb3b3";
+    setTimeout(() => { if (!t.dataset.d) t.style.background = "#fff"; }, 300);
+  }
+}
+$("px").onpointerdown = e => { pd = 1; pxHit(e); };
+$("px").onpointermove = e => { if (pd) pxHit(e); };
+addEventListener("pointerup", () => pd = 0);
+
+/* ---- Drawing helper ---- */
+function pad(c, st) {
+  const x = c.getContext("2d"); x.lineCap = x.lineJoin = "round"; let d = 0, l;
+  const P = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) * c.width / r.width, (e.clientY - r.top) * c.height / r.height]; };
+  c.onpointerdown = e => { d = 1; l = P(e); c.setPointerCapture(e.pointerId); seg(l, l); };
+  c.onpointermove = e => { if (!d) return; const p = P(e); seg(l, p); l = p; };
+  c.onpointerup = () => d = 0;
+  function seg(a, b) { const s = st(); x.strokeStyle = s[0]; x.lineWidth = s[1]; x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); }
+  return x;
+}
+function blank(c) { const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); }
+
+/* ---- Mission 4: Teach the Robot (with visual memory thumbnails + confidence bars!) ---- */
+let tx, S = [], ta = [0, 0], lg;
+function tInit() {
+  if (!tx) tx = pad($("tc"), () => ["#222", 16]);
+  S = []; ta = [0, 0]; tClear(); tCount();
+  $("tacc").textContent = "📏 Accuracy: no tests yet";
+  $("tmem").innerHTML = "";
+}
+function tClear() { blank($("tc")); $("tm").textContent = ""; $("tfb").innerHTML = ""; $("tbars").innerHTML = ""; }
+function cnt() { const n = {}; S.forEach(s => n[s.l] = (n[s.l] || 0) + 1); return n; }
+function tCount() {
+  const n = cnt();
+  $("tc-n").innerHTML = "📓 <b>Training data</b> (" + S.length + " examples): " + (S.length ? Object.entries(n).map(([k, v]) => k + " × " + v).join(" · ") : "empty – teach me!");
+  $("tmem").innerHTML = S.slice(-12).map(s => `<div class="mem-item"><img src="${s.thumb}" alt=""><span>${s.l.split(" ")[0]}</span></div>`).join("");
+}
+function vec() {
+  const c = $("tc"), d = tx.getImageData(0, 0, c.width, c.height).data;
+  let a = 1e9, b = 1e9, e = -1, f = -1;
+  for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4] < 160) { if (x < a) a = x; if (x > e) e = x; if (y < b) b = y; if (y > f) f = y; }
+  if (e < 0) return null;
+  const t = document.createElement("canvas"); t.width = t.height = 12;
+  const q = t.getContext("2d"); q.fillStyle = "#fff"; q.fillRect(0, 0, 12, 12); q.imageSmoothingQuality = "high";
+  q.drawImage(c, a, b, e - a + 1, f - b + 1, 0, 0, 12, 12);
+  const u = q.getImageData(0, 0, 12, 12).data, v = [];
+  for (let i = 0; i < 144; i++) v.push(255 - u[i * 4]);
+  const th = document.createElement("canvas"); th.width = th.height = 40;
+  const tq = th.getContext("2d"); tq.fillStyle = "#fff"; tq.fillRect(0, 0, 40, 40);
+  tq.drawImage(c, 0, 0, 40, 40);
+  return { v, thumb: th.toDataURL() };
+}
+function tAdd(l) {
+  const res = vec();
+  if (!res) { $("tm").textContent = "Draw something first! ✏️"; return; }
+  S.push({ l, v: res.v, thumb: res.thumb });
+  Portal.SFX.pop();
+  tClear(); tCount();
+  $("tm").innerHTML = '<span class="ok">🏷️ Labelled as ' + l + ' – saved into the robot’s memory!</span>';
+}
+function tGuess() {
+  const res = vec();
+  if (!res) { $("tm").textContent = "Draw something for the robot to guess! ✏️"; return; }
+  if (new Set(S.map(s => s.l)).size < 2) { $("tm").textContent = "Teach at least 2 different shapes first 📚"; return; }
+  const v = res.v, m = {};
+  S.forEach(s => { let d = 0; for (let i = 0; i < 144; i++) d += (s.v[i] - v[i]) ** 2; m[s.l] = Math.min(m[s.l] ?? 1e18, d); });
+  const w = Object.entries(m).map(([l, d]) => [l, 1 / (d + 1)]), sum = w.reduce((a, b) => a + b[1], 0);
+  w.sort((a, b) => b[1] - a[1]); lg = w[0][0];
+  const n = Object.values(cnt()), lo = Math.min(...n), hi = Math.max(...n);
+  const tip = lo < 3 ? "📚 Only " + lo + " example(s) of one shape – <b>more training data</b> makes AI smarter!" : hi >= lo * 3 ? "⚖️ <b>Data bias</b>: you taught far more of one shape, so the robot favours it!" : "✨ Nice, <b>balanced</b> training data!";
+  Portal.SFX.box();
+  $("tm").innerHTML = "🤖 I think it’s <b>" + lg + "</b> – confidence " + Math.round(w[0][1] / sum * 100) + "%<br><small>" + tip + "</small><br>Was the robot right?";
+  $("tbars").innerHTML = w.map(([lbl, sc]) => {
+    const pct = Math.round((sc / sum) * 100);
+    return `<div class="bar"><span>${lbl}</span><i style="width:${Math.round(pct * 1.6)}px"></i>${pct}%</div>`;
+  }).join("");
+  $("tfb").innerHTML = '<button class="gbtn" style="background:var(--ok)" onclick="tR(1)">✅ Right</button><button class="gbtn" onclick="tR(0)">❌ Wrong</button>';
+}
+function tR(r) {
+  ta[1]++; ta[0] += r;
+  if (r) { star(); Portal.SFX.good(); Portal.confetti(14); } else Portal.SFX.bad();
+  $("tacc").textContent = "📏 Accuracy: " + ta[0] + " / " + ta[1] + " = " + Math.round(ta[0] / ta[1] * 100) + "%  (evaluating = checking how often the AI is right)";
+  if (ta[1] >= 2) Portal.unlockBadge("c7_trainer");
+  $("tfb").innerHTML = ""; $("tbars").innerHTML = ""; tClear();
+}
+
+/* ---- Mission 5: AI Colour Lab & Doodle Studio ---- */
+const CT = [
+  ["👁️ Eyes", "Computer Vision", "AI that can see and understand images"],
+  ["👂 Ears", "Natural Language", "AI that listens to and understands human words"],
+  ["🧠 Brain", "Machine Learning", "computers learning from examples"],
+  ["🔮 Crystal ball", "Prediction", "AI guessing what may happen next"],
+  ["💾 Memory", "Data", "the facts and examples used to train AI"],
+  ["⚖️ Heart", "Ethics", "using AI fairly, safely and kindly"]
+];
+const FCN = ["#e23d3d", "#1e5ae6", "#2aa84a", "#f7d800", "#8c32be", "#ff9900", "#ff5fa2", "#19b8d6"];
+let fci = 0, tm = [0, 0], tt = 0, todo = [], cur = 0, left = 20, tid;
+
+function fInit() {
+  $("fc").innerHTML = FCN.map((c, i) => `<button class="sw${i ? "" : " on"}" style="background:${c}" onclick="fPick(${i})"></button>`).join("");
+  dInit();
+  fReset();
+}
+function fPick(i) {
+  fci = i;
+  [...$("fc").children].forEach((b, j) => b.classList.toggle("on", j == i));
+  Portal.SFX.pop();
+}
+function fReset() {
+  clearInterval(tid); tm = [0, 0]; tt = 0; todo = sh([0, 1, 2, 3, 4, 5]);
+  document.querySelectorAll("#rob .sh").forEach(e => e.style.fill = "#fff");
+  $("rob").classList.remove("wake");
+  $("fwake").classList.add("hide");
+  $("fm2").textContent = "";
+  fNext();
+}
+function fScore() { $("tsc").textContent = "🔴 " + tm[0] + "  vs  🔵 " + tm[1]; $("tturn").textContent = "Turn: Team " + ["🔴", "🔵"][tt]; }
+function fNext() {
+  clearInterval(tid);
+  if (!todo.length) {
+    $("fm").innerHTML = "🎉 Robot complete! " + (tm[0] == tm[1] ? "It’s a tie!" : "Team " + (tm[0] > tm[1] ? "🔴" : "🔵") + " wins!") + " Name your robot below.";
+    $("fwake").classList.remove("hide");
+    fScore();
+    Portal.SFX.win();
+    Portal.confetti(30);
+    return;
+  }
+  cur = todo[0]; left = 20; fScore();
+  $("fm").innerHTML = "🎯 <b>Team " + ["🔴", "🔵"][tt] + "</b>: which robot part is the AI’s <b>“" + CT[cur][1] + "”</b>? (“" + CT[cur][2] + "”) Pick any colour, then tap the part!";
+  $("tfill").style.width = "100%";
+  tid = setInterval(tick, 1000);
+}
+function tick() {
+  if ($("s-free").classList.contains("hide")) { clearInterval(tid); return; }
+  left--; $("tfill").style.width = left * 5 + "%";
+  if (left <= 5 && left > 0) Portal.SFX.tick();
+  if (left <= 0) {
+    Portal.SFX.bad();
+    $("fm2").innerHTML = '<span class="no">⏰ Time up! Pass to the other team.</span>';
+    tt = 1 - tt; left = 20; fScore();
+  }
+}
+function fPart(i) {
+  if (!todo.includes(i)) return;
+  if (i == cur) {
+    document.querySelectorAll("#rp" + i + " .sh").forEach(e => e.style.fill = FCN[fci]);
+    todo.shift(); tm[tt]++; star();
+    Portal.SFX.good();
+    $("fm2").innerHTML = '<span class="ok">✅ +1 ⭐ ' + CT[i][0] + " = " + CT[i][1] + ": " + CT[i][2] + ".</span>";
+    tt = 1 - tt; fNext();
+  } else {
+    Portal.SFX.bad();
+    $("fm2").innerHTML = '<span class="no">❌ That part is the ' + CT[i][0] + '. Pass to the other team!</span>';
+    tt = 1 - tt; left = 20; fScore();
+  }
+}
+function fWake() {
+  const n = ($("rn").value || "Robo").replace(/[<>&]/g, "");
+  $("rob").classList.add("wake");
+  star(3);
+  Portal.SFX.win();
+  Portal.confetti(40);
+  Portal.unlockBadge("c7_builder");
+  Portal.recordC7Milestone(`Built & woke up robot "${n}"`);
+  const speech = `Hello! I am ${n}! I can see, hear, learn, remember, predict, and I always act fairly. Thank you for building me!`;
+  $("fm2").innerHTML = "🗣️ “Hello! I am <b>" + n + "</b>! I can <b>see 👁️, hear 👂, learn 🧠, remember 💾, predict 🔮</b> and I always act <b>fairly ⚖️</b>. Thank you for building me!” <span class='ok'>+3 ⭐</span>";
+  if ("speechSynthesis" in window && Portal.getState().sound) {
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance(speech));
+    } catch (_) {}
+  }
+}
+
+/* ---- Doodle Studio ---- */
+const ICONS = [
+  ["eye", "👁️", "Eyes"], ["ear", "👂", "Ears"], ["brain", "🧠", "Brain"], ["ball", "🔮", "Crystal ball"],
+  ["mem", "💾", "Memory"], ["scale", "⚖️", "Ethics scale"], ["robot", "🤖", "Robot"], ["heart", "💖", "Heart"],
+  ["rocket", "🚀", "Rocket"], ["star", "⭐", "Star"], ["circle", "⭕", "Circle"], ["plus", "➕", "Plus"], ["tri", "🔺", "Triangle"]
+];
+const ell = (cx, cy, rx, ry, a0, a1, n = 32) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [cx + rx * Math.cos(a), cy + ry * Math.sin(a)]; });
+const circ = (x, y, r) => ell(x, y, r, r, 0, 360);
+const TPL = {
+  eye: [ell(50, 50, 45, 26, 0, 360), circ(50, 50, 13), circ(50, 50, 4)],
+  ear: [ell(50, 50, 30, 44, -110, 120), ell(50, 52, 15, 26, -60, 110)],
+  brain: [Array.from({ length: 49 }, (_, i) => { const t = i / 48 * 2 * Math.PI, r = 1 + .08 * Math.sin(8 * t); return [50 + 42 * r * Math.cos(t), 50 + 34 * r * Math.sin(t)]; }), [[50, 18], [44, 32], [56, 46], [44, 60], [52, 82]]],
+  ball: [circ(50, 40, 32), [[30, 72], [22, 92], [78, 92], [70, 72]], ell(50, 40, 20, 20, 200, 260, 6)],
+  mem: [[[15, 15], [70, 15], [85, 30], [85, 85], [15, 85], [15, 15]], [[28, 15], [28, 38], [65, 38], [65, 15]], [[28, 85], [28, 58], [72, 58], [72, 85]]],
+  scale: [[[50, 12], [50, 85]], [[28, 88], [72, 88]], [[15, 28], [85, 28]], [[15, 28], [4, 58], [26, 58], [15, 28]], [[85, 28], [74, 58], [96, 58], [85, 28]]],
+  robot: [[[20, 25], [80, 25], [80, 80], [20, 80], [20, 25]], [[50, 25], [50, 8]], circ(50, 6, 4), circ(36, 48, 6), circ(64, 48, 6), [[36, 68], [64, 68]]],
+  heart: [Array.from({ length: 41 }, (_, i) => { const t = i / 40 * 2 * Math.PI; return [50 + 43 * Math.pow(Math.sin(t), 3), 40 - 2.7 * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t))]; })],
+  rocket: [[[50, 5], [68, 30], [68, 70], [32, 70], [32, 30], [50, 5]], circ(50, 40, 8), [[32, 55], [15, 78], [32, 70]], [[68, 55], [85, 78], [68, 70]], [[42, 70], [50, 95], [58, 70]]],
+  star: [Array.from({ length: 11 }, (_, i) => { const a = (-90 + i * 36) * Math.PI / 180, r = i % 2 ? 17 : 42; return [50 + r * Math.cos(a), 55 + r * Math.sin(a)]; })],
+  circle: [circ(50, 50, 40)],
+  plus: [[[50, 10], [50, 90]], [[10, 50], [90, 50]]],
+  tri: [[[50, 10], [92, 88], [8, 88], [50, 10]]]
+};
+const G = 32;
+function blur(g, s) {
+  const r = Math.ceil(3 * s), k = []; let t = 0;
+  for (let i = -r; i <= r; i++) { const v = Math.exp(-i * i / (2 * s * s)); k.push(v); t += v; }
+  const o = new Float32Array(G * G), q = new Float32Array(G * G);
+  for (let y = 0; y < G; y++) for (let x = 0; x < G; x++) { let a = 0; for (let i = -r; i <= r; i++) { const xx = x + i; if (xx >= 0 && xx < G) a += g[y * G + xx] * k[i + r]; } o[y * G + x] = a / t; }
+  for (let y = 0; y < G; y++) for (let x = 0; x < G; x++) { let a = 0; for (let i = -r; i <= r; i++) { const yy = y + i; if (yy >= 0 && yy < G) a += o[yy * G + x] * k[i + r]; } q[y * G + x] = a / t; }
+  return q;
+}
+function ras(st) {
+  let a = 1e9, b = 1e9, c = -1e9, d = -1e9;
+  st.forEach(s => s.forEach(p => { a = Math.min(a, p[0]); c = Math.max(c, p[0]); b = Math.min(b, p[1]); d = Math.max(d, p[1]); }));
+  const w = c - a, h = d - b, m = Math.max(w, h); if (!(m >= 8)) return null;
+  const sc = (G - 8) / m, ox = (G - w * sc) / 2, oy = (G - h * sc) / 2, g = new Float32Array(G * G);
+  const T = p => [(p[0] - a) * sc + ox, (p[1] - b) * sc + oy];
+  st.forEach(s => {
+    for (let i = 0; i < s.length; i++) {
+      const u = T(s[i]), v = T(s[i + 1] || s[i]), k = Math.max(1, Math.ceil(Math.hypot(v[0] - u[0], v[1] - u[1]) / .4));
+      for (let j = 0; j <= k; j++) {
+        const x = Math.round(u[0] + (v[0] - u[0]) * j / k), y = Math.round(u[1] + (v[1] - u[1]) * j / k);
+        g[Math.min(G - 1, Math.max(0, y)) * G + Math.min(G - 1, Math.max(0, x))] = 1;
+      }
+    }
+  });
+  return [blur(g, 1.2), blur(g, 2.6)];
+}
+function corr(a, b) {
+  let ma = 0, mb = 0; const n = a.length;
+  for (let i = 0; i < n; i++) { ma += a[i]; mb += b[i]; }
+  ma /= n; mb /= n; let s = 0, x = 0, y = 0;
+  for (let i = 0; i < n; i++) { const u = a[i] - ma, v = b[i] - mb; s += u * v; x += u * u; y += v * v; }
+  return s / Math.sqrt(x * y + 1e-9);
+}
+const sim = (a, b) => .5 * corr(a[0], b[0]) + .5 * corr(a[1], b[1]);
+const EX = {};
+function match(st) { const r = ras(st); if (!r) return null; return ICONS.map(i => [i[0], Math.max(...EX[i[0]].map(e => sim(r, e)))]).sort((x, y) => y[1] - x[1]); }
+
+let dI = 0, dS = [], dtar = null, dq = [], dqi = 0, dgs = null, dci = 0, dbw = 12, drb = 0, dA = [0, 0], dL = 0, dbusy = 0;
+const dIc = id => ICONS.find(i => i[0] == id), dTxt = i => i[1] + " " + i[2];
+function dInit() {
+  if (dI) return; dI = 1;
+  ICONS.forEach(i => EX[i[0]] = [ras(TPL[i[0]])]);
+  $("dgal").innerHTML = ICONS.map(i => `<div class="dtile" id="dg-${i[0]}"><b>${i[1]}</b>${i[2]}</div>`).join("");
+  $("dpal").innerHTML = FCN.map((c, i) => `<button class="sw${i ? "" : " on"}" style="background:${c}" onclick="dCol(${i})"></button>`).join("");
+  const c = $("dcv"); blank(c); let cs = null;
+  const P = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) * c.width / r.width, (e.clientY - r.top) * c.height / r.height]; };
+  c.onpointerdown = e => { c.setPointerCapture(e.pointerId); cs = { c: drb ? `hsl(${(Math.random() * 360) | 0},90%,50%)` : FCN[dci], w: dbw, p: [P(e)] }; dS.push(cs); dLine(cs, 0); };
+  c.onpointermove = e => { if (!cs) return; cs.p.push(P(e)); dLine(cs, cs.p.length - 2); };
+  c.onpointerup = c.onpointercancel = () => cs = null;
+}
+function dLine(s, i) { const x = $("dcv").getContext("2d"), a = s.p[i], b = s.p[i + 1] || a; x.strokeStyle = s.c; x.lineWidth = s.w; x.lineCap = x.lineJoin = "round"; x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); }
+function dRedraw() { blank($("dcv")); dS.forEach(s => { for (let i = 0; i < Math.max(1, s.p.length - 1); i++) dLine(s, i); }); }
+function dCol(i) { dci = i; drb = 0; [...$("dpal").children].forEach((b, j) => b.classList.toggle("on", j == i)); }
+function dHi() { ICONS.forEach(i => { const e = $("dg-" + i[0]); e.classList.toggle("tg", !!dtar && dtar[0] == i[0]); e.classList.toggle("ai", dgs == i[0]); }); }
+function dReset() { dgs = null; dq = []; $("dm").innerHTML = ""; $("dyn").innerHTML = ""; $("dbars").innerHTML = ""; dHi(); }
+function dUndo() { dS.pop(); dRedraw(); dReset(); }
+function dClear() { dS = []; dRedraw(); dReset(); }
+function dPick() {
+  if (dbusy) return; dbusy = 1; dClear(); let k = 0;
+  const t = setInterval(() => {
+    dtar = R(ICONS); $("dpk").textContent = "🎲 …"; dHi(); Portal.SFX.spin();
+    if (++k > 12) { clearInterval(t); dbusy = 0; Portal.SFX.good(); $("dpk").innerHTML = "🎯 Your icon: <span style='font-size:2rem'>" + dtar[1] + "</span> " + dtar[2] + " – draw it!"; }
+  }, 85);
+}
+function dCheck() {
+  if (!dtar) { $("dm").textContent = "Pick your icon first 🎲"; return; }
+  const m = match(dS.map(s => s.p));
+  if (!m) { $("dm").textContent = "Draw something bigger first ✏️"; return; }
+  dq = m; dqi = 0; dAsk();
+}
+function dAsk() {
+  const g = dq[dqi], ic = dIc(g[0]), e = dq.map(x => Math.exp(14 * x[1])), sum = e.reduce((a, b) => a + b, 0);
+  dgs = g[0]; dHi(); Portal.SFX.box();
+  $("dm").innerHTML = (dqi ? "🤔 Hmm, let me try again… " : "🤖 ") + "I think you drew <b>" + dTxt(ic) + "</b> – I’m " + Math.round(e[dqi] / sum * 100) + "% sure.<br>Am I correct?";
+  $("dyn").innerHTML = '<button class="gbtn" style="background:var(--ok)" onclick="dYes()">✅ Yes!</button><button class="gbtn" onclick="dNo()">❌ No</button>';
+  $("dbars").innerHTML = "<small>🔍 How much your doodle looks like each icon:</small>" + dq.slice(0, 3).map((x, i) => `<div class="bar"><span>${dTxt(dIc(x[0]))}</span><i style="width:${Math.round(e[i] / sum * 150)}px"></i>${Math.round(e[i] / sum * 100)}%</div>`).join("");
+}
+function dLearn(id) { const r = ras(dS.map(s => s.p)); if (!r) return; EX[id].push(r); if (EX[id].length > 6) EX[id].splice(1, 1); dL++; }
+function dScore() { $("dsc").textContent = "📏 AI score: right on 1st guess " + dA[0] + " / " + dA[1] + " = " + Math.round(dA[0] / dA[1] * 100) + "%  ·  📚 learned from " + dL + " doodle(s)"; }
+function dYes() {
+  const id = dq[dqi][0]; dA[1]++; if (!dqi) dA[0]++; dLearn(id); star(); dScore();
+  Portal.SFX.good(); Portal.confetti(20); Portal.unlockBadge("c7_doodle");
+  $("dm").innerHTML = "🎉 Yes! I matched your doodle with <b>" + dTxt(dIc(id)) + "</b>! <span class='ok'>+1 ⭐</span><br><small>I also learned from your drawing, so I get better next time – just like AI learns from feedback!</small>";
+  $("dyn").innerHTML = ""; $("dbars").innerHTML = "";
+}
+function dNo() {
+  dqi++; if (dqi < 3) { Portal.SFX.pop(); dAsk(); return; }
+  dA[1]++; dLearn(dtar[0]); star(2); dScore(); dgs = null; dHi();
+  Portal.SFX.win(); Portal.confetti(24); Portal.unlockBadge("c7_doodle");
+  $("dm").innerHTML = "😮 You stumped me! Your icon was <b>" + dTxt(dtar) + "</b>. <span class='ok'>+2 ⭐ for the artist</span><br><small>I’ve added your drawing to my examples – more examples make AI smarter!</small>";
+  $("dyn").innerHTML = ""; $("dbars").innerHTML = "";
+}
+
+// Support direct hash navigation from the Portal hub (#ai, #pat, #pix, #train, #free)
+const h = location.hash.replace("#", "");
+if (["ai", "pat", "pix", "train", "free"].includes(h)) go(h);
+</script>
+</body>
+</html>

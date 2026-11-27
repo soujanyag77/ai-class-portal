@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Battle Arena – Class IX</title>
+<link rel="stylesheet" href="portal.css">
+<style>
+body { font-size: 19px; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 14px 16px 36px; }
+.top { display: flex; gap: 10px; flex-wrap: wrap; }
+.team {
+  flex: 1;
+  min-width: 190px;
+  background: var(--card);
+  border: 4px solid var(--line);
+  border-radius: 18px;
+  padding: 10px 12px;
+  text-align: center;
+  transition: transform 0.2s, border-color 0.2s;
+  box-shadow: var(--shadow);
+}
+.team.on { transform: scale(1.03); }
+.t0.on { border-color: var(--red); }
+.t1.on { border-color: var(--blue); }
+.team input {
+  font: inherit;
+  font-weight: 800;
+  text-align: center;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+.t0 input { color: var(--red); }
+.t1 input { color: var(--blue); }
+.score { font-size: 44px; font-weight: 900; line-height: 1.05; }
+.life-row { display: flex; gap: 5px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
+.life-tag {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.life-tag.used { opacity: 0.35; text-decoration: line-through; }
+
+.mid {
+  min-width: 160px;
+  text-align: center;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  padding: 8px 12px;
+  box-shadow: var(--shadow);
+}
+.clock { font-size: 36px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+button.abtn {
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 20px;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 800;
+  transition: transform 0.1s;
+}
+button.abtn:active { transform: scale(0.96); }
+button.sm { padding: 6px 12px; font-size: 15px; }
+button:disabled { opacity: 0.52; cursor: default; }
+
+.spot-strip {
+  margin-top: 10px;
+  background: var(--card);
+  border: 2px dashed var(--a);
+  border-radius: 14px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.bar { display: flex; gap: 6px; justify-content: center; margin: 10px 0 0; flex-wrap: wrap; }
+.bar button {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 2px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.bar button.cur { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.panel {
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  padding: 20px;
+  margin-top: 12px;
+  min-height: 390px;
+  box-shadow: var(--shadow);
+}
+h1, h2 { margin: 0.2em 0; }
+.mut { color: var(--mut); }
+.c { text-align: center; }
+.q { font-size: 27px; font-weight: 800; margin: 12px 0; text-align: center; }
+.opts { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.opts button {
+  flex: 1;
+  min-width: 180px;
+  font: inherit;
+  font-weight: 800;
+  font-size: 22px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 3px solid var(--line);
+  cursor: pointer;
+}
+.opts button:hover:not(:disabled) { border-color: var(--ink); }
+.opts button.good { background: var(--ok); color: #fff; border-color: var(--ok); opacity: 1; }
+.opts button.bad { background: #c0392b; color: #fff; border-color: #c0392b; opacity: 1; }
+.opts button[data-e]::before { content: attr(data-e) " "; }
+.opts.st button { min-width: 90px; font-size: 17px; padding: 8px; }
+.opts.st button.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.turn { text-align: center; font-weight: 900; font-size: 23px; }
+.fb { text-align: center; font-size: 20px; min-height: 54px; margin-top: 10px; font-weight: 700; }
+.clue { max-width: 760px; margin: 6px auto; padding: 10px 14px; border-left: 6px solid var(--blue); background: var(--bg); border-radius: 8px; font-size: 20px; }
+.case { max-width: 820px; margin: 8px auto; padding: 12px 14px; border: 3px dashed var(--line); border-radius: 14px; font-size: 18px; }
+.pts { display: inline-block; background: var(--ok); color: #fff; border-radius: 20px; padding: 2px 14px; font-weight: 800; }
+.evt { max-width: 700px; margin: 10px auto; padding: 12px; border-radius: 14px; background: #f4b400; color: #14213d; font-weight: 900; text-align: center; animation: pop 0.5s; }
+@keyframes pop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+.sim { display: grid; grid-template-columns: 1fr 1.2fr; gap: 18px; }
+@media (max-width: 800px) { .sim { grid-template-columns: 1fr; } }
+pre { background: #0b1020; color: #7cfc9a; border-radius: 12px; padding: 10px; font-size: 13px; height: 140px; overflow: auto; margin: 0; white-space: pre-wrap; }
+canvas { width: 100%; height: 110px; border: 2px solid var(--line); border-radius: 10px; margin-top: 6px; background: var(--bg); }
+canvas#sc { height: auto; width: 260px; max-width: 100%; display: block; margin: auto; }
+.row { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+.big { font-size: 58px; text-align: center; }
+.mt { border-collapse: collapse; margin: 6px auto; font-size: 15px; }
+.mt td { border: 2px solid var(--line); padding: 4px 10px; text-align: center; }
+.card {
+  display: inline-block;
+  margin: 4px;
+  padding: 8px 12px;
+  font-size: 34px;
+  background: var(--bg);
+  border: 3px solid var(--line);
+  border-radius: 14px;
+  cursor: grab;
+  user-select: none;
+  text-align: center;
+}
+.card.sel { border-color: var(--blue); transform: scale(1.12); }
+.card small { display: block; font-size: 14px; line-height: 1.3; }
+.pc { display: inline-block; margin: 3px; font-size: 22px; padding: 2px 6px; background: var(--ok); color: #fff; border-radius: 10px; text-align: center; }
+.tray { min-height: 70px; text-align: center; border: 3px dashed var(--line); border-radius: 14px; padding: 6px; margin: 8px 0; }
+.zones { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.zone { border: 3px solid var(--line); border-radius: 14px; padding: 8px; min-height: 90px; text-align: center; cursor: pointer; background: var(--card); }
+.zone:hover { border-color: var(--blue); }
+.shake { animation: sh 0.3s; }
+@keyframes sh { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.grp { margin: 6px 0; }
+.grp > span { font-weight: 700; font-size: 15px; }
+.float { display: flex; justify-content: center; gap: 14px; font-size: 38px; margin: 10px; }
+.float span { animation: bob 1.6s ease-in-out infinite; }
+.float span:nth-child(2n) { animation-delay: 0.4s; }
+@keyframes bob { 50% { transform: translateY(-10px); } }
+.lifelines-bar { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 8px 0; }
+</style>
+</head>
+<body>
+<nav id="portal-nav"></nav>
+
+<div class="wrap">
+  <div class="top">
+    <div class="team t0" id="t0">
+      <input id="n0" value="Neural Ninjas" aria-label="Team 1 Name">
+      <div class="score" id="s0">0</div>
+      <div class="life-row" id="l0"></div>
+    </div>
+    <div class="mid">
+      <div class="clock" id="clk">30:00</div>
+      <div class="mut" id="rl" style="font-size:15px">Ready</div>
+      <button class="abtn sm" id="pp">Start</button>
+    </div>
+    <div class="team t1" id="t1">
+      <input id="n1" value="Data Dragons" aria-label="Team 2 Name">
+      <div class="score" id="s1">0</div>
+      <div class="life-row" id="l1"></div>
+    </div>
+  </div>
+
+  <div class="spot-strip">
+    <span id="spot-label">🎤 Challengers at Board: Pick 2 challengers or call any student!</span>
+    <button class="p-pill warm" onclick="Portal.openPicker('9', setChallengers)">⚔️ Pick Challengers</button>
+  </div>
+
+  <div class="bar" id="bar"></div>
+  <div class="panel" id="main"></div>
+</div>
+
+<script src="portal.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const sh = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+function setChallengers(txt) {
+  $("spot-label").innerHTML = `🎤 At the Board: <b style="color:var(--a)">${txt}</b>`;
+}
+Portal.mountBar("portal-nav", { active: "9", cls: "9", onPick: setChallengers });
+
+const S = [0, 0], dbl = [1, 1];
+const LIFE = [{ poll: true, fifty: true, swap: true }, { poll: true, fifty: true, swap: true }];
+let R = -1, left = 1800, run = false, tick = null, Q = {};
+const STAGES = ["Problem Scoping", "Data Acquisition", "Data Exploration", "Modelling", "Evaluation"];
+
+/* ---------- Question Banks ---------- */
+const R1 = [
+  ["Face unlock on a smartphone", "AI", "It learns the pattern of your face.", "📱"],
+  ["Calculator adding 2 + 2", "Not AI", "Fixed rules, no learning.", "🧮"],
+  ["Smart speaker understanding “play a song”", "AI", "It processes speech and language.", "🔊"],
+  ["Traffic light on a fixed 60-second timer", "Not AI", "A timer, not a learner. A camera-based signal that adapts would be AI.", "🚦"],
+  ["Chess app that improves by playing millions of games", "AI", "It learns from experience.", "♟️"],
+  ["Excel SUM formula", "Not AI", "It follows a fixed rule.", "📊"],
+  ["Photo app that groups pictures by person", "AI", "It recognises faces in images.", "🖼️"],
+  ["Automatic door that opens on any motion", "Not AI", "One fixed rule: motion → open.", "🚪"],
+  ["YouTube autoplay picking your next video", "AI", "It learns from what you watch.", "▶️"],
+  ["Thermostat that learns your daily schedule", "AI", "It learns from your behaviour.", "🌡️"],
+  ["Thermostat fixed at 24 °C", "Not AI", "No data, no learning.", "🔥"],
+  ["Washing machine that weighs clothes and picks water level using a trained model", "AI", "A trained model makes the decision.", "🧺"],
+  ["Email spam filter catching new junk mail patterns", "AI", "It learns spam features from millions of examples.", "✉️"],
+  ["Digital stopwatch counting seconds", "Not AI", "Purely rule-based counting, zero learning.", "⏱️"],
+  ["Delivery drone avoiding trees using live camera vision", "AI", "Real-time object detection uses Computer Vision.", "🚁"]
+].map(([q, a, w, e]) => ({ q, o: ["AI", "Not AI"], a, w, e }));
+
+const D3 = ["Data", "Computer Vision", "NLP"];
+const R2 = [
+  [["It takes an input.", "The input is a photo of a leaf.", "It says whether the plant is diseased."], "Computer Vision", "Images in, so Computer Vision."],
+  [["Used by a bank.", "It reads thousands of customer emails.", "It tags each one as complaint or praise."], "NLP", "Reading human language is NLP."],
+  [["A farm uses it.", "It looks at rainfall, soil pH and past yields in a sheet.", "It predicts next season’s crop output."], "Data", "Numbers and tables: Data."],
+  [["It listens first.", "You say “Hey…” and it answers.", "It turns speech into meaning."], "NLP", "Speech and language: NLP."],
+  [["Installed at a railway station.", "Cameras watch the platform.", "It alerts when someone crosses the yellow line."], "Computer Vision", "Video is visual data: CV."],
+  [["A cricket board uses it.", "Ten years of scores, pitch types and weather numbers.", "It predicts a team’s score."], "Data", "Statistics in rows: Data."],
+  [["Lives on your phone keyboard.", "It suggests your next word.", "It learned from huge amounts of text."], "NLP", "Predicting text: NLP."],
+  [["A shop counter.", "A camera looks at fruits on the scale.", "It names the fruit without a barcode."], "Computer Vision", "It must see the fruit: CV."],
+  [["A hospital uses it.", "Past patient records of age, BP and sugar in rows.", "It estimates the risk of illness."], "Data", "Tabular records: Data."],
+  [["Used in a school library.", "Students scan a book cover with a tablet.", "It identifies the book instantly without reading the barcode."], "Computer Vision", "Recognising a cover image is Computer Vision."],
+  [["A travel app feature.", "You type a sentence in Hindi.", "It outputs natural Tamil sentences."], "NLP", "Machine translation of language is NLP."]
+].map(([c, a, w]) => ({ q: "Which AI domain is this?", c, o: D3, a, w, e: "🕵️" }));
+
+const O4 = ["Bias", "Privacy", "Transparency", "Misinformation"];
+const R5 = [
+  ["A hiring AI rejects most women because it learnt from old, male-heavy data", "Bias", "Unfair data gives unfair results.", ["Retrain on balanced, diverse data and audit the results", "Hide the AI’s decisions", "Add even more of the same old data"], "👩‍💼"],
+  ["An app records your voice all day without telling you", "Privacy", "Data was collected without consent.", ["Ask clear consent and collect only what is needed", "Bury it in the terms and conditions", "Sell the recordings"], "🎙️"],
+  ["A loan AI rejects you and nobody can explain why", "Transparency", "AI decisions must be explainable.", ["Use an explainable model and give reasons", "Tell customers it is a secret", "Make the AI bigger"], "🏦"],
+  ["A deepfake video shows a teacher saying false things", "Misinformation", "AI-made fake content spreads wrong information.", ["Check the source, report it and label AI content", "Forward it to all friends", "Ignore everything online"], "🎭"],
+  ["A face-unlock fails often for darker skin tones", "Bias", "The training data did not include everyone.", ["Test on all skin tones and add diverse images", "Use it only in bright light", "Ignore the complaints"], "🔓"],
+  ["A school app shares students’ photos and marks with advertisers", "Privacy", "Personal data must not be shared without permission.", ["Share nothing without parental consent and delete extra data", "Share only marks, not photos", "Let advertisers decide"], "🏫"],
+  ["A chatbot confidently gives a wrong medicine dose", "Misinformation", "Confident but false answers mislead people.", ["Add expert review and show sources", "Make its tone more confident", "Remove the disclaimer"], "💊"],
+  ["A student grading AI gives zero marks but teachers aren't allowed to see its scoring rules", "Transparency", "High-stakes AI must show how it reaches decisions.", ["Publish clear scoring criteria and allow human review", "Keep the algorithm hidden to avoid questions", "Grade even faster"], "📝"]
+].map(([q, a, w, f, e]) => ({ q, o: O4, a, w, f, fa: f[0], e }));
+
+const CASES = [
+  {
+    t: "Smart Dustbin, KV Tenali", e: "🗑️", story: "Students want a dustbin that sorts waste on its own.", s: [
+      ["The team writes: “Can AI tell plastic from paper?” after the principal complains about litter.", 0],
+      ["Students click 400 photos of waste items using phones.", 1],
+      ["A chart shows only 20 of the 400 photos are metal.", 2],
+      ["An image classifier is trained to sort waste.", 3],
+      ["On 50 unseen photos it is right 41 times.", 4]
+    ]
+  },
+  {
+    t: "Crop Doctor App", e: "🌱", story: "Farmers in Guntur lose crops to leaf diseases.", s: [
+      ["The team decides to detect disease from leaf photos, not soil tests.", 0],
+      ["Volunteers collect 1,000 leaf photos from different farms and seasons.", 1],
+      ["Blurry photos are removed and each disease is checked for enough samples.", 2],
+      ["A neural network learns patterns of spots and colour.", 3],
+      ["Accuracy on fresh farm photos is 78%, so they plan to add more data.", 4]
+    ]
+  },
+  {
+    t: "Bus Rush Predictor", e: "🚌", story: "Students arrive late because of crowded buses.", s: [
+      ["The goal is set: predict which hour the bus will be most crowded.", 0],
+      ["The depot shares daily passenger counts for six months.", 1],
+      ["A graph reveals Monday mornings are busiest.", 2],
+      ["A model is trained on counts, time of day and weather.", 3],
+      ["Predictions are compared with the real counts of the next week.", 4]
+    ]
+  },
+  {
+    t: "School Library Book Finder", e: "📚", story: "Students struggle to pick books they will enjoy.", s: [
+      ["Students interview librarians to define the goal: recommend 3 books per reader.", 0],
+      ["Borrowing logs from the past 2 years are gathered safely without student names.", 1],
+      ["Bar charts show sci-fi and mystery peak before holidays.", 2],
+      ["A recommendation model groups readers with similar interests.", 3],
+      ["Students rate the suggestions and the model scores 84% satisfaction.", 4]
+    ]
+  }
+];
+
+const ROUNDS = [
+  { t: "Round 1 · Spot the Trick", m: 5, k: "wager", n: 6, pool: R1 },
+  { t: "Round 2 · Domain Detective", m: 6, k: "clue", n: 6, pool: R2 },
+  { t: "Round 3 · Case File", m: 5, k: "case" },
+  { t: "Round 4 · Train the Machine", m: 8, k: "sim" },
+  { t: "Round 5 · Ethics Roulette", m: 6, k: "eth", n: 5, pool: R5 }
+];
+
+const EM = {
+  "AI": "🤖", "Not AI": "🧱", "Data": "📊", "Computer Vision": "👁️", "NLP": "💬",
+  "Bias": "⚖️", "Privacy": "🔒", "Transparency": "🔍", "Misinformation": "📰",
+  "Problem Scoping": "🎯", "Data Acquisition": "📥", "Data Exploration": "🔎",
+  "Modelling": "⚙️", "Evaluation": "✅"
+};
+
+/* ---------- Helpers ---------- */
+const fmt = s => String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+const nm = i => $("n" + i).value || "Team " + (i + 1);
+const col = i => i ? "var(--blue)" : "var(--red)";
+
+function renderLifelines(i) {
+  const L = LIFE[i];
+  $("l" + i).innerHTML = `
+    <span class="life-tag ${L.poll ? "" : "used"}">🙋 Poll</span>
+    <span class="life-tag ${L.fifty ? "" : "used"}">⚡ 50/50</span>
+    <span class="life-tag ${L.swap ? "" : "used"}">🔄 Swap</span>
+  `;
+}
+
+function head(t) {
+  $("s0").textContent = S[0]; $("s1").textContent = S[1]; $("clk").textContent = fmt(left);
+  $("t0").classList.toggle("on", t === 0); $("t1").classList.toggle("on", t === 1);
+  renderLifelines(0); renderLifelines(1);
+  $("bar").innerHTML = ROUNDS.map((r, i) => `<button class="${i == R ? "cur" : ""}" onclick="go(${i})">R${i + 1} · ${r.m}m</button>`).join("");
+}
+
+function award(t, p) { if (p > 0 && dbl[t] > 1) { p *= dbl[t]; dbl[t] = 1; } S[t] += p; }
+function evt(t) {
+  Portal.SFX.box();
+  const e = Math.random() * 3 | 0;
+  if (e == 0) { S[t] += 5; return `🎁 Mystery Box! ${nm(t)} wins a +5 bonus!`; }
+  if (e == 1) { dbl[t] = 2; return `⚡ Mystery Box! ${nm(t)}’s next points are DOUBLED!`; }
+  const x = Math.min(5, Math.max(0, S[1 - t])); S[1 - t] -= x; S[t] += x;
+  return `🦹 Mystery Box! ${nm(t)} steals ${x} points from ${nm(1 - t)}!`;
+}
+
+$("pp").onclick = () => {
+  run = !run; $("pp").textContent = run ? "Pause" : "Resume";
+  if (run && !tick) tick = setInterval(() => { if (run && left > 0) { left--; $("clk").textContent = fmt(left); } }, 1000);
+};
+
+function setPreset(a, b) { $("n0").value = a; $("n1").value = b; Portal.SFX.pop(); }
+
+function intro() {
+  R = -1; $("rl").textContent = "Ready"; head();
+  $("main").innerHTML = `
+    <div class="big">🤖⚔️🤖</div>
+    <h1 class="c">AI Battle Arena · Class IX</h1>
+    <p class="mut c">CBSE AI (417): AI basics · Domains · Project Cycle · Hands-On ML Lab · Ethics</p>
+    <div class="row" style="margin:8px 0">
+      <button class="p-pill" onclick="setPreset('Neural Ninjas','Data Dragons')">🥷 Neural Ninjas vs 🐉 Data Dragons</button>
+      <button class="p-pill" onclick="setPreset('Vision Vipers','NLP Knights')">👁️ Vision Vipers vs 💬 NLP Knights</button>
+      <button class="p-pill" onclick="setPreset('Team Alpha','Team Beta')">🅰️ Alpha vs 🅱️ Beta</button>
+    </div>
+    <ol style="max-width:780px;margin:10px auto">
+      <li>Pick team names &amp; click <b>⚔️ Pick Challengers</b> so new students battle at the board each round!</li>
+      <li><b>Round 1:</b> Bet <b>10 / 20 / 30</b> before answering. Wrong = lose half your bet.</li>
+      <li><b>Round 2:</b> Clues appear one by one. <b>Fewer clues = more points</b> (15 / 10 / 5).</li>
+      <li><b>Round 3:</b> Crack a random <b>Case File</b>. <b>Round 4:</b> 4-step <b>Hands-On ML Lab</b> + Confusion Matrix!</li>
+      <li><b>Round 5:</b> Spot the Ethics issue, then pick the best fix. Use your 3 lifelines (<b>🙋 Class Poll</b>, <b>⚡ 50/50</b>, <b>🔄 Swap</b>) wisely!</li>
+    </ol>
+    <div class="float"><span>🤖</span><span>📷</span><span>🗣️</span><span>🧠</span><span>🍎</span><span>🍊</span><span>⚖️</span></div>
+    <div class="row"><button class="abtn" onclick="go(0)">Begin Round 1 ▶</button></div>
+  `;
+}
+function nextBtn() { return `<div class="row"><button class="abtn" onclick="go(${R + 1})">${R == 4 ? "Final Result 🏆" : "Next Round ▶"}</button></div>`; }
+
+/* ---------- Question Engine (Rounds 1, 2, 3, 5) ---------- */
+function go(r) {
+  R = r; if (r >= 5) return end();
+  const o = ROUNDS[r]; $("rl").textContent = o.t.split(" · ")[0];
+  if (!run) $("pp").click();
+  Portal.SFX.pop();
+  if (o.k == "sim") { head(); return sim(); }
+  let items, cs, reserve = [];
+  if (o.k == "case") {
+    cs = CASES[Math.random() * CASES.length | 0];
+    items = sh(cs.s).map(([q, s]) => ({ q, o: STAGES, a: STAGES[s], w: "This is the " + STAGES[s] + " stage." }));
+  } else {
+    const shuffled = sh(o.pool);
+    items = shuffled.slice(0, o.n);
+    reserve = shuffled.slice(o.n);
+  }
+  Q = { o, items, reserve, cs, i: 0, base: Math.random() * 2 | 0, steal: false, clue: 0, stake: 10, stage: 0 };
+  setQ();
+}
+function setQ() {
+  const it = Q.items[Q.i];
+  if (it) { it.ord = sh(it.o); if (it.f) Q.ford = sh(it.f); }
+  ask();
+}
+const owner = () => (Q.base + Q.i) % 2;
+const base = () => Q.stage ? 10 : Q.o.k == "clue" ? [15, 10, 5][Q.clue] : Q.o.k == "wager" ? Q.stake : 10;
+const pts = () => Q.steal ? Math.ceil(base() / 2) : base();
+
+function ask() {
+  const o = Q.o, it = Q.items[Q.i];
+  if (!it) {
+    head();
+    Portal.SFX.win();
+    $("main").innerHTML = `<h2>${o.t} complete</h2><p class="q">${nm(0)} ${S[0]} – ${S[1]} ${nm(1)}</p>` + nextBtn();
+    return;
+  }
+  const t = Q.steal ? 1 - owner() : owner(), k = o.k, list = Q.stage ? Q.ford : it.ord;
+  head(t);
+  const L = LIFE[t];
+  const canSwap = !Q.steal && !Q.stage && Q.reserve && Q.reserve.length > 0;
+  let h = `<h2>${o.t}</h2><div class="turn" style="color:${col(t)}">${nm(t)}${Q.steal ? " · STEAL chance" : ""}${Q.stage ? " · now pick the best FIX" : ""}</div>
+  <div class="mut c">Question ${Q.i + 1} of ${Q.items.length} · worth <span class="pts">${pts()}${dbl[t] > 1 ? " ×2" : ""}</span></div>
+  <div class="lifelines-bar">
+    <button class="p-pill" ${L.poll ? "" : "disabled"} onclick="usePoll(${t})">🙋 Ask Class</button>
+    <button class="p-pill" ${L.fifty && !Q.steal ? "" : "disabled"} onclick="useFifty(${t})">⚡ 50/50 Hint</button>
+    <button class="p-pill" ${L.swap && canSwap ? "" : "disabled"} onclick="useSwap(${t})">🔄 Swap Q</button>
+  </div>`;
+  if (k == "case") h += `<div class="case">${Q.cs.e} <b>${Q.cs.t}</b> — ${Q.cs.story}<br><span class="mut">Which stage of the AI Project Cycle does this evidence belong to?</span></div>`;
+  if (k == "clue") h += it.c.slice(0, Q.clue + 1).map((c, i) => `<div class="clue">🔎 Clue ${i + 1}: ${c}</div>`).join("") +
+    (!Q.steal && Q.clue < 2 ? `<div class="row" style="margin-top:6px"><button class="abtn sm" onclick="Q.clue++;Portal.SFX.pop();ask()">Reveal next clue (points drop)</button></div>` : "");
+  if (k == "wager" && !Q.steal) h += `<div class="opts st" style="margin-top:8px"><span class="mut">Your bet:</span>${[10, 20, 30].map(s => `<button class="${Q.stake == s ? "on" : ""}" onclick="Q.stake=${s};Portal.SFX.pop();ask()">${s == 10 ? "🙂" : s == 20 ? "😎" : "🔥"} ${s}</button>`).join("")}</div>`;
+  const ico = k == "case" ? Q.cs.e : it.e;
+  if (ico && !Q.stage) h += `<div class="big">${ico}</div>`;
+  h += `<div class="q">${Q.stage ? "Best fix for: “" + it.q + "”" : it.q}</div><div class="opts">${list.map(x => `<button ${EM[x] ? `data-e="${EM[x]}"` : ""}>${x}</button>`).join("")}</div><div class="fb" id="fb"></div>`;
+  $("main").innerHTML = h;
+  document.querySelectorAll(".opts:not(.st) button").forEach(b => b.onclick = () => pick(b, it, t));
+}
+
+function usePoll(t) {
+  if (!LIFE[t].poll) return;
+  LIFE[t].poll = false;
+  head(t);
+  const it = Q.items[Q.i];
+  const opts = Q.stage ? Q.ford : it.ord;
+  Portal.openPoll(Q.stage ? "Best fix for: " + it.q : it.q, opts, (topChoice, counts, total) => {
+    const fb = $("fb");
+    if (fb) fb.innerHTML = `🙋 Class Poll (${total} votes) favours: <b>${topChoice}</b>!`;
+  });
+}
+
+function useFifty(t) {
+  if (!LIFE[t].fifty) return;
+  LIFE[t].fifty = false;
+  head(t);
+  const it = Q.items[Q.i], ans = Q.stage ? it.fa : it.a;
+  const btns = [...document.querySelectorAll(".opts:not(.st) button")];
+  const wrong = btns.filter(b => b.textContent !== ans && !b.disabled);
+  if (wrong.length >= 2) {
+    sh(wrong).slice(0, Math.ceil(wrong.length / 2)).forEach(b => { b.disabled = true; b.style.opacity = 0.25; });
+    $("fb").innerHTML = "⚡ 50/50 removed wrong options!";
+  } else {
+    $("fb").innerHTML = `⚡ Hint: Think — <i>${it.w.split(".")[0]}</i>`;
+  }
+  Portal.SFX.box();
+}
+
+function useSwap(t) {
+  if (!LIFE[t].swap || !Q.reserve.length) return;
+  LIFE[t].swap = false;
+  Q.items[Q.i] = Q.reserve.shift();
+  Q.clue = 0; Q.stake = 10; Q.stage = 0;
+  Portal.SFX.pop();
+  setQ();
+}
+
+function pick(b, it, t) {
+  const ans = Q.stage ? it.fa : it.a, ok = b.textContent == ans, k = Q.o.k;
+  document.querySelectorAll(".opts:not(.st) button").forEach(x => { x.disabled = true; if (x.textContent == ans) x.classList.add("good"); });
+  const fb = $("fb"); let scored = null;
+  if (ok) {
+    award(t, pts()); scored = t;
+    Portal.SFX.good(); Portal.confetti(22);
+    fb.innerHTML = `✅ <b>Correct!</b> +${pts()} ${Q.stage ? "" : it.w}`;
+    if (k == "eth" && !Q.steal && !Q.stage) {
+      Q.stage = 1; fb.innerHTML += "<br>Now choose the best fix ⬇";
+      setTimeout(ask, 1500); return;
+    }
+    if (Q.stage) Portal.unlockBadge("c9_ethics");
+  } else {
+    b.classList.add("bad", "shake");
+    Portal.SFX.bad();
+    if (k == "wager" && !Q.steal) {
+      const l = Q.stake / 2; S[t] -= l;
+      fb.innerHTML = `❌ Wrong! Bet lost: −${l}. The other team can steal!`;
+      head(t); setTimeout(() => { Q.steal = true; ask(); }, 1600); return;
+    }
+    if (!Q.steal && !Q.stage) {
+      fb.innerHTML = "❌ Not quite — the other team can steal!";
+      setTimeout(() => { Q.steal = true; ask(); }, 1400); return;
+    }
+    fb.innerHTML = `❌ Answer: <b>${ans}</b>. ${Q.stage ? "" : it.w}`;
+  }
+  if (Q.stage && ok) fb.innerHTML += " 🛠️ Great fix!";
+  head(t);
+  let e = "";
+  if (scored !== null && Math.random() < 0.4) { e = `<div class="evt">${evt(scored)}</div>`; head(t); }
+  const d = document.createElement("div");
+  d.innerHTML = e + `<div class="row"><button class="abtn">Next ▶</button></div>`;
+  $("main").appendChild(d);
+  d.querySelector("button").onclick = () => { Q.i++; Q.steal = false; Q.clue = 0; Q.stake = 10; Q.stage = 0; setQ(); };
+}
+
+/* ---------- Round 4: Hands-On ML Lab ---------- */
+const gauss = () => Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
+const sg = z => 1 / (1 + Math.exp(-z));
+function gen(n, pOr, sd, off, flip) {
+  const D = [];
+  for (let i = 0; i < n; i++) {
+    const t = Math.random() < pOr ? 1 : 0;
+    D.push({ x: [(t ? 0.65 : 0.35) + off + gauss() * sd, (t ? 0.6 : 0.4) - off + gauss() * sd], t, y: Math.random() < flip ? 1 - t : t });
+  }
+  return D;
+}
+function feat(p, d) {
+  const a = (p[0] - 0.5) * 2.4, b = (p[1] - 0.5) * 2.4, f = [];
+  for (let i = 0; i <= d; i++) for (let j = 0; i + j <= d; j++) if (i + j) f.push(a ** i * b ** j);
+  return f;
+}
+function fit(D, T, d, E) {
+  const F = D.map(r => feat(r.x, d)), FT = T.map(r => feat(r.x, d));
+  let w = Array(F[0].length).fill(0), b = 0;
+  const L = [], LT = [], LR = 0.3;
+  const z = f => f.reduce((a, v, j) => a + v * w[j], b);
+  const loss = (F, D, key) => {
+    let s = 0;
+    F.forEach((f, i) => {
+      const p = Math.min(0.999, Math.max(0.001, sg(z(f))));
+      s -= D[i][key] ? Math.log(p) : Math.log(1 - p);
+    });
+    return Math.min(3, s / F.length);
+  };
+  for (let e = 0; e < E; e++) {
+    const g = w.map(() => 0); let gb = 0;
+    F.forEach((f, i) => {
+      const er = sg(z(f)) - D[i].y; gb += er;
+      f.forEach((v, j) => g[j] += er * v);
+    });
+    w = w.map((v, j) => v - LR * g[j] / F.length);
+    b -= LR * gb / F.length;
+    L.push(loss(F, D, "y"));
+    LT.push(loss(FT, T, "t"));
+  }
+  return { L, LT, F, FT, pred: f => sg(z(f)) > 0.5 ? 1 : 0, nw: w.length + 1 };
+}
+
+let LB = {}, SEL = null;
+const lt = () => (LB.base + LB.k) % 2;
+const lh = (s, ti) => { const t = lt(); head(t); return `<h2>${ROUNDS[3].t} 🧪</h2><div class="turn" style="color:${col(t)}">${nm(t)} · Step ${s}/4 · ${ti}</div>`; };
+const card = (c, txt) => `<span class="card" data-id="${c.id}">${txt || c.e}</span>`;
+
+function dd(fn) {
+  document.querySelectorAll(".card").forEach(c => {
+    c.draggable = true;
+    c.ondragstart = e => { SEL = c.dataset.id; e.dataTransfer.setData("text", SEL); };
+    c.onclick = e => { e.stopPropagation(); SEL = c.dataset.id; document.querySelectorAll(".card").forEach(x => x.classList.toggle("sel", x == c)); };
+  });
+  document.querySelectorAll(".zone").forEach(z => {
+    z.ondragover = e => e.preventDefault();
+    z.ondrop = e => { e.preventDefault(); if (SEL != null) fn(+SEL, z.dataset.z); };
+    z.onclick = () => { if (SEL != null) fn(+SEL, z.dataset.z); };
+  });
+}
+
+function sim() { LB = { k: 0, base: Math.random() * 2 | 0 }; lab1(); }
+function lab1() {
+  LB.cards = sh(["🍎", "🍎", "🍎", "🍊", "🍊", "🍊", "🍅", "🍑"]).map((e, i) => ({ id: i, e, z: null }));
+  LB.cfg = { n: 150, dv: 1, bal: 0.5, d: 2, E: 100 };
+  SEL = null;
+  drawL1();
+}
+function drawL1() {
+  const C = LB.cards;
+  const z = (k, l) => `<div class="zone" data-z="${k}"><b>${l}</b><div>${C.filter(c => c.z == k).map(c => card(c)).join("")}</div></div>`;
+  $("main").innerHTML = lh(1, "Label the data") +
+    `<p class="mut c" style="margin:4px">You are the data labeller! Drag each picture into the right box (or tap a picture, then tap a box). Unclear pictures go to the 🗑️ bin.</p>
+    <div class="tray">${C.filter(c => c.z == null).map(c => card(c)).join("") || "✅ All sorted!"}</div>
+    <div class="zones">${z("A", "🍎 Apple basket")}${z("O", "🍊 Orange basket")}${z("X", "🗑️ Bad-data bin")}</div>
+    <div class="row"><button class="abtn" id="nx" ${C.some(c => c.z == null) ? "disabled" : ""}>Check my labels ▶</button></div><div class="fb" id="fb"></div>`;
+  dd((id, zn) => { C[id].z = zn; SEL = null; Portal.SFX.pop(); drawL1(); });
+  $("nx").onclick = () => {
+    $("nx").disabled = true; let err = 0;
+    C.forEach(c => { if (c.z != (c.e == "🍎" ? "A" : c.e == "🍊" ? "O" : "X")) err++; });
+    LB.noise = Math.min(0.4, 0.03 + err * 0.1);
+    award(lt(), 8 - err); head(lt());
+    if (err === 0) Portal.SFX.good(); else Portal.SFX.bad();
+    $("fb").innerHTML = err ? `😬 ${err} wrong label${err > 1 ? "s" : ""}! Bad labels become noise: your data is ${Math.round(LB.noise * 100)}% noisy.` : "✅ Perfect labels! Only 3% natural noise.";
+    setTimeout(drawL2, 1800);
+  };
+}
+function drawL2() {
+  const c = LB.cfg;
+  const g = (l, k, a) => `<div class="grp"><span>${l}</span><div class="opts st">${a.map(([n, v]) => `<button class="${c[k] == v ? "on" : ""}" onclick="LB.cfg.${k}=${v};Portal.SFX.pop();drawL2()">${n}</button>`).join("")}</div></div>`;
+  $("main").innerHTML = lh(2, "Build &amp; train the model") +
+    `<div class="sim"><div>` +
+    g("🖼️ How many images?", "n", [["50", 50], ["150", 150], ["400", 400]]) +
+    g("🏪 Data variety", "dv", [["One shop", 0], ["Many shops", 1]]) +
+    g("⚖️ Class balance", "bal", [["Balanced", 0.5], ["Mostly apples", 0.1]]) +
+    g("🧠 Model brain", "d", [["Simple", 1], ["Medium", 2], ["Complex", 5]]) +
+    g("🔁 Epochs", "E", [["20", 20], ["100", 100], ["300", 300]]) +
+    `<div class="row">
+      <button class="p-pill" onclick="pollML()">🙋 Class Prediction Poll</button>
+      <button class="abtn" id="go" onclick="trainL()">🚀 Train the model</button>
+    </div></div>
+    <div><canvas id="sc" width="260" height="260"></canvas><div class="mut c" style="font-size:13px">🔴 apples · 🟠 oranges · background = model’s guess</div>
+    <pre id="con">Ready. Choose settings, ask the class to predict, then press Train!</pre>
+    <canvas id="cv" width="600" height="110"></canvas><div class="mut" style="font-size:13px">🔴 train loss · 🔵 test loss</div><div class="fb" id="ins"></div></div></div>`;
+}
+function pollML() {
+  Portal.openPoll("Before we train: how will this model perform on unseen test photos?", ["🌟 Generalizes well (85%+)", "📏 Underfits (too simple / few epochs)", "🧬 Overfits (memorises noise)", "⚖️ Biased (misses oranges)"]);
+}
+function trainL() {
+  const t = lt(), c = LB.cfg; $("go").disabled = true;
+  const D = gen(c.n, c.bal, c.dv ? 0.14 : 0.07, c.dv ? 0 : -0.07, LB.noise), T = gen(200, 0.5, 0.14, 0, 0);
+  const m = fit(D, T, c.d, c.E);
+  const ac = (F, X, k) => F.filter((f, i) => m.pred(f) == X[i][k]).length / F.length;
+  const tr = Math.round(ac(m.F, D, "y") * 100), te = Math.round(ac(m.FT, T, "t") * 100), oc = D.filter(r => r.t).length;
+  LB.m = m; LB.T = T;
+  const rc = (() => { let a = 0, b = 0; m.FT.forEach((f, i) => { if (T[i].t) { b++; if (m.pred(f)) a++; } }); return a / b; })();
+  const lines = [
+    `[1/5] Collecting… ${c.n} images`,
+    `[2/5] Exploring: ${c.n - oc} apples, ${oc} oranges`,
+    `[3/5] Cleaning: noise ≈ ${Math.round(LB.noise * 100)}% from your labels`,
+    `[4/5] Training ${c.E} epochs (${m.nw} weights)`,
+    ...[0, 0.5, 1].map(f => { const e = Math.round(f * (c.E - 1)); return `      epoch ${e + 1}: train loss ${m.L[e].toFixed(2)} · test loss ${m.LT[e].toFixed(2)}`; }),
+    `[5/5] Hidden test set: train ${tr}% · TEST ${te}%`
+  ];
+  const con = $("con"); con.textContent = ""; let i = 0;
+  const iv = setInterval(() => {
+    con.textContent += lines[i++] + "\n"; con.scrollTop = 1e5;
+    Portal.SFX.tick();
+    if (i < lines.length) return;
+    clearInterval(iv);
+    const x = $("sc").getContext("2d"), N = 30, s = 260 / N;
+    for (let a = 0; a < N; a++) for (let b = 0; b < N; b++) {
+      x.fillStyle = m.pred(feat([(a + 0.5) / N, 1 - (b + 0.5) / N], c.d)) ? "rgba(244,160,0,.35)" : "rgba(230,57,70,.3)";
+      x.fillRect(a * s, b * s, s + 1, s + 1);
+    }
+    D.forEach(r => {
+      x.beginPath(); x.fillStyle = r.y ? "#f4a000" : "#e63946"; x.strokeStyle = "#fff";
+      x.arc(Math.min(256, Math.max(4, r.x[0] * 260)), Math.min(256, Math.max(4, (1 - r.x[1]) * 260)), 4, 0, 7);
+      x.fill(); x.stroke();
+    });
+    const y = $("cv").getContext("2d"), mx = Math.max(...m.L, ...m.LT, 0.05);
+    [[m.L, "#e63946"], [m.LT, "#1d70d6"]].forEach(([a, cl]) => {
+      y.beginPath(); y.strokeStyle = cl; y.lineWidth = 3;
+      a.forEach((v, k) => { const px = k / (a.length - 1 || 1) * 590 + 5, py = 105 - v / mx * 100; k ? y.lineTo(px, py) : y.moveTo(px, py); });
+      y.stroke();
+    });
+    const p = Math.round(te / 10); award(t, p); head(t);
+    Portal.SFX.good(); Portal.confetti(18, ["🍎", "🍊", "⭐"]);
+    const msg = [
+      c.n < 100 ? "📉 Few images: not enough to learn from." : "",
+      LB.noise > 0.1 ? `🗑️ ${Math.round(LB.noise * 100)}% noisy labels: garbage in, garbage out.` : "",
+      c.bal < 0.5 && rc < 0.65 ? `⚖️ Imbalanced: only ${Math.round(rc * 100)}% of oranges found.` : "",
+      !c.dv ? "💡 One shop only: struggles in new conditions." : "",
+      tr - te > 6 && c.d >= 5 ? `🧬 Overfitting: memorised (${tr}% train vs ${te}% test).` : "",
+      c.E == 20 && te < 80 ? "⏱️ Too few epochs: not finished learning." : ""
+    ].filter(Boolean).join("<br>") || "🌟 Excellent data and a right-sized model!";
+    $("ins").innerHTML = `<b>Test accuracy ${te}% → +${p} pts</b><br>${msg}<div class="row"><button class="abtn" onclick="goL3()">Test it &amp; build the matrix ▶</button></div>`;
+  }, 320);
+}
+
+const zk = c => c.p && c.tr ? "TP" : c.p && !c.tr ? "FP" : !c.p && c.tr ? "FN" : "TN";
+function goL3() {
+  const m = LB.m, T = LB.T, idx = T.map((_, i) => i);
+  const bad = sh(idx.filter(i => m.pred(m.FT[i]) != T[i].t)).slice(0, 3);
+  const good = sh(idx.filter(i => !bad.includes(i) && m.pred(m.FT[i]) == T[i].t)).slice(0, 12 - bad.length);
+  const rest = sh(idx.filter(i => !bad.includes(i) && !good.includes(i))).slice(0, 12 - bad.length - good.length);
+  LB.tc = sh([...bad, ...good, ...rest]).map((i, k) => ({ id: k, tr: T[i].t, p: m.pred(m.FT[i]), z: null, tries: 0 }));
+  SEL = null; drawL3();
+}
+function drawL3() {
+  const C = LB.tc, t = lt(), tx = c => `Truth ${c.tr ? "🍊" : "🍎"}<small>Model: ${c.p ? "🍊" : "🍎"}</small>`;
+  const z = (k, l) => `<div class="zone" data-z="${k}"><b>${k}</b> <span class="mut" style="font-size:14px">${l}</span><div class="score" style="font-size:30px">${C.filter(c => c.z == k).length}</div><div>${C.filter(c => c.z == k).map(c => `<span class="pc">${c.tr ? "🍊" : "🍎"}</span>`).join("")}</div></div>`;
+  const rem = C.filter(c => !c.z);
+  $("main").innerHTML = lh(3, "Build the confusion matrix") +
+    `<p class="mut c" style="margin:4px">12 test photos came back. Positive = 🍊 Orange. Drag each card to its box (or tap card, then box). +1 for each right first try.</p>
+    <div class="tray">${rem.map(c => card(c, tx(c))).join("") || "✅ Matrix complete!"}</div>
+    <div class="zones" style="grid-template-columns:1fr 1fr">${z("TP", "Truth 🍊 · Model 🍊")}${z("FN", "Truth 🍊 · Model 🍎")}${z("FP", "Truth 🍎 · Model 🍊")}${z("TN", "Truth 🍎 · Model 🍎")}</div>
+    <div class="fb" id="fb"></div>${rem.length ? "" : `<div class="row"><button class="abtn" onclick="drawL4()">Calculate the scores ▶</button></div>`}`;
+  dd((id, zn) => {
+    const c = C[id]; if (c.z) return;
+    if (zk(c) == zn) {
+      c.z = zn; if (!c.tries) award(t, 1); SEL = null; Portal.SFX.good(); drawL3();
+    } else {
+      c.tries++; Portal.SFX.bad();
+      $("fb").innerHTML = "❌ Not that box! Compare Truth with what the Model said.";
+      document.querySelectorAll(".card").forEach(x => { if (+x.dataset.id == id) { x.classList.add("shake"); setTimeout(() => x.classList.remove("shake"), 400); } });
+    }
+  });
+}
+function drawL4() {
+  const C = LB.tc, n = k => C.filter(x => zk(x) == k).length;
+  const TP = n("TP"), FP = n("FP"), FN = n("FN"), TN = n("TN"), N = C.length;
+  const P = TP + FP ? TP / (TP + FP) : 0, Rc = TP + FN ? TP / (TP + FN) : 0, F = P + Rc ? 2 * P * Rc / (P + Rc) : 0;
+  LB.cnt = { TP, FP, FN, TN, N };
+  LB.M = [
+    ["Accuracy", "(TP + TN) ÷ Total", (TP + TN) / N],
+    ["Precision", "TP ÷ (TP + FP)", P],
+    ["Recall", "TP ÷ (TP + FN)", Rc],
+    ["F1 score", "2 × P × R ÷ (P + R)", F]
+  ].map(([a, b, v]) => [a, b, Math.round(v * 100)]);
+  LB.mi = 0;
+  drawQ();
+}
+function drawQ() {
+  const t = lt(), { TP, FP, FN, TN, N } = LB.cnt, M = LB.M, i = LB.mi;
+  const mat = `<table class="mt"><tr><td></td><td><b>Model 🍊</b></td><td><b>Model 🍎</b></td></tr><tr><td><b>Truth 🍊</b></td><td>TP = ${TP}</td><td>FN = ${FN}</td></tr><tr><td><b>Truth 🍎</b></td><td>FP = ${FP}</td><td>TN = ${TN}</td></tr></table>`;
+  if (i >= 4) {
+    LB.k++; head();
+    Portal.SFX.win();
+    Portal.unlockBadge("c9_ml");
+    $("main").innerHTML = `<h2>🎓 Lab complete for ${nm(t)}!</h2>${mat}<p class="q">${nm(0)} ${S[0]} – ${S[1]} ${nm(1)}</p><p class="mut c">Precision = how many predicted 🍊 were real. Recall = how many real 🍊 were found. F1 balances both.</p>` +
+      (LB.k >= 2 ? nextBtn() : `<div class="row"><button class="abtn" onclick="lab1()">Next team’s lab ▶</button></div>`);
+    return;
+  }
+  const [a, f, v] = M[i]; let s = [v];
+  M.filter((_, j) => j != i).forEach(x => { if (!s.includes(x[2]) && s.length < 3) s.push(x[2]); });
+  for (let k = 5; s.length < 3; k += 5) { const w = Math.max(0, Math.min(100, v + (Math.random() < 0.5 ? -k : k))); if (!s.includes(w)) s.push(w); }
+  $("main").innerHTML = lh(4, "Calculate the scores") + mat +
+    `<div class="case" style="text-align:center">Total = ${N} photos<br><b>${a}</b> = ${f}<br><span class="mut">Work it out, then pick the answer (+5)</span></div>
+    <div class="opts">${sh(s).map(x => `<button>${x}%</button>`).join("")}</div><div class="fb" id="fb"></div>`;
+  document.querySelectorAll(".opts button").forEach(b => b.onclick = () => {
+    const ok = parseInt(b.textContent) == v;
+    document.querySelectorAll(".opts button").forEach(x => { x.disabled = true; if (parseInt(x.textContent) == v) x.classList.add("good"); });
+    if (ok) { award(t, 5); head(t); Portal.SFX.good(); Portal.confetti(22, ["🎉", "⭐", "🧮"]); $("fb").innerHTML = `✅ Correct! ${a} = ${v}%`; }
+    else { b.classList.add("bad", "shake"); Portal.SFX.bad(); $("fb").innerHTML = `❌ ${a} = ${v}%`; }
+    setTimeout(() => { LB.mi++; drawQ(); }, 1800);
+  });
+}
+
+function end() {
+  head(); $("rl").textContent = "Finished";
+  const w = S[0] == S[1] ? -1 : S[0] > S[1] ? 0 : 1;
+  Portal.SFX.win();
+  Portal.confetti(55, ["🏆", "🎉", "⭐", "🎈", "✨"]);
+  Portal.unlockBadge("c9_strategist");
+  Portal.recordC9Match(nm(0), S[0], nm(1), S[1]);
+  $("main").innerHTML = `
+    <div class="big">🏆</div>
+    <h1 class="c" style="color:${w < 0 ? "inherit" : col(w)}">${w < 0 ? "It is a tie!" : nm(w) + " wins!"}</h1>
+    <p class="q">${nm(0)} ${S[0]} – ${S[1]} ${nm(1)}</p>
+    <p class="mut c">Time left: ${fmt(left)}. Revise: AI vs not AI · domains · project cycle · training data &amp; overfitting · confusion matrix · ethics.</p>
+    <div class="row">
+      <button class="abtn" onclick="location.reload()">Play again (new random questions)</button>
+      <a class="p-pill" href="index.html">🏫 Back to Portal Hub</a>
+    </div>
+  `;
+}
+
+// Support direct hash navigation (#r0 .. #r4)
+const h = location.hash.match(/^#r([0-4])$/);
+if (h) go(Number(h[1]));
+else intro();
+</script>
+</body>
+</html>
