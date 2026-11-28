@@ -149,10 +149,12 @@ export default function Championship({
         )}
         {state.currentMission === 7 && (
           <BossBattle
+            activeTeam={state.activeTeam}
             teams={state.teams}
             bossEnergy={state.bossEnergy}
             onDamageBoss={onDamageBoss}
             onAward={onAward}
+            onSwitchTurn={switchTurn}
             onOpenReport={() => onNavigate('reports')}
           />
         )}

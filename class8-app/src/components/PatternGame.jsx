@@ -1,46 +1,59 @@
 import React, { useMemo, useState } from 'react';
-import { CheckCircle2, Sparkles } from 'lucide-react';
+import { CheckCircle2, Sparkles, Eye } from 'lucide-react';
 import ByteGuide from './ByteGuide.jsx';
 import { CT_PUZZLES } from '../data/questionBank.js';
 import { CT_CHAPTERS } from '../data/ctCurriculum.js';
 import AlgorithmBuilder from './AlgorithmBuilder.jsx';
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = (Math.random() * (i + 1)) | 0;
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+import { shuffle, shuffleDifferent } from '../utils/shuffle.js';
 
 const teamLabel = (t) => (t === 'blue' ? 'TEAM BLUE (CYBER TITANS)' : 'TEAM ORANGE (DATA DRAGONS)');
+const otherTeam = (t) => (t === 'blue' ? 'orange' : 'blue');
 
 export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompleteMission, revealHint, revealAnswer }) {
   const [gameTab, setGameTab] = useState('A');
-  const patternPuzzles = useMemo(() => CT_PUZZLES.filter((p) => p.game === 'A'), []);
+
+  // Game A: Shuffled puzzles + shuffled options per puzzle
+  const patternPuzzles = useMemo(
+    () => shuffle(CT_PUZZLES.filter((p) => p.game === 'A')).map((p) => ({ ...p, shuffledOpts: shuffle(p.options) })),
+    []
+  );
   const [patIdx, setPatIdx] = useState(0);
   const [patSelected, setPatSelected] = useState(null);
   const [patSolved, setPatSolved] = useState(false);
+  const [patTriedWrong, setPatTriedWrong] = useState([]);
+  const [patMissTeams, setPatMissTeams] = useState([]);
+  const [patTeacherWait, setPatTeacherWait] = useState(false);
 
+  // Game B: Decomposition
   const decompPuzzle = CT_PUZZLES.find((p) => p.game === 'B');
-  const [decompPool] = useState(() => shuffle(decompPuzzle.steps));
+  const [decompPool] = useState(() => shuffleDifferent(decompPuzzle.steps));
   const [decompPlaced, setDecompPlaced] = useState([]);
   const [decompSel, setDecompSel] = useState(null);
+  const [decompMisses, setDecompMisses] = useState({});
+  const [decompTeacherSlot, setDecompTeacherSlot] = useState(null);
 
+  // Game D: Abstraction (shuffled clues)
   const absPuzzle = CT_PUZZLES.find((p) => p.game === 'D');
+  const [absClues] = useState(() => shuffle(absPuzzle.clues));
   const [absPicked, setAbsPicked] = useState({});
 
-  const bankPuzzles = useMemo(() => CT_PUZZLES.filter((p) => p.game === 'CT-Bank'), []);
+  // CT Bank (shuffled puzzles + shuffled options)
+  const bankPuzzles = useMemo(
+    () => shuffle(CT_PUZZLES.filter((p) => p.game === 'CT-Bank')).map((p) => ({ ...p, shuffledOpts: shuffle(p.options) })),
+    []
+  );
   const [bankIdx, setBankIdx] = useState(0);
   const [bankAnswered, setBankAnswered] = useState(false);
+  const [bankTriedWrong, setBankTriedWrong] = useState([]);
+  const [bankMissTeams, setBankMissTeams] = useState([]);
+  const [bankTeacherWait, setBankTeacherWait] = useState(false);
 
   const [byteMsg, setByteMsg] = useState('Game A: Pattern Detectives! Drag or tap the missing tile into the [ ? ] slot.');
 
   const curPat = patternPuzzles[patIdx];
 
   const solvePattern = (choice) => {
-    if (patSolved) return;
+    if (patSolved || patTeacherWait || patTriedWrong.includes(choice)) return;
     setPatSelected(null);
     if (choice === curPat.correctAnswer) {
       setPatSolved(true);
@@ -48,13 +61,44 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
       setByteMsg(`✅ ${teamLabel(activeTeam)} +${curPat.points} pts! ${curPat.chapter}: ${curPat.explanation}`);
       onSwitchTurn();
     } else {
-      onAward({ teamId: activeTeam, points: 25, correct: false, concept: curPat.concept, misconception: curPat.concept });
-      setByteMsg(`❌ ${teamLabel(activeTeam)} (+25 learning pts) — Not ${choice}! Look carefully at how each step changes.`);
+      const nextWrong = [...patTriedWrong, choice];
+      const nextMiss = patMissTeams.includes(activeTeam) ? patMissTeams : [...patMissTeams, activeTeam];
+      setPatTriedWrong(nextWrong);
+      setPatMissTeams(nextMiss);
+      onAward({ teamId: activeTeam, points: 0, correct: false, concept: curPat.concept, misconception: curPat.concept });
+      if (nextMiss.length >= 2) {
+        setPatTeacherWait(true);
+        setByteMsg('👩‍🏫 Both teams missed! Answer stays hidden — Teacher, click below to reveal & explain!');
+      } else {
+        onSwitchTurn();
+        setByteMsg(`❌ "${choice}" is not right! Turn passes to ${teamLabel(otherTeam(activeTeam))} without revealing the answer!`);
+      }
+    }
+  };
+
+  const teacherRevealPat = () => {
+    setPatTeacherWait(false);
+    setPatSolved(true);
+    setByteMsg(`👩‍🏫 Teacher Reveal: ${curPat.correctAnswer}. ${curPat.explanation}`);
+    onSwitchTurn();
+  };
+
+  const nextPattern = () => {
+    if (patIdx + 1 < patternPuzzles.length) {
+      setPatIdx((i) => i + 1);
+      setPatSolved(false);
+      setPatTriedWrong([]);
+      setPatMissTeams([]);
+      setPatTeacherWait(false);
+      setByteMsg('Next pattern puzzle! Watch the sequence carefully.');
+    } else {
+      setGameTab('B');
+      setByteMsg('Game B (+50 pts/step + 100 bonus): Decomposition! Break "Organise a school science exhibition" into 5 ordered steps!');
     }
   };
 
   const placeDecompStep = (stepText, slotIdx) => {
-    if (decompPlaced[slotIdx]) return;
+    if (decompPlaced[slotIdx] || decompTeacherSlot !== null) return;
     setDecompSel(null);
     const expected = decompPuzzle.steps[slotIdx];
     if (stepText === expected) {
@@ -69,9 +113,29 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
         onSwitchTurn();
       }
     } else {
+      const prev = decompMisses[slotIdx] || [];
+      const nextM = prev.includes(activeTeam) ? prev : [...prev, activeTeam];
+      setDecompMisses({ ...decompMisses, [slotIdx]: nextM });
       onAward({ teamId: activeTeam, points: 0, correct: false, concept: 'Decomposition', misconception: 'Task Sequencing' });
-      setByteMsg(`❌ Think: what must happen at Step ${slotIdx + 1} before the next task?`);
+      if (nextM.length >= 2) {
+        setDecompTeacherSlot(slotIdx);
+        setByteMsg(`👩‍🏫 Both teams missed Step ${slotIdx + 1}! Teacher, click below to reveal Step ${slotIdx + 1}!`);
+      } else {
+        onSwitchTurn();
+        setByteMsg(`❌ Not Step ${slotIdx + 1}! Turn passes to ${teamLabel(otherTeam(activeTeam))}!`);
+      }
     }
+  };
+
+  const teacherRevealDecomp = () => {
+    const idx = decompTeacherSlot;
+    if (idx === null) return;
+    const next = [...decompPlaced];
+    next[idx] = decompPuzzle.steps[idx];
+    setDecompPlaced(next);
+    setDecompTeacherSlot(null);
+    setByteMsg(`👩‍🏫 Teacher Reveal — Step ${idx + 1} is "${decompPuzzle.steps[idx]}".`);
+    onSwitchTurn();
   };
 
   const toggleClue = (clue) => {
@@ -88,22 +152,40 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
       }
     } else {
       onAward({ teamId: activeTeam, points: 0, correct: false, concept: 'Abstraction', misconception: 'Irrelevant details' });
-      setByteMsg(`🚫 "${clue.text}" is irrelevant noise! Abstraction ignores details that don't affect bus count.`);
+      onSwitchTurn();
+      setByteMsg(`🚫 "${clue.text}" is irrelevant noise! Turn passes to ${teamLabel(otherTeam(activeTeam))}!`);
     }
   };
 
   const curBank = bankPuzzles[bankIdx];
   const answerBank = (opt) => {
-    if (bankAnswered) return;
-    setBankAnswered(true);
+    if (bankAnswered || bankTeacherWait || bankTriedWrong.includes(opt)) return;
     if (opt === curBank.correctAnswer) {
+      setBankAnswered(true);
       onAward({ teamId: activeTeam, points: curBank.points, correct: true, concept: curBank.concept, ctChapter: curBank.chapter });
       setByteMsg(`✅ ${teamLabel(activeTeam)} +${curBank.points} pts! ${curBank.chapter}: ${curBank.explanation}`);
       onSwitchTurn();
     } else {
-      onAward({ teamId: activeTeam, points: 25, correct: false, concept: curBank.concept, misconception: curBank.concept });
-      setByteMsg(`❌ ${teamLabel(activeTeam)} (+25 learning pts) — Answer: ${curBank.correctAnswer}. ${curBank.explanation}`);
+      const nextW = [...bankTriedWrong, opt];
+      const nextM = bankMissTeams.includes(activeTeam) ? bankMissTeams : [...bankMissTeams, activeTeam];
+      setBankTriedWrong(nextW);
+      setBankMissTeams(nextM);
+      onAward({ teamId: activeTeam, points: 0, correct: false, concept: curBank.concept, misconception: curBank.concept });
+      if (nextM.length >= 2) {
+        setBankTeacherWait(true);
+        setByteMsg('👩‍🏫 Both teams missed! Teacher, click below to reveal & explain the answer!');
+      } else {
+        onSwitchTurn();
+        setByteMsg(`❌ Not "${opt}"! Turn passes to ${teamLabel(otherTeam(activeTeam))} — answer still hidden!`);
+      }
     }
+  };
+
+  const teacherRevealBank = () => {
+    setBankTeacherWait(false);
+    setBankAnswered(true);
+    setByteMsg(`👩‍🏫 Teacher Reveal: ${curBank.correctAnswer}. ${curBank.explanation}`);
+    onSwitchTurn();
   };
 
   return (
@@ -134,7 +216,7 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
         </div>
       </div>
 
-      <ByteGuide message={byteMsg} mood="happy" compact />
+      <ByteGuide message={byteMsg} mood={patTeacherWait || bankTeacherWait || decompTeacherSlot !== null ? 'alert' : 'happy'} compact />
 
       {gameTab === 'A' && (
         <div className="space-y-4">
@@ -161,45 +243,47 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
               {patSolved ? `${curPat.prompt.replace('?', curPat.correctAnswer)}` : curPat.prompt}
             </div>
             <div className="text-sm font-bold text-sky-700">
-              {patSolved ? '✅ Pattern Solved!' : 'Drop or tap a tile below into this panel!'}
+              {patSolved ? '✅ Pattern Solved!' : 'Drop or tap a shuffled tile below into this panel!'}
             </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {curPat.options.map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                draggable={!patSolved}
-                onDragStart={(e) => { e.dataTransfer.setData('text/plain', opt); setPatSelected(opt); }}
-                onClick={() => solvePattern(opt)}
-                disabled={patSolved}
-                className={`touch-btn py-4 px-4 rounded-2xl border-2 font-black text-xl cursor-pointer shadow-sm ${
-                  patSolved && opt === curPat.correctAnswer
-                    ? 'bg-emerald-600 text-white border-emerald-700'
-                    : 'bg-white text-slate-900 border-slate-300 hover:border-sky-500'
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
+            {curPat.shuffledOpts.map((opt) => {
+              const wrongTried = patTriedWrong.includes(opt);
+              const isRight = patSolved && opt === curPat.correctAnswer;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  draggable={!patSolved && !patTeacherWait && !wrongTried}
+                  onDragStart={(e) => { e.dataTransfer.setData('text/plain', opt); setPatSelected(opt); }}
+                  onClick={() => solvePattern(opt)}
+                  disabled={patSolved || patTeacherWait || wrongTried}
+                  className={`touch-btn py-4 px-4 rounded-2xl border-2 border-b-4 font-black text-xl cursor-pointer shadow-sm ${
+                    isRight
+                      ? 'bg-emerald-600 text-white border-emerald-700'
+                      : wrongTried
+                        ? 'bg-rose-100 text-rose-700 border-rose-300 opacity-60 line-through'
+                        : 'bg-white text-slate-900 border-slate-300 hover:border-sky-500'
+                  }`}
+                >
+                  {opt}
+                </button>
+              );
+            })}
           </div>
+
+          {patTeacherWait && (
+            <div className="flex justify-center">
+              <button type="button" onClick={teacherRevealPat} className="touch-btn px-6 py-3 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer">
+                <Eye className="w-5 h-5" /> 👩‍🏫 Teacher: Reveal Answer &amp; Explain
+              </button>
+            </div>
+          )}
 
           {patSolved && (
             <div className="flex justify-center">
-              <button
-                type="button"
-                onClick={() => {
-                  if (patIdx + 1 < patternPuzzles.length) {
-                    setPatIdx((i) => i + 1);
-                    setPatSolved(false);
-                  } else {
-                    setGameTab('B');
-                    setByteMsg('Game B (+50 pts/step + 100 bonus): Decomposition! Break "Organise a school science exhibition" into 5 ordered steps!');
-                  }
-                }}
-                className="touch-btn px-6 py-3 rounded-2xl bg-sky-600 text-white font-black text-lg cursor-pointer"
-              >
+              <button type="button" onClick={nextPattern} className="touch-btn px-6 py-3 rounded-2xl bg-sky-600 text-white font-black text-lg cursor-pointer">
                 {patIdx + 1 < patternPuzzles.length ? 'Next Pattern Puzzle ▶' : 'Move to Game B: Decomposition ▶'}
               </button>
             </div>
@@ -212,15 +296,22 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
           <div className="p-3 rounded-2xl bg-indigo-100 border border-indigo-300 text-center text-xl font-black text-indigo-950">
             🎯 Big Problem: "Organise a school science exhibition." <span className="text-emerald-700 text-base">(+50 pts/step)</span>
           </div>
+          {decompTeacherSlot !== null && (
+            <div className="flex justify-center">
+              <button type="button" onClick={teacherRevealDecomp} className="touch-btn px-6 py-3 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer">
+                <Eye className="w-5 h-5" /> 👩‍🏫 Teacher: Reveal Step {decompTeacherSlot + 1}
+              </button>
+            </div>
+          )}
           <div className="rounded-2xl p-3 bg-slate-100 border-2 border-dashed border-slate-300 flex flex-wrap gap-2 justify-center">
             {decompPool.filter((s) => !decompPlaced.includes(s)).map((s) => (
               <button
                 key={s}
                 type="button"
-                draggable
+                draggable={decompTeacherSlot === null}
                 onDragStart={(e) => { e.dataTransfer.setData('text/plain', s); setDecompSel(s); }}
                 onClick={() => setDecompSel(decompSel === s ? null : s)}
-                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-black text-base cursor-grab ${
+                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 border-b-4 font-black text-base cursor-grab ${
                   decompSel === s ? 'bg-sky-600 text-white border-sky-800' : 'bg-white text-slate-900 border-slate-300 shadow-sm'
                 }`}
               >
@@ -269,18 +360,18 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
               🚌 Find the Essential Clue (Abstraction) · <span className="text-emerald-700">+50 pts/clue</span>
             </h3>
             <p className="text-lg text-slate-700 mt-1 mb-0">
-              Tap ONLY the essential clues needed to allocate school buses (ignore distracting facts!).
+              Tap ONLY the essential clues needed to allocate school buses (clues are shuffled!).
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {absPuzzle.clues.map((c) => {
+            {absClues.map((c) => {
               const picked = absPicked[c.id];
               return (
                 <button
                   key={c.id}
                   type="button"
                   onClick={() => toggleClue(c)}
-                  className={`touch-btn p-4 rounded-2xl border-2 text-left font-bold text-lg flex items-center justify-between gap-2 cursor-pointer ${
+                  className={`touch-btn p-4 rounded-2xl border-2 border-b-4 text-left font-bold text-lg flex items-center justify-between gap-2 cursor-pointer ${
                     picked ? 'bg-emerald-50 border-emerald-500 text-emerald-950' : 'bg-white border-slate-300 text-slate-900 shadow-sm'
                   }`}
                 >
@@ -311,35 +402,51 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
               </span>
             ))}
           </div>
-          <div className="rounded-2xl p-5 bg-indigo-50 border-2 border-indigo-300">
-            <div className="text-sm font-black text-sky-800 mb-1">
+          <div className="rounded-2xl p-5 bg-indigo-50 border-2 border-indigo-300 space-y-4">
+            <div className="text-sm font-black text-sky-800">
               Chapter: {curBank.chapter} · Challenge {bankIdx + 1}/{bankPuzzles.length} · <span className="text-emerald-700">Worth +{curBank.points} pts</span>
             </div>
-            <div className="text-xl md:text-2xl font-black text-slate-900 mb-4">{curBank.instructions}</div>
+            <div className="text-xl md:text-2xl font-black text-slate-900">{curBank.instructions}</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {curBank.options.map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  disabled={bankAnswered}
-                  onClick={() => answerBank(opt)}
-                  className={`touch-btn p-4 rounded-2xl border-2 font-black text-lg cursor-pointer shadow-sm ${
-                    bankAnswered && opt === curBank.correctAnswer
-                      ? 'bg-emerald-600 text-white border-emerald-700'
-                      : 'bg-white text-slate-900 border-slate-300'
-                  }`}
-                >
-                  {opt}
-                </button>
-              ))}
+              {curBank.shuffledOpts.map((opt) => {
+                const wrongTried = bankTriedWrong.includes(opt);
+                const isRight = bankAnswered && opt === curBank.correctAnswer;
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    disabled={bankAnswered || bankTeacherWait || wrongTried}
+                    onClick={() => answerBank(opt)}
+                    className={`touch-btn p-4 rounded-2xl border-2 border-b-4 font-black text-lg cursor-pointer shadow-sm ${
+                      isRight
+                        ? 'bg-emerald-600 text-white border-emerald-700'
+                        : wrongTried
+                          ? 'bg-rose-100 text-rose-700 border-rose-300 opacity-60 line-through'
+                          : 'bg-white text-slate-900 border-slate-300'
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
             </div>
+            {bankTeacherWait && (
+              <div className="flex justify-center">
+                <button type="button" onClick={teacherRevealBank} className="touch-btn px-6 py-3 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer">
+                  <Eye className="w-5 h-5" /> 👩‍🏫 Teacher: Reveal Answer &amp; Explain
+                </button>
+              </div>
+            )}
             {bankAnswered && (
-              <div className="mt-4 flex justify-center">
+              <div className="flex justify-center">
                 <button
                   type="button"
                   onClick={() => {
                     setBankIdx((i) => (i + 1) % bankPuzzles.length);
                     setBankAnswered(false);
+                    setBankTriedWrong([]);
+                    setBankMissTeams([]);
+                    setBankTeacherWait(false);
                   }}
                   className="px-5 py-2.5 rounded-xl bg-sky-600 text-white font-black cursor-pointer"
                 >

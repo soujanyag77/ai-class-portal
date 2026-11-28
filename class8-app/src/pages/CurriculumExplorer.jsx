@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ArrowLeft, BookOpen, Cpu } from 'lucide-react';
 import { AI_CHAPTERS } from '../data/aiCurriculum.js';
 import { CT_CHAPTERS } from '../data/ctCurriculum.js';
 import { AI_CONCEPT_QUESTIONS } from '../data/questionBank.js';
+import { shuffle } from '../utils/shuffle.js';
 
 export default function CurriculumExplorer({ onBack }) {
   const [tab, setTab] = useState('ai');
   const [quizAnswer, setQuizAnswer] = useState({});
+  const shuffledBank = useMemo(
+    () => shuffle(AI_CONCEPT_QUESTIONS).map((q) => ({ ...q, shuffledOpts: shuffle(q.options) })),
+    []
+  );
 
   return (
     <div className="min-h-screen ai-arena-bg text-slate-900 p-4 md:p-6">
@@ -67,7 +72,7 @@ export default function CurriculumExplorer({ onBack }) {
 
         {tab === 'bank' && (
           <div className="space-y-3">
-            {AI_CONCEPT_QUESTIONS.map((q, idx) => (
+            {shuffledBank.map((q, idx) => (
               <div key={q.id} className="glass-panel rounded-2xl p-4 space-y-2">
                 <div className="flex justify-between text-xs font-black text-sky-700">
                   <span>Q{idx + 1} · {q.concept}</span>
@@ -75,7 +80,7 @@ export default function CurriculumExplorer({ onBack }) {
                 </div>
                 <div className="text-lg font-extrabold text-slate-900">{q.instructions}</div>
                 <div className="flex flex-wrap gap-2">
-                  {q.options.map((opt) => (
+                  {q.shuffledOpts.map((opt) => (
                     <button
                       key={opt}
                       type="button"
@@ -92,8 +97,11 @@ export default function CurriculumExplorer({ onBack }) {
                     </button>
                   ))}
                 </div>
-                {quizAnswer[q.id] && (
-                  <div className="text-sm font-bold text-amber-900">💡 {q.explanation}</div>
+                {quizAnswer[q.id] && quizAnswer[q.id] === q.correctAnswer && (
+                  <div className="text-sm font-bold text-emerald-800">💡 {q.explanation}</div>
+                )}
+                {quizAnswer[q.id] && quizAnswer[q.id] !== q.correctAnswer && (
+                  <div className="text-sm font-bold text-rose-700">❌ Not quite — try another option!</div>
                 )}
               </div>
             ))}

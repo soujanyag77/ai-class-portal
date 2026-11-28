@@ -1,27 +1,24 @@
 import React, { useMemo, useState } from 'react';
-import { AlertCircle, CheckCircle2, Wrench } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Wrench, Eye } from 'lucide-react';
 import ByteGuide from './ByteGuide.jsx';
 import { SPORTS_BIASED_DATASET, FAIRNESS_SCENARIOS } from '../data/questionBank.js';
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = (Math.random() * (i + 1)) | 0;
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+import { shuffle } from '../utils/shuffle.js';
 
 const teamLabel = (t) => (t === 'blue' ? 'TEAM BLUE (CYBER TITANS)' : 'TEAM ORANGE (DATA DRAGONS)');
+const otherTeam = (t) => (t === 'blue' ? 'orange' : 'blue');
 
 export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCompleteMission }) {
   const [tab, setTab] = useState('A');
+  const datasetRows = useMemo(() => shuffle(SPORTS_BIASED_DATASET), []);
   const [flaggedIds, setFlaggedIds] = useState({});
   const scenarios = useMemo(() => shuffle(FAIRNESS_SCENARIOS).slice(0, 6), []);
   const [placed, setPlaced] = useState({});
   const [selId, setSelId] = useState(null);
+  const [scenMisses, setScenMisses] = useState({});
+  const [scenTeacherId, setScenTeacherId] = useState(null);
+
   const [repaired, setRepaired] = useState({ girls: false, rural: false, para: false });
-  const [byteMsg, setByteMsg] = useState('Investigation Room (+100 pts/clue): Examine the fictional Sports AI dataset and tap the biased / excluded rows!');
+  const [byteMsg, setByteMsg] = useState('Investigation Room (+100 pts/clue): Examine the fictional Sports AI dataset (rows shuffled!) and tap the biased / excluded rows!');
 
   const biasedRows = SPORTS_BIASED_DATASET.filter((r) => r.selected !== 'Selected');
   const diversityScore = 25 + (repaired.girls ? 25 : 0) + (repaired.rural ? 25 : 0) + (repaired.para ? 25 : 0);
@@ -41,12 +38,14 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
         }, 1100);
       }
     } else {
-      setByteMsg(`ℹ️ ${row.id} (${row.category}) was already represented and selected—look at who was left out!`);
+      onAward({ teamId: activeTeam, points: 0, correct: false, concept: 'Spotting Data Bias' });
+      onSwitchTurn();
+      setByteMsg(`❌ ${row.id} (${row.category}) was already selected! Turn passes to ${teamLabel(otherTeam(activeTeam))} to find who was unfairly excluded!`);
     }
   };
 
   const placeScenario = (id, bucket) => {
-    if (placed[id]) return;
+    if (placed[id] || scenTeacherId) return;
     setSelId(null);
     const sc = scenarios.find((s) => s.id === id);
     if (sc && sc.label === bucket) {
@@ -62,8 +61,30 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
         }, 1100);
       }
     } else {
-      onAward({ teamId: activeTeam, points: 20, correct: false, concept: sc?.concept || 'Fairness', misconception: 'Identifying AI Fairness vs Bias' });
-      setByteMsg(`❌ ${teamLabel(activeTeam)} (+20 learning pts) — Ask: Does this give every group an equal, inclusive chance?`);
+      const prev = scenMisses[id] || [];
+      const nextM = prev.includes(activeTeam) ? prev : [...prev, activeTeam];
+      setScenMisses({ ...scenMisses, [id]: nextM });
+      onAward({ teamId: activeTeam, points: 0, correct: false, concept: sc?.concept || 'Fairness', misconception: 'Identifying AI Fairness vs Bias' });
+      if (nextM.length >= 2) {
+        setScenTeacherId(id);
+        setByteMsg('👩‍🏫 Both teams missed this scenario! Teacher, click below to reveal the fair classification.');
+      } else {
+        onSwitchTurn();
+        setByteMsg(`❌ Not "${bucket}"! Turn passes to ${teamLabel(otherTeam(activeTeam))} without revealing the answer!`);
+      }
+    }
+  };
+
+  const teacherRevealScen = () => {
+    const sc = scenarios.find((s) => s.id === scenTeacherId);
+    if (!sc) return;
+    const next = { ...placed, [sc.id]: sc.label };
+    setPlaced(next);
+    setScenTeacherId(null);
+    setByteMsg(`👩‍🏫 Teacher Reveal — ${sc.label}: ${sc.explanation}`);
+    onSwitchTurn();
+    if (Object.keys(next).length === scenarios.length) {
+      setTimeout(() => setTab('C'), 1100);
     }
   };
 
@@ -111,7 +132,15 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
         </div>
       </div>
 
-      <ByteGuide message={byteMsg} mood="thinking" compact />
+      <ByteGuide message={byteMsg} mood={scenTeacherId ? 'alert' : 'thinking'} compact />
+
+      {scenTeacherId && (
+        <div className="flex justify-center">
+          <button type="button" onClick={teacherRevealScen} className="touch-btn px-6 py-3 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer">
+            <Eye className="w-5 h-5" /> 👩‍🏫 Teacher: Reveal Classification &amp; Explain
+          </button>
+        </div>
+      )}
 
       {tab === 'A' && (
         <div className="space-y-3">
@@ -130,7 +159,7 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
                 </tr>
               </thead>
               <tbody>
-                {SPORTS_BIASED_DATASET.map((r) => {
+                {datasetRows.map((r) => {
                   const hit = flaggedIds[r.id];
                   return (
                     <tr
@@ -162,10 +191,11 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
               <button
                 key={s.id}
                 type="button"
-                draggable
+                disabled={Boolean(scenTeacherId)}
+                draggable={!scenTeacherId}
                 onDragStart={(e) => { e.dataTransfer.setData('text/plain', s.id); setSelId(s.id); }}
                 onClick={() => setSelId(selId === s.id ? null : s.id)}
-                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-bold text-base text-left max-w-md cursor-grab ${
+                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 border-b-4 font-bold text-base text-left max-w-md cursor-grab ${
                   selId === s.id ? 'bg-orange-500 text-white border-orange-700' : 'bg-white text-slate-900 border-slate-300 shadow-sm'
                 }`}
               >
@@ -227,7 +257,7 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
                 type="button"
                 disabled={repaired[btn.key]}
                 onClick={() => addCategory(btn.key, btn.label)}
-                className={`touch-btn p-4 rounded-2xl border-2 font-black text-lg cursor-pointer shadow-sm ${
+                className={`touch-btn p-4 rounded-2xl border-2 border-b-4 font-black text-lg cursor-pointer shadow-sm ${
                   repaired[btn.key]
                     ? 'bg-emerald-600 border-emerald-700 text-white'
                     : 'bg-white border-orange-400 text-slate-900'

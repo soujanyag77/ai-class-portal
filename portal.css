@@ -1,28 +1,17 @@
 :root {
-  --bg: #f4f6fb;
+  --bg: #eef6ff;
   --card: #ffffff;
   --ink: #14213d;
-  --mut: #5b6785;
-  --line: #d9dff0;
+  --mut: #475569;
+  --line: #bae6fd;
   --a: #6c4cf1;
   --b: #ff7a59;
   --red: #e63946;
-  --blue: #1d70d6;
-  --ok: #1b9e5a;
-  --no: #d63031;
-  --gold: #f4b400;
-  --shadow: 0 10px 28px rgba(20, 33, 61, 0.08);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0f1426;
-    --card: #1a2240;
-    --ink: #eef1fb;
-    --mut: #a3adcc;
-    --line: #2d3760;
-    --shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
-  }
+  --blue: #0284c7;
+  --ok: #16a34a;
+  --no: #dc2626;
+  --gold: #f59e0b;
+  --shadow: 0 10px 26px rgba(14, 116, 144, 0.11), 0 4px 0 rgba(186, 230, 253, 0.7);
 }
 
 :root[data-theme="dark"] {
@@ -33,13 +22,20 @@
   --line: #2d3760;
   --shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
 }
+:root[data-theme="dark"] body {
+  background: #0f1426;
+}
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 8% 12%, rgba(56, 189, 248, 0.25), transparent 34%),
+    radial-gradient(circle at 92% 14%, rgba(251, 146, 60, 0.22), transparent 34%),
+    radial-gradient(circle at 50% 90%, rgba(167, 139, 250, 0.18), transparent 40%),
+    linear-gradient(155deg, #e0f2fe 0%, #fefce8 52%, #fff1f2 100%);
   color: var(--ink);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: "Trebuchet MS", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   min-height: 100vh;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);

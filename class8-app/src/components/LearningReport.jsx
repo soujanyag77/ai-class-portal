@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Download, Printer, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { BEFORE_ASSESSMENT, AFTER_ASSESSMENT } from '../data/questionBank.js';
 import { buildLearningSummary, exportReportCSV } from '../utils/assessment.js';
+import { shuffle } from '../utils/shuffle.js';
 
 export default function LearningReport({
   state,
@@ -13,6 +14,15 @@ export default function LearningReport({
   const [tab, setTab] = useState('report');
   const summary = buildLearningSummary(state, BEFORE_ASSESSMENT, AFTER_ASSESSMENT);
 
+  const beforeShuffled = useMemo(
+    () => BEFORE_ASSESSMENT.map((q) => ({ ...q, shuffled: shuffle(q.options.map((t, i) => ({ t, origIdx: i }))) })),
+    []
+  );
+  const afterShuffled = useMemo(
+    () => AFTER_ASSESSMENT.map((q) => ({ ...q, shuffled: shuffle(q.options.map((t, i) => ({ t, origIdx: i }))) })),
+    []
+  );
+
   const renderQuiz = (title, qs, answers, onAnswer) => (
     <div className="space-y-4">
       <h2 className="text-2xl font-black text-sky-800 m-0">{title}</h2>
@@ -21,19 +31,19 @@ export default function LearningReport({
           <div className="text-xs font-black uppercase text-orange-700">{q.concept}</div>
           <div className="text-lg font-extrabold text-slate-900">{q.prompt}</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {q.options.map((opt, idx) => {
-              const selected = answers[q.id] === idx;
+            {q.shuffled.map(({ t, origIdx }) => {
+              const selected = answers[q.id] === origIdx;
               return (
                 <button
-                  key={opt}
+                  key={t}
                   type="button"
-                  onClick={() => onAnswer(q.id, idx)}
+                  onClick={() => onAnswer(q.id, origIdx)}
                   className={`p-3 rounded-xl border-2 text-left font-bold text-sm flex items-center gap-2 cursor-pointer ${
                     selected ? 'bg-sky-600 text-white border-sky-700' : 'bg-slate-50 text-slate-800 border-slate-300'
                   }`}
                 >
                   {selected && <CheckCircle2 className="w-4 h-4 shrink-0" />}
-                  <span>{opt}</span>
+                  <span>{t}</span>
                 </button>
               );
             })}
@@ -78,8 +88,8 @@ export default function LearningReport({
           </div>
         </div>
 
-        {tab === 'before' && renderQuiz('📝 Pre-Session Baseline Assessment (5 Questions)', BEFORE_ASSESSMENT, state.beforeAssessment, onSaveBefore)}
-        {tab === 'after' && renderQuiz('🎓 Post-Session Learning Assessment (5 Questions)', AFTER_ASSESSMENT, state.afterAssessment, onSaveAfter)}
+        {tab === 'before' && renderQuiz('📝 Pre-Session Baseline Assessment (5 Questions)', beforeShuffled, state.beforeAssessment, onSaveBefore)}
+        {tab === 'after' && renderQuiz('🎓 Post-Session Learning Assessment (5 Questions)', afterShuffled, state.afterAssessment, onSaveAfter)}
 
         {tab === 'report' && (
           <div className="glass-panel print-card rounded-3xl p-6 space-y-5 border-2 border-sky-300">

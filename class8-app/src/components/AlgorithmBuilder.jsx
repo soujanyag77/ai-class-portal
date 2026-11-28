@@ -1,26 +1,22 @@
 import React, { useState } from 'react';
-import { ArrowDown, ArrowUp, Play, RotateCcw } from 'lucide-react';
+import { ArrowDown, ArrowUp, Play, RotateCcw, Eye } from 'lucide-react';
 import { CT_PUZZLES } from '../data/questionBank.js';
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = (Math.random() * (i + 1)) | 0;
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+import { shuffleDifferent } from '../utils/shuffle.js';
 
 const teamLabel = (t) => (t === 'blue' ? 'TEAM BLUE (CYBER TITANS)' : 'TEAM ORANGE (DATA DRAGONS)');
+const otherTeam = (t) => (t === 'blue' ? 'orange' : 'blue');
 
 export default function AlgorithmBuilder({ activeTeam, onAward, onSwitchTurn, onNextGame }) {
   const puzzle = CT_PUZZLES.find((p) => p.game === 'C');
   const correctSteps = puzzle.steps;
-  const [sequence, setSequence] = useState(() => shuffle(correctSteps));
+  const [sequence, setSequence] = useState(() => shuffleDifferent(correctSteps));
   const [runIndex, setRunIndex] = useState(-1);
   const [simResult, setSimResult] = useState(null);
+  const [missTeams, setMissTeams] = useState([]);
+  const [teacherWait, setTeacherWait] = useState(false);
 
   const moveStep = (idx, dir) => {
+    if (teacherWait) return;
     const target = idx + dir;
     if (target < 0 || target >= sequence.length) return;
     const copy = [...sequence];
@@ -31,17 +27,26 @@ export default function AlgorithmBuilder({ activeTeam, onAward, onSwitchTurn, on
   };
 
   const runRobot = () => {
+    if (teacherWait) return;
     setSimResult(null);
     let step = 0;
     const iv = setInterval(() => {
       setRunIndex(step);
       if (sequence[step] !== correctSteps[step]) {
         clearInterval(iv);
-        const bugHint = step === 0
-          ? '🤖 Oops! BYTE tried to pour or mix before boiling water! (+25 learning pts)'
-          : `🤖 Debug alert at Step ${step + 1}: "${sequence[step]}" happened too early or too late! (+25 learning pts)`;
-        setSimResult({ ok: false, msg: bugHint });
-        onAward({ teamId: activeTeam, points: 25, correct: false, concept: 'Algorithm Debugging', misconception: 'Algorithm Step Sequence' });
+        const nextMiss = missTeams.includes(activeTeam) ? missTeams : [...missTeams, activeTeam];
+        setMissTeams(nextMiss);
+        onAward({ teamId: activeTeam, points: 0, correct: false, concept: 'Algorithm Debugging', misconception: 'Algorithm Step Sequence' });
+        if (nextMiss.length >= 2) {
+          setTeacherWait(true);
+          setSimResult({ ok: false, msg: '👩‍🏫 Both teams had a bug in the sequence! Teacher, click below to reveal the exact algorithm!' });
+        } else {
+          onSwitchTurn();
+          setSimResult({
+            ok: false,
+            msg: `🤖 Bug at Step ${step + 1}! Turn passes to ${teamLabel(otherTeam(activeTeam))} to debug & fix the order!`
+          });
+        }
         return;
       }
       step++;
@@ -51,7 +56,15 @@ export default function AlgorithmBuilder({ activeTeam, onAward, onSwitchTurn, on
         onAward({ teamId: activeTeam, points: 150, correct: true, earnStar: true, concept: 'Algorithm Design & Sequence', ctChapter: 'Algorithm Design' });
         onSwitchTurn();
       }
-    }, 520);
+    }, 480);
+  };
+
+  const teacherReveal = () => {
+    setSequence([...correctSteps]);
+    setTeacherWait(false);
+    setRunIndex(-1);
+    setSimResult({ ok: true, msg: `👩‍🏫 Teacher Reveal: ${puzzle.explanation}` });
+    onSwitchTurn();
   };
 
   return (
@@ -67,7 +80,7 @@ export default function AlgorithmBuilder({ activeTeam, onAward, onSwitchTurn, on
         </div>
         <button
           type="button"
-          onClick={() => { setSequence(shuffle(correctSteps)); setSimResult(null); setRunIndex(-1); }}
+          onClick={() => { setSequence(shuffleDifferent(correctSteps)); setSimResult(null); setRunIndex(-1); setMissTeams([]); setTeacherWait(false); }}
           className="px-3.5 py-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 font-bold text-sm flex items-center gap-1 cursor-pointer"
         >
           <RotateCcw className="w-4 h-4" /> Scramble
@@ -102,7 +115,7 @@ export default function AlgorithmBuilder({ activeTeam, onAward, onSwitchTurn, on
                 <button
                   type="button"
                   onClick={() => moveStep(idx, -1)}
-                  disabled={idx === 0}
+                  disabled={idx === 0 || teacherWait}
                   className="p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 disabled:opacity-30 cursor-pointer"
                   aria-label="Move step up"
                 >
@@ -111,7 +124,7 @@ export default function AlgorithmBuilder({ activeTeam, onAward, onSwitchTurn, on
                 <button
                   type="button"
                   onClick={() => moveStep(idx, 1)}
-                  disabled={idx === sequence.length - 1}
+                  disabled={idx === sequence.length - 1 || teacherWait}
                   className="p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 disabled:opacity-30 cursor-pointer"
                   aria-label="Move step down"
                 >
@@ -130,13 +143,19 @@ export default function AlgorithmBuilder({ activeTeam, onAward, onSwitchTurn, on
       )}
 
       <div className="flex justify-center gap-3 flex-wrap">
-        <button
-          type="button"
-          onClick={runRobot}
-          className="touch-btn px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer"
-        >
-          <Play className="w-5 h-5 fill-white" /> Run Robot BYTE
-        </button>
+        {teacherWait ? (
+          <button type="button" onClick={teacherReveal} className="touch-btn px-6 py-3 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer">
+            <Eye className="w-5 h-5" /> 👩‍🏫 Teacher: Reveal Exact Algorithm
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={runRobot}
+            className="touch-btn px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer"
+          >
+            <Play className="w-5 h-5 fill-white" /> Run Robot BYTE
+          </button>
+        )}
         {simResult?.ok && (
           <button
             type="button"

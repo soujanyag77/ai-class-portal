@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { CheckCircle2, Sparkles, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, Sparkles, AlertTriangle, Eye } from 'lucide-react';
 import ByteGuide from './ByteGuide.jsx';
 import {
   MISSION1_DEVICES,
@@ -8,22 +8,18 @@ import {
   DATA_CLEANING_ROWS
 } from '../data/questionBank.js';
 import { SCORE_VALUES } from '../utils/scoring.js';
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = (Math.random() * (i + 1)) | 0;
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+import { shuffle } from '../utils/shuffle.js';
 
 const teamLabel = (t) => (t === 'blue' ? 'TEAM BLUE (CYBER TITANS)' : 'TEAM ORANGE (DATA DRAGONS)');
+const otherTeam = (t) => (t === 'blue' ? 'orange' : 'blue');
 
 export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMission, revealHint, revealAnswer }) {
   const items = useMemo(() => shuffle(MISSION1_DEVICES), []);
   const [placed, setPlaced] = useState({});
   const [selectedId, setSelectedId] = useState(null);
+  // Tracks which teams tried & missed the current item: { [deviceId]: ['blue'] }
+  const [itemMisses, setItemMisses] = useState({});
+  const [teacherPendingId, setTeacherPendingId] = useState(null);
   const [feedback, setFeedback] = useState({
     msg: 'Drag any device into Bucket A (Uses AI) or Bucket B (Does not necessarily use AI) — or tap a device, then tap a bucket!',
     mood: 'happy',
@@ -34,6 +30,7 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
   const remaining = items.filter((d) => !placed[d.id]);
 
   const handlePlace = (deviceId, bucket) => {
+    if (teacherPendingId) return;
     const dev = items.find((d) => d.id === deviceId);
     if (!dev || placed[deviceId]) return;
     setSelectedId(null);
@@ -60,27 +57,57 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
         onSwitchTurn();
       }
     } else {
+      const prevMisses = itemMisses[deviceId] || [];
+      const nextMisses = prevMisses.includes(activeTeam) ? prevMisses : [...prevMisses, activeTeam];
+      setItemMisses({ ...itemMisses, [deviceId]: nextMisses });
       onAward({
         teamId: activeTeam,
-        points: 20,
+        points: 0,
         correct: false,
         concept: dev.concept,
         misconception: dev.concept
       });
-      setFeedback({
-        msg: `🤔 ${teamLabel(activeTeam)} (+20 learning pts) — Not quite for ${dev.name}! Hint: ${dev.explanation}`,
-        mood: 'thinking',
-        canBonus: false
-      });
+
+      if (nextMisses.length >= 2) {
+        setTeacherPendingId(deviceId);
+        setFeedback({
+          msg: `👩‍🏫 Both teams missed "${dev.name}"! Answer is hidden — Teacher, click below to reveal & place it!`,
+          mood: 'alert',
+          canBonus: false
+        });
+      } else {
+        onSwitchTurn();
+        setFeedback({
+          msg: `❌ Not quite for "${dev.name}"! Turn passes to ${teamLabel(otherTeam(activeTeam))} — try placing it!`,
+          mood: 'thinking',
+          canBonus: false
+        });
+      }
+    }
+  };
+
+  const teacherRevealItem = () => {
+    const dev = items.find((d) => d.id === teacherPendingId);
+    if (!dev) return;
+    const next = { ...placed, [dev.id]: dev.bucket };
+    setPlaced(next);
+    setTeacherPendingId(null);
+    setFeedback({
+      msg: `👩‍🏫 Teacher Reveal — ${dev.name} → ${dev.correctAnswer}. ${dev.explanation}`,
+      mood: 'happy',
+      canBonus: false
+    });
+    onSwitchTurn();
+    if (Object.keys(next).length === items.length) {
+      onCompleteMission(1, 'ai_spotter');
     }
   };
 
   const handleExplanationBonus = () => {
     if (bonusClaimed) return;
     setBonusClaimed(true);
-    const prevTeam = activeTeam === 'blue' ? 'orange' : 'blue';
     onAward({
-      teamId: prevTeam,
+      teamId: otherTeam(activeTeam),
       points: SCORE_VALUES.EXPLANATION_BONUS,
       correct: true,
       earnStar: true,
@@ -96,7 +123,7 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
             🤖 Mission 1 · Human or Machine? ({Object.keys(placed).length}/{items.length})
           </h2>
           <p className="text-lg md:text-xl text-slate-700 m-0">
-            Watch out for tricky automation vs real AI! <span className="font-black text-emerald-700">(+100 / +150 pts per item)</span>
+            Items are shuffled! Wrong guess switches team turn without revealing the answer.
           </p>
         </div>
         {Object.keys(placed).length === items.length && (
@@ -111,6 +138,18 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
       </div>
 
       <ByteGuide message={feedback.msg} mood={feedback.mood} compact />
+
+      {teacherPendingId && (
+        <div className="flex justify-center animate-pop">
+          <button
+            type="button"
+            onClick={teacherRevealItem}
+            className="touch-btn px-6 py-3 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer shadow-md"
+          >
+            <Eye className="w-5 h-5" /> 👩‍🏫 Teacher: Reveal Correct Bucket &amp; Explain
+          </button>
+        </div>
+      )}
 
       {feedback.canBonus && !bonusClaimed && (
         <div className="flex justify-end">
@@ -132,23 +171,25 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
         </div>
       )}
 
-      <div className="rounded-2xl p-3 bg-slate-100 border-2 border-dashed border-slate-400 flex flex-wrap gap-2.5 justify-center min-h-[86px]">
+      <div className="rounded-2xl p-3 bg-sky-50/80 border-2 border-dashed border-sky-300 flex flex-wrap gap-2.5 justify-center min-h-[86px]">
         {remaining.length === 0 ? (
           <div className="text-xl font-black text-emerald-700 py-3">🎉 All 10 Objects Classified!</div>
         ) : (
           remaining.map((dev) => {
             const isSel = selectedId === dev.id;
+            const lockedOut = Boolean(teacherPendingId);
             return (
               <button
                 key={dev.id}
                 type="button"
-                draggable
+                disabled={lockedOut}
+                draggable={!lockedOut}
                 onDragStart={(e) => {
                   e.dataTransfer.setData('text/plain', dev.id);
                   setSelectedId(dev.id);
                 }}
                 onClick={() => setSelectedId(isSel ? null : dev.id)}
-                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-extrabold text-base md:text-lg flex items-center gap-2 cursor-grab transition-all shadow-sm ${
+                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 border-b-4 font-extrabold text-base md:text-lg flex items-center gap-2 cursor-grab transition-all shadow-sm disabled:opacity-50 ${
                   isSel
                     ? 'bg-sky-600 text-white border-sky-800 scale-105'
                     : 'bg-white text-slate-900 border-slate-300'
@@ -207,19 +248,24 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
   const [stageOrderCards] = useState(() => shuffle(LIFECYCLE_STAGES));
   const [stageSlots, setStageSlots] = useState({});
   const [selStage, setSelStage] = useState(null);
+  const [stageMisses, setStageMisses] = useState({});
+  const [teacherStageSlot, setTeacherStageSlot] = useState(null);
 
   const [elecCards] = useState(() => shuffle(SCHOOL_ELECTRICITY_CARDS));
   const [elecPlaced, setElecPlaced] = useState({});
   const [selElec, setSelElec] = useState(null);
+  const [elecMisses, setElecMisses] = useState({});
+  const [teacherElecCard, setTeacherElecCard] = useState(null);
 
   const [cleanedRows, setCleanedRows] = useState({});
+  const [rowOrder] = useState(() => shuffle(DATA_CLEANING_ROWS));
   const [byteMsg, setByteMsg] = useState('Activity A (+100 pts each): Drag the 4 AI Project Lifecycle stages into their circular order 1 → 4!');
 
   const badRowsCount = DATA_CLEANING_ROWS.filter((r) => r.badField).length;
   const fixedCount = Object.keys(cleanedRows).length;
 
   const placeStage = (cardId, slotNum) => {
-    if (stageSlots[slotNum]) return;
+    if (stageSlots[slotNum] || teacherStageSlot) return;
     setSelStage(null);
     const stage = LIFECYCLE_STAGES.find((s) => s.id === cardId);
     if (stage && stage.order === slotNum) {
@@ -231,17 +277,40 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
       if (Object.keys(next).length === 4) {
         setTimeout(() => {
           setTab('B');
-          setByteMsg('⚡ Great! Now Activity B (+100 pts each): Drag each School Electricity Wastage card to its matching Lifecycle stage!');
+          setByteMsg('⚡ Great! Now Activity B (+100 pts each): Drag each School Electricity card to its matching Lifecycle stage!');
         }, 1000);
       }
     } else {
-      onAward({ teamId: activeTeam, points: 25, correct: false, concept: 'AI Project Lifecycle Order', misconception: 'AI Project Lifecycle Sequence' });
-      setByteMsg(`❌ ${teamLabel(activeTeam)} (+25 learning pts) — Check the cycle order: Define Problem → Collect Data → Test AI Tools → Reflect & Improve!`);
+      const key = `${slotNum}`;
+      const prev = stageMisses[key] || [];
+      const nextM = prev.includes(activeTeam) ? prev : [...prev, activeTeam];
+      setStageMisses({ ...stageMisses, [key]: nextM });
+      onAward({ teamId: activeTeam, points: 0, correct: false, concept: 'AI Project Lifecycle Order', misconception: 'AI Project Lifecycle Sequence' });
+      if (nextM.length >= 2) {
+        setTeacherStageSlot(slotNum);
+        setByteMsg(`👩‍🏫 Both teams missed Cycle Stage ${slotNum}! Teacher, click below to reveal Stage ${slotNum}!`);
+      } else {
+        onSwitchTurn();
+        setByteMsg(`❌ Not Stage ${slotNum}! Turn passes to ${teamLabel(otherTeam(activeTeam))} — try placing Stage ${slotNum}!`);
+      }
+    }
+  };
+
+  const teacherRevealStage = () => {
+    const stage = LIFECYCLE_STAGES.find((s) => s.order === teacherStageSlot);
+    if (!stage) return;
+    const next = { ...stageSlots, [teacherStageSlot]: stage };
+    setStageSlots(next);
+    setTeacherStageSlot(null);
+    setByteMsg(`👩‍🏫 Teacher Reveal — Stage ${stage.order} is ${stage.title}. ${stage.desc}`);
+    onSwitchTurn();
+    if (Object.keys(next).length === 4) {
+      setTimeout(() => setTab('B'), 1000);
     }
   };
 
   const placeElec = (cardId, stageId) => {
-    if (elecPlaced[cardId]) return;
+    if (elecPlaced[cardId] || teacherElecCard) return;
     setSelElec(null);
     const card = SCHOOL_ELECTRICITY_CARDS.find((c) => c.id === cardId);
     if (card && card.stage === stageId) {
@@ -253,12 +322,34 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
       if (Object.keys(next).length === SCHOOL_ELECTRICITY_CARDS.length) {
         setTimeout(() => {
           setTab('C');
-          setByteMsg('🧹 Activity C (+100 pts each): Tap the dirty/broken records in the School Electricity Dataset to clean them!');
+          setByteMsg('🧹 Activity C (+100 pts each): Tap the messy/broken records in the School Electricity Dataset to clean them!');
         }, 1100);
       }
     } else {
-      onAward({ teamId: activeTeam, points: 25, correct: false, concept: 'School Electricity AI Mapping' });
-      setByteMsg(`❌ ${teamLabel(activeTeam)} (+25 learning pts) — Match the action carefully with Define, Collect, Test, or Reflect!`);
+      const prev = elecMisses[cardId] || [];
+      const nextM = prev.includes(activeTeam) ? prev : [...prev, activeTeam];
+      setElecMisses({ ...elecMisses, [cardId]: nextM });
+      onAward({ teamId: activeTeam, points: 0, correct: false, concept: 'School Electricity AI Mapping' });
+      if (nextM.length >= 2) {
+        setTeacherElecCard(cardId);
+        setByteMsg(`👩‍🏫 Both teams missed "${card?.text}"! Teacher, click below to reveal the correct stage.`);
+      } else {
+        onSwitchTurn();
+        setByteMsg(`❌ Not that stage! Turn passes to ${teamLabel(otherTeam(activeTeam))}!`);
+      }
+    }
+  };
+
+  const teacherRevealElec = () => {
+    const card = SCHOOL_ELECTRICITY_CARDS.find((c) => c.id === teacherElecCard);
+    if (!card) return;
+    const next = { ...elecPlaced, [card.id]: card.stage };
+    setElecPlaced(next);
+    setTeacherElecCard(null);
+    setByteMsg(`👩‍🏫 Teacher Reveal: ${card.explanation}`);
+    onSwitchTurn();
+    if (Object.keys(next).length === SCHOOL_ELECTRICITY_CARDS.length) {
+      setTimeout(() => setTab('C'), 1000);
     }
   };
 
@@ -282,7 +373,8 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
       }
     } else {
       onAward({ teamId: activeTeam, points: 0, correct: false, concept: 'Data Cleaning', misconception: 'Distinguishing clean vs dirty records' });
-      setByteMsg(`✅ ${row.id} (${row.room}: ${row.kwh} kWh) is already clean and valid! Look for missing, duplicate, or impossible numbers.`);
+      onSwitchTurn();
+      setByteMsg(`❌ ${row.id} (${row.room}: ${row.kwh} kWh) is clean! Turn passes to ${teamLabel(otherTeam(activeTeam))} to find a messy record.`);
     }
   };
 
@@ -312,11 +404,27 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
         </div>
       </div>
 
-      <ByteGuide message={byteMsg} mood="happy" compact />
+      <ByteGuide message={byteMsg} mood={teacherStageSlot || teacherElecCard ? 'alert' : 'happy'} compact />
+
+      {teacherStageSlot && (
+        <div className="flex justify-center">
+          <button type="button" onClick={teacherRevealStage} className="touch-btn px-6 py-3 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer">
+            <Eye className="w-5 h-5" /> 👩‍🏫 Teacher: Reveal Stage {teacherStageSlot}
+          </button>
+        </div>
+      )}
+
+      {teacherElecCard && (
+        <div className="flex justify-center">
+          <button type="button" onClick={teacherRevealElec} className="touch-btn px-6 py-3 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer">
+            <Eye className="w-5 h-5" /> 👩‍🏫 Teacher: Reveal Correct Lifecycle Stage
+          </button>
+        </div>
+      )}
 
       {tab === 'A' && (
         <div className="space-y-4">
-          <div className="rounded-2xl p-3 bg-slate-100 border-2 border-dashed border-slate-300 flex flex-wrap gap-2.5 justify-center">
+          <div className="rounded-2xl p-3 bg-purple-50 border-2 border-dashed border-purple-300 flex flex-wrap gap-2.5 justify-center">
             {stageOrderCards.filter((s) => !Object.values(stageSlots).some((v) => v.id === s.id)).map((s) => (
               <button
                 key={s.id}
@@ -324,7 +432,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
                 draggable
                 onDragStart={(e) => { e.dataTransfer.setData('text/plain', s.id); setSelStage(s.id); }}
                 onClick={() => setSelStage(selStage === s.id ? null : s.id)}
-                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-black text-base cursor-grab ${
+                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 border-b-4 font-black text-base cursor-grab ${
                   selStage === s.id ? 'bg-sky-600 text-white border-sky-800' : 'bg-white text-slate-900 border-slate-300 shadow-sm'
                 }`}
               >
@@ -380,7 +488,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
                 draggable
                 onDragStart={(e) => { e.dataTransfer.setData('text/plain', c.id); setSelElec(c.id); }}
                 onClick={() => setSelElec(selElec === c.id ? null : c.id)}
-                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-bold text-base cursor-grab ${
+                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 border-b-4 font-bold text-base cursor-grab ${
                   selElec === c.id ? 'bg-amber-400 text-slate-950 border-amber-600' : 'bg-white text-slate-900 border-slate-300 shadow-sm'
                 }`}
               >
@@ -431,7 +539,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
                 </tr>
               </thead>
               <tbody>
-                {DATA_CLEANING_ROWS.map((r) => {
+                {rowOrder.map((r) => {
                   const isFixed = cleanedRows[r.id];
                   return (
                     <tr
