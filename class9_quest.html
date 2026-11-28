@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Board Boss Quest · Class 9 (CBSE AI 417 PYQs)</title>
+<title>Class 9 · AI Concept Quest (SDGs · Data · Math · Cycle · GenAI)</title>
 <link rel="stylesheet" href="portal.css">
 <style>
 body { font-size: 18px; }
-.q-wrap { max-width: 1120px; margin: 0 auto; padding: 14px 16px 40px; }
+.q-wrap { max-width: 1120px; margin: 0 auto; padding: 14px 16px 42px; }
 
 /* Squad Scoreboard */
 .squads-grid {
@@ -21,8 +21,8 @@ body { font-size: 18px; }
   border-radius: 18px;
   padding: 10px 12px;
   box-shadow: var(--shadow);
+  cursor: pointer;
   transition: transform 0.16s, border-color 0.16s, box-shadow 0.16s;
-  position: relative;
 }
 .sq-card.on {
   transform: translateY(-2px) scale(1.02);
@@ -30,7 +30,7 @@ body { font-size: 18px; }
   box-shadow: 0 0 0 3px rgba(108, 76, 241, 0.18), var(--shadow);
 }
 .sq-top { display: flex; align-items: center; gap: 6px; }
-.sq-ico { font-size: 1.5rem; }
+.sq-ico { font-size: 1.45rem; }
 .sq-name {
   flex: 1;
   min-width: 0;
@@ -41,28 +41,18 @@ body { font-size: 18px; }
   background: transparent;
   color: var(--ink);
 }
-.sq-xp { font-size: 1.85rem; font-weight: 900; line-height: 1.1; color: var(--sq-col, var(--a)); }
-.sq-meta { display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; font-weight: 800; color: var(--mut); margin-top: 2px; }
+.sq-meta { display: flex; align-items: center; justify-content: space-between; font-weight: 800; margin-top: 3px; }
+.sq-xp { font-size: 1.75rem; font-weight: 900; line-height: 1.1; color: var(--sq-col, var(--a)); }
 .streak-pill {
   background: linear-gradient(135deg, #ff7a59, #f4b400);
   color: #14213d;
-  padding: 1px 8px;
+  padding: 2px 9px;
   border-radius: 999px;
   font-weight: 900;
   font-size: 0.78rem;
 }
-.pwr-mini { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
-.pwr-tag {
-  font-size: 0.74rem;
-  font-weight: 800;
-  padding: 2px 7px;
-  border-radius: 999px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-}
-.pwr-tag.empty { opacity: 0.35; text-decoration: line-through; }
 
-/* Spotlight & Controls Strip */
+/* Spotlight & Zone Bar */
 .spot-strip {
   margin-top: 10px;
   background: var(--card);
@@ -77,8 +67,6 @@ body { font-size: 18px; }
   font-size: 0.95rem;
   font-weight: 700;
 }
-
-/* Zone Navigation Bar */
 .zone-bar {
   display: flex;
   gap: 6px;
@@ -101,26 +89,26 @@ body { font-size: 18px; }
 .zone-btn.cur { background: var(--a); color: #fff; border-color: var(--a); }
 .zone-btn.done { border-color: var(--ok); }
 
-/* Main Stage Panel */
+/* Stage Panel */
 .stage {
   background: var(--card);
   border: 2px solid var(--line);
   border-radius: 22px;
   padding: 22px 20px;
   margin-top: 12px;
-  min-height: 410px;
+  min-height: 430px;
   box-shadow: var(--shadow);
 }
 .c { text-align: center; }
 .mut { color: var(--mut); }
-.pyq-tag {
+.topic-tag {
   display: inline-block;
-  padding: 3px 10px;
+  padding: 3px 12px;
   border-radius: 999px;
-  background: rgba(29, 112, 214, 0.14);
-  color: var(--blue);
-  border: 1px solid rgba(29, 112, 214, 0.35);
-  font-size: 0.8rem;
+  background: rgba(108, 76, 241, 0.14);
+  color: var(--a);
+  border: 1px solid rgba(108, 76, 241, 0.35);
+  font-size: 0.82rem;
   font-weight: 800;
 }
 .xp-pill {
@@ -133,109 +121,231 @@ body { font-size: 18px; }
   font-weight: 900;
 }
 .q-title {
-  font-size: 1.42rem;
+  font-size: 1.32rem;
   font-weight: 800;
   line-height: 1.35;
-  margin: 12px auto;
-  max-width: 860px;
+  margin: 10px auto;
+  max-width: 840px;
   text-align: center;
 }
-.ar-box {
-  max-width: 820px;
-  margin: 10px auto;
-  text-align: left;
-  background: var(--bg);
-  border: 2px solid var(--line);
-  border-left: 6px solid var(--a);
-  border-radius: 14px;
-  padding: 12px 16px;
-  font-size: 1rem;
-  line-height: 1.45;
-}
-.ar-box p { margin: 5px 0; }
 
-/* Timer Rush Bar */
-.rush-wrap {
-  max-width: 560px;
-  margin: 8px auto;
-  height: 12px;
-  background: var(--line);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.rush-fill {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, var(--ok), var(--gold), var(--red));
-  transition: width 0.25s linear;
-}
-
-/* Power-up Bar */
-.pwr-bar {
+/* Shared Drag & Drop + Tap Cards */
+.dd-tray {
   display: flex;
-  gap: 8px;
-  justify-content: center;
   flex-wrap: wrap;
-  margin: 10px 0;
-}
-.pwr-btn {
-  padding: 7px 13px;
-  border-radius: 12px;
-  border: 2px solid var(--line);
+  gap: 9px;
+  justify-content: center;
+  min-height: 68px;
+  padding: 12px;
   background: var(--bg);
-  color: var(--ink);
-  font-weight: 800;
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition: transform 0.1s, border-color 0.15s;
+  border: 3px dashed var(--line);
+  border-radius: 16px;
+  margin: 12px 0;
 }
-.pwr-btn:hover:not(:disabled) { border-color: var(--a); transform: translateY(-1px); }
-.pwr-btn.armed { background: var(--gold); color: #14213d; border-color: var(--gold); }
-.pwr-btn:disabled { opacity: 0.4; cursor: default; }
+.dd-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 13px;
+  background: var(--card);
+  color: var(--ink);
+  border: 3px solid var(--line);
+  font-weight: 800;
+  font-size: 0.96rem;
+  cursor: grab;
+  user-select: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+}
+.dd-card:hover { border-color: var(--a); transform: translateY(-2px); }
+.dd-card.sel { border-color: var(--b); box-shadow: 0 0 0 3px rgba(255, 122, 89, 0.25); transform: scale(1.04); }
+.dd-card.locked { border-color: var(--ok); background: rgba(27, 158, 90, 0.14); cursor: default; }
 
-/* Option Buttons */
+.dd-zones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+.dd-zone {
+  background: var(--bg);
+  border: 3px dashed var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  min-height: 108px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.12s;
+}
+.dd-zone.over { border-color: var(--a); background: rgba(108, 76, 241, 0.1); transform: scale(1.02); }
+.dd-zone.ok { border-style: solid; border-color: var(--ok); background: rgba(27, 158, 90, 0.08); }
+.dd-zone-hd { font-weight: 900; font-size: 1rem; }
+.dd-zone-sub { font-size: 0.82rem; color: var(--mut); font-weight: 700; }
+
+/* DIKW Pyramid Tiers */
+.pyramid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 12px auto;
+}
+.pyr-tier {
+  width: 100%;
+  min-height: 70px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 3px dashed var(--line);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.pyr-tier.over { border-color: var(--a); background: rgba(108, 76, 241, 0.1); }
+.pyr-tier.ok { border-style: solid; border-color: var(--ok); background: rgba(27, 158, 90, 0.1); }
+
+/* Clickable Option Grids */
 .opts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 11px;
-  max-width: 880px;
+  max-width: 860px;
   margin: 12px auto;
 }
 .opt-btn {
   font: inherit;
   font-weight: 700;
-  font-size: 1.02rem;
+  font-size: 1rem;
   text-align: left;
-  padding: 14px 16px;
+  padding: 13px 15px;
   border-radius: 15px;
   background: var(--bg);
   color: var(--ink);
   border: 3px solid var(--line);
   cursor: pointer;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   transition: transform 0.1s, border-color 0.15s;
 }
 .opt-btn:hover:not(:disabled) { border-color: var(--a); transform: translateY(-1px); }
-.opt-btn .opt-k {
-  display: inline-flex;
-  align-items: center;
+.opt-btn.good { background: var(--ok); color: #fff; border-color: var(--ok); }
+.opt-btn.bad { background: var(--no); color: #fff; border-color: var(--no); }
+.opt-btn.picked { border-color: var(--a); background: rgba(108, 76, 241, 0.14); }
+.opt-btn:disabled { cursor: default; }
+
+/* Math Live Bar Chart */
+.math-bars {
+  display: flex;
   justify-content: center;
+  align-items: flex-end;
+  gap: 14px;
+  height: 190px;
+  padding: 12px;
+  background: var(--bg);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  max-width: 640px;
+  margin: 10px auto;
+}
+.m-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 72px;
+}
+.m-bar {
+  width: 44px;
+  background: linear-gradient(180deg, var(--a), var(--blue));
+  border-radius: 10px 10px 4px 4px;
+  transition: height 0.2s;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.85rem;
+  padding-top: 4px;
+}
+.m-ctrl { display: flex; gap: 4px; }
+.m-ctrl button {
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: var(--card);
   border: 2px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
   font-weight: 900;
-  flex-shrink: 0;
+  cursor: pointer;
 }
-.opt-btn.good { background: var(--ok); color: #fff; border-color: var(--ok); }
-.opt-btn.good .opt-k { background: rgba(255, 255, 255, 0.25); border-color: #fff; color: #fff; }
-.opt-btn.bad { background: var(--no); color: #fff; border-color: var(--no); }
-.opt-btn.bad .opt-k { background: rgba(255, 255, 255, 0.25); border-color: #fff; color: #fff; }
-.opt-btn:disabled { cursor: default; }
+.stat-strip {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.stat-pill {
+  padding: 8px 16px;
+  border-radius: 14px;
+  background: var(--bg);
+  border: 2px solid var(--line);
+  font-weight: 800;
+}
 
+/* Probability Line */
+.prob-scale {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Prompt Studio */
+.prompt-box {
+  max-width: 820px;
+  margin: 10px auto;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.96rem;
+  line-height: 1.5;
+  border: 2px solid var(--line);
+}
+.meter-wrap {
+  max-width: 460px;
+  margin: 8px auto;
+  height: 14px;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.meter-fill { height: 100%; transition: width 0.3s; background: linear-gradient(90deg, var(--b), var(--ok)); }
+.blk-chip {
+  padding: 9px 14px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+}
+.blk-chip.on { background: var(--a); color: #fff; border-color: var(--a); }
+
+/* Buttons & Feedback */
 button.qbtn {
   font: inherit;
   font-weight: 800;
@@ -261,198 +371,17 @@ button.qbtn:disabled { opacity: 0.48; cursor: default; }
   border: 2px solid var(--line);
   text-align: center;
   font-weight: 700;
-  min-height: 48px;
+  min-height: 46px;
 }
-.fb-box.ok { border-color: var(--ok); background: rgba(27, 158, 90, 0.1); }
+.fb-box.ok { border-color: var(--ok); background: rgba(27, 158, 90, 0.12); }
 .fb-box.bad { border-color: var(--no); background: rgba(214, 48, 49, 0.1); }
-
-/* Steal Buzzer */
-.steal-bar {
-  margin-top: 10px;
-  padding: 10px 14px;
-  border-radius: 14px;
-  background: rgba(244, 180, 0, 0.16);
-  border: 2px dashed var(--gold);
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-/* Zone 2: Vision & Pixel Lab */
-.lab-split {
-  display: grid;
-  grid-template-columns: 1fr 1.15fr;
-  gap: 18px;
-  align-items: start;
-}
-@media (max-width: 800px) { .lab-split { grid-template-columns: 1fr; } }
-.rgb-swatch {
-  height: 110px;
-  border-radius: 16px;
-  border: 3px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 1.05rem;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
-  color: #fff;
-  margin-bottom: 10px;
-}
-.slider-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 8px 0;
-  font-weight: 800;
-}
-.slider-row input[type=range] { flex: 1; accent-color: var(--a); }
-.pix-grid-5 {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 5px;
-  max-width: 280px;
-  margin: 10px auto;
-}
-.pix-cell {
-  aspect-ratio: 1;
-  border-radius: 8px;
-  border: 2px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.78rem;
-  font-weight: 900;
-  cursor: pointer;
-  user-select: none;
-}
-
-/* Zone 3: NLP Token Forge */
-.tok-box {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  justify-content: center;
-  padding: 16px;
-  background: var(--bg);
-  border: 3px dashed var(--line);
-  border-radius: 16px;
-  margin: 12px auto;
-  max-width: 780px;
-}
-.tok-chip {
-  padding: 9px 15px;
-  border-radius: 12px;
-  border: 2px solid var(--line);
-  background: var(--card);
-  color: var(--ink);
-  font-weight: 800;
-  font-size: 1.08rem;
-  cursor: pointer;
-  transition: transform 0.1s, opacity 0.2s, background 0.2s;
-}
-.tok-chip:hover:not(:disabled) { border-color: var(--b); transform: translateY(-2px); }
-.tok-chip.zapped {
-  text-decoration: line-through;
-  opacity: 0.35;
-  background: rgba(214, 48, 49, 0.14);
-  border-color: var(--no);
-}
-.tok-chip.kept { border-color: var(--ok); background: rgba(27, 158, 90, 0.14); }
-.bow-table {
-  border-collapse: collapse;
-  margin: 12px auto;
-  font-size: 0.96rem;
-}
-.bow-table th, .bow-table td {
-  border: 2px solid var(--line);
-  padding: 8px 12px;
-  text-align: center;
-}
-.bow-table th { background: var(--bg); }
-.bow-cell-btn {
-  min-width: 44px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  border: 2px solid var(--line);
-  background: var(--bg);
-  color: var(--ink);
-  font: inherit;
-  font-weight: 900;
-  cursor: pointer;
-}
-.bow-cell-btn.ok { background: var(--ok); color: #fff; border-color: var(--ok); }
-
-/* Zone 4: Confusion Matrix Case Lab */
-.cm-grid {
-  display: grid;
-  grid-template-columns: auto 1fr 1fr;
-  gap: 8px;
-  max-width: 580px;
-  margin: 12px auto;
-  align-items: center;
-}
-.cm-hd { font-weight: 900; text-align: center; font-size: 0.9rem; color: var(--mut); padding: 4px; }
-.cm-slot {
-  background: var(--bg);
-  border: 3px dashed var(--line);
-  border-radius: 14px;
-  padding: 12px 10px;
-  text-align: center;
-  cursor: pointer;
-  min-height: 76px;
-  transition: border-color 0.15s;
-}
-.cm-slot:hover { border-color: var(--a); }
-.cm-slot.filled { border-style: solid; border-color: var(--ok); background: rgba(27, 158, 90, 0.1); }
-.num-tray { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 10px 0; }
-.num-pill {
-  padding: 9px 18px;
-  border-radius: 12px;
-  border: 3px solid var(--line);
-  background: var(--card);
-  color: var(--ink);
-  font-weight: 900;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-.num-pill.sel { border-color: var(--a); background: rgba(108, 76, 241, 0.14); transform: scale(1.06); }
-
-/* Zone 5: Boss Raid */
-.boss-banner {
-  background: linear-gradient(135deg, #1b1536, #321b5c);
-  color: #fff;
-  border-radius: 18px;
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-.boss-avatar { font-size: 3.3rem; animation: bossFloat 2s ease-in-out infinite; }
-@keyframes bossFloat { 50% { transform: translateY(-7px); } }
-.hp-track {
-  height: 18px;
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-.hp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #ff4d6d, #ff9f1c);
-  transition: width 0.35s ease;
-}
-
 .row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center; margin-top: 12px; }
 .shake { animation: sh 0.32s; }
 @keyframes sh { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
 .lobby-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 12px;
   margin: 14px 0;
 }
@@ -466,7 +395,7 @@ button.qbtn:disabled { opacity: 0.48; cursor: default; }
   transition: transform 0.14s, border-color 0.14s;
 }
 .lobby-tile:hover { transform: translateY(-2px); border-color: var(--a); }
-.lobby-tile b { display: block; font-size: 2rem; margin-bottom: 4px; }
+.lobby-tile b { display: block; font-size: 2.1rem; margin-bottom: 4px; }
 </style>
 </head>
 <body>
@@ -476,10 +405,10 @@ button.qbtn:disabled { opacity: 0.48; cursor: default; }
   <div class="squads-grid" id="squads-grid"></div>
 
   <div class="spot-strip">
-    <span id="spot-label">🎤 Active Student: Spin the Spotlight or pick any Squad challenger!</span>
+    <span id="spot-label">🎤 Active Student: Spin Spotlight or tap a Squad to take the board!</span>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="p-pill warm" onclick="Portal.openPicker('9', setSpotStudent)">🎲 Spotlight Student</button>
-      <button class="p-pill" onclick="toggleRush()">⏱️ <span id="rush-lbl">25s Rush: ON</span></button>
+      <button class="p-pill" onclick="classVoteCurrent()">🙋 Whole-Class Poll</button>
     </div>
   </div>
 
@@ -505,103 +434,108 @@ function setSpotStudent(txt) {
 }
 Portal.mountBar("portal-nav", { active: "9q", cls: "9", onPick: setSpotStudent });
 
-/* ---------- Squad & Game State ---------- */
+/* ---------- Squads & XP Engine ---------- */
 const SQUAD_PRESETS = [
-  { name: "Cyber Foxes", ico: "🦊", col: "#e63946" },
-  { name: "Neural Sparks", ico: "⚡", col: "#1d70d6" },
-  { name: "Data Dragons", ico: "🐉", col: "#1b9e5a" },
-  { name: "Vision Hawks", ico: "🦅", col: "#9b5de5" }
+  { name: "SDG Sparks", ico: "🌍", col: "#1b9e5a" },
+  { name: "Data Ninjas", ico: "📊", col: "#1d70d6" },
+  { name: "Math Wizards", ico: "🔢", col: "#9b5de5" },
+  { name: "GenAI Creators", ico: "✨", col: "#e63946" }
 ];
 
 let squadCount = 3;
 let squads = [];
 let activeSq = 0;
-let rushOn = true;
-let rushTimer = null;
-let rushLeft = 25;
 let curZone = -1;
+let curPollPrompt = { q: "Which option does the class choose?", opts: ["Option A", "Option B", "Option C"] };
 const zonesDone = [false, false, false, false, false];
 
 function initSquads(n) {
   squadCount = n;
-  squads = SQUAD_PRESETS.slice(0, n).map(p => ({
-    name: p.name,
-    ico: p.ico,
-    col: p.col,
-    xp: 0,
-    streak: 0,
-    pwr: { fifty: 2, boost: 2, shield: 1, poll: 2 }
-  }));
+  squads = SQUAD_PRESETS.slice(0, n).map(p => ({ ...p, xp: 0, streak: 0 }));
   activeSq = 0;
   renderSquads();
 }
 
-const streakMult = st => st >= 3 ? 2 : st === 2 ? 1.5 : st === 1 ? 1.25 : 1;
+const multOf = s => s >= 3 ? 2 : s === 2 ? 1.5 : s === 1 ? 1.25 : 1;
 
-function awardXP(sqIdx, baseXP) {
+function awardXP(sqIdx, base) {
   const sq = squads[sqIdx];
-  const mult = streakMult(sq.streak);
-  const gained = Math.round(baseXP * mult);
+  const gained = Math.round(base * multOf(sq.streak));
   sq.xp += gained;
   sq.streak++;
   renderSquads();
   return gained;
 }
 
-function breakStreak(sqIdx, shielded = false) {
-  if (!shielded) squads[sqIdx].streak = 0;
+function missTurn(sqIdx) {
+  squads[sqIdx].streak = 0;
   renderSquads();
 }
 
 function renderSquads() {
   $("squads-grid").innerHTML = squads.map((s, i) => `
-    <div class="sq-card ${i === activeSq ? "on" : ""}" style="--sq-col:${s.col}" onclick="selectSquad(${i})" title="Click to make this Squad active">
+    <div class="sq-card ${i === activeSq ? "on" : ""}" style="--sq-col:${s.col}" onclick="selectSquad(${i})" title="Tap to switch active squad">
       <div class="sq-top">
         <span class="sq-ico">${s.ico}</span>
-        <input class="sq-name" value="${esc(s.name)}" aria-label="Squad ${i + 1} Name" onclick="event.stopPropagation()" oninput="squads[${i}].name=this.value||'Squad ${i + 1}'">
+        <input class="sq-name" value="${esc(s.name)}" aria-label="Squad ${i + 1}" onclick="event.stopPropagation()" oninput="squads[${i}].name=this.value||'Squad ${i + 1}'">
       </div>
       <div class="sq-meta">
         <span class="sq-xp">${s.xp} XP</span>
-        <span class="streak-pill">🔥 ${s.streak} (${streakMult(s.streak)}×)</span>
-      </div>
-      <div class="pwr-mini">
-        <span class="pwr-tag ${s.pwr.fifty ? "" : "empty"}">⚡${s.pwr.fifty}</span>
-        <span class="pwr-tag ${s.pwr.boost ? "" : "empty"}">🔥2×:${s.pwr.boost}</span>
-        <span class="pwr-tag ${s.pwr.shield ? "" : "empty"}">🛡️${s.pwr.shield}</span>
-        <span class="pwr-tag ${s.pwr.poll ? "" : "empty"}">🙋${s.pwr.poll}</span>
+        <span class="streak-pill">🔥 ${s.streak} (${multOf(s.streak)}×)</span>
       </div>
     </div>
   `).join("");
 }
 
-function selectSquad(i) {
-  activeSq = i;
-  Portal.SFX.pop();
-  renderSquads();
+function selectSquad(i) { activeSq = i; Portal.SFX.pop(); renderSquads(); }
+function nextSquad() { activeSq = (activeSq + 1) % squadCount; renderSquads(); }
+
+function classVoteCurrent() {
+  Portal.openPoll(curPollPrompt.q, curPollPrompt.opts, (top, _c, total) => {
+    Portal.toast(`🙋 Class voted (${total}): ${top}`);
+  });
 }
 
-function nextSquad() {
-  activeSq = (activeSq + 1) % squadCount;
-  renderSquads();
+/* ---------- Shared Drag & Drop + Tap Helper ---------- */
+let DD_SEL = null;
+function bindDragDrop(onDropFn) {
+  DD_SEL = null;
+  document.querySelectorAll("[data-dd-card]").forEach(el => {
+    el.draggable = true;
+    el.ondragstart = e => {
+      DD_SEL = el.dataset.ddCard;
+      e.dataTransfer.setData("text/plain", DD_SEL);
+    };
+    el.onclick = e => {
+      e.stopPropagation();
+      const id = el.dataset.ddCard;
+      DD_SEL = (DD_SEL === id) ? null : id;
+      document.querySelectorAll("[data-dd-card]").forEach(x => x.classList.toggle("sel", x.dataset.ddCard === DD_SEL));
+      Portal.SFX.pop();
+    };
+  });
+  document.querySelectorAll("[data-dd-zone]").forEach(zn => {
+    zn.ondragover = e => { e.preventDefault(); zn.classList.add("over"); };
+    zn.ondragleave = () => zn.classList.remove("over");
+    zn.ondrop = e => {
+      e.preventDefault();
+      zn.classList.remove("over");
+      const cid = e.dataTransfer.getData("text/plain") || DD_SEL;
+      if (cid) onDropFn(cid, zn.dataset.ddZone, zn);
+    };
+    zn.onclick = () => {
+      if (DD_SEL) onDropFn(DD_SEL, zn.dataset.ddZone, zn);
+    };
+  });
 }
 
-function toggleRush() {
-  rushOn = !rushOn;
-  $("rush-lbl").textContent = rushOn ? "25s Rush: ON" : "25s Rush: OFF";
-  if (!rushOn) stopRush();
-  Portal.SFX.pop();
-}
-
-function stopRush() {
-  if (rushTimer) { clearInterval(rushTimer); rushTimer = null; }
-}
-
+/* ---------- Zones Navigation ---------- */
 const ZONES = [
-  { id: 0, ico: "🎯", t: "Z1 · PYQ Blitz", sub: "CBSE 10 AI MCQs + Assertion-Reason" },
-  { id: 1, ico: "👁️", t: "Z2 · Vision & Pixels", sub: "RGB, Grayscale & CV Tasks" },
-  { id: 2, ico: "💬", t: "Z3 · NLP Token Forge", sub: "Stopwords, Stemming & Bag of Words" },
-  { id: 3, ico: "🧮", t: "Z4 · Matrix Rescue", sub: "4-Mark Confusion Matrix Case Studies" },
-  { id: 4, ico: "👾", t: "Z5 · Examiner Boss", sub: "Defeat Prof. Perceptron (100 HP)" }
+  { id: 0, ico: "🌍", t: "Z1 · SDGs", sub: "Drag-Drop AI Solutions to UN SDGs" },
+  { id: 1, ico: "📊", t: "Z2 · Data Literacy", sub: "DIKW Pyramid, Data Types & Privacy" },
+  { id: 2, ico: "🔢", t: "Z3 · Math for AI", sub: "Patterns, Live Mean/Median & Probability" },
+  { id: 3, ico: "🔄", t: "Z4 · AI Project Cycle", sub: "Stage Order, 4Ws Canvas & Modelling" },
+  { id: 4, ico: "✨", t: "Z5 · Generative AI", sub: "Gen vs Discriminative, Prompts & Ethics" }
 ];
 
 function renderZoneBar() {
@@ -610,172 +544,17 @@ function renderZoneBar() {
     ZONES.map((z, i) => `<button class="zone-btn ${curZone === i ? "cur" : ""} ${zonesDone[i] ? "done" : ""}" onclick="enterZone(${i})">${z.ico} ${z.t.split(" · ")[1]}${zonesDone[i] ? " ✓" : ""}</button>`).join("");
 }
 
-/* ---------- CBSE Class 10 AI (417) PYQ Question Banks ---------- */
-const PYQ_BANK = [
-  {
-    tag: "CBSE 2024 PYQ · NLP",
-    q: "Which NLP text-normalisation step uses a dictionary & morphological analysis to return a valid root word (e.g. 'studies' → 'study')?",
-    opts: ["Lemmatization", "Stemming", "Tokenisation", "Stopword Removal"],
-    a: 0,
-    tip: "Stemming chops affixes quickly ('studies' → 'studi'), whereas Lemmatization checks vocabulary to give a meaningful lemma ('study')."
-  },
-  {
-    tag: "CBSE 2023 PYQ · 4Ws Canvas",
-    q: "In the 4Ws Problem Canvas of the AI Project Cycle, which block identifies the 'Stakeholders' facing the problem?",
-    opts: ["Who", "What", "Where", "Why"],
-    a: 0,
-    tip: "Who = Stakeholders; What = Nature & evidence of the problem; Where = Context/location; Why = Benefits of solving it."
-  },
-  {
-    tag: "CBSE SQP 2024 · Computer Vision",
-    q: "Why are RGB images commonly converted to Grayscale before feeding them into a Computer Vision model?",
-    opts: [
-      "To reduce computational complexity from 3 channels to 1 channel",
-      "To increase the image resolution automatically",
-      "To add extra colour features for object detection",
-      "To convert pixel values above 255 into negative numbers"
-    ],
-    a: 0,
-    tip: "RGB stores 3 values per pixel (R, G, B). Grayscale stores only 1 intensity value (0–255), cutting computation by 3×."
-  },
-  {
-    tag: "CBSE 2024 PYQ · Multiple Intelligences",
-    q: "Suhani easily recognises musical rhythms, pitches, and tones and can compose melodies effortlessly. According to Howard Gardner, she has high:",
-    opts: ["Musical Intelligence", "Spatial Intelligence", "Naturalist Intelligence", "Kinesthetic Intelligence"],
-    a: 0,
-    tip: "CBSE frequently asks Gardner's Multiple Intelligences: Musical (sound/rhythm), Spatial (visual/3D), Naturalist (nature), Kinesthetic (body/movement)."
-  },
-  {
-    tag: "CBSE 2023 PYQ · Evaluation",
-    q: "A forest-fire detector must NEVER miss an actual wildfire, even if it raises a few false alarms. Which metric should be prioritized?",
-    opts: ["Recall", "Precision", "Specificity", "Error Rate"],
-    a: 0,
-    tip: "Missing a fire is a False Negative (FN). Recall = TP / (TP + FN) directly minimizes False Negatives in life-safety alerts!"
-  },
-  {
-    tag: "CBSE 2024 PYQ · AI Modelling",
-    q: "A bank groups thousands of customers into spending clusters WITHOUT any pre-labelled categories. Which ML approach is this?",
-    opts: ["Unsupervised Learning (Clustering)", "Supervised Classification", "Reinforcement Learning", "Rule-based Scripting"],
-    a: 0,
-    tip: "Unlabelled data grouped by similarity = Unsupervised Learning (Clustering). Labelled categories = Supervised Classification."
-  },
-  {
-    tag: "CBSE SQP 2024-25 · Assertion-Reason",
-    ar: [
-      "Assertion (A): Training data and testing data must be kept separate in an AI project.",
-      "Reason (R): Testing a model on the exact same data it was trained on can hide overfitting and give falsely high accuracy."
-    ],
-    q: "Choose the correct option for Assertion (A) and Reason (R):",
-    opts: [
-      "Both A and R are true, and R is the correct explanation of A",
-      "Both A and R are true, but R is NOT the correct explanation of A",
-      "A is true, but R is false",
-      "A is false, but R is true"
-    ],
-    a: 0,
-    tip: "A model can memorize training examples (overfitting), so it must be evaluated on unseen testing data."
-  },
-  {
-    tag: "CBSE 2024 PYQ · Employability (SMART)",
-    q: "In the SMART method of goal setting for Self-Management, what does the letter 'A' stand for?",
-    opts: ["Achievable", "Abrupt", "Accountable", "Admirable"],
-    a: 0,
-    tip: "SMART = Specific, Measurable, Achievable, Realistic (or Relevant), Time-bound."
-  },
-  {
-    tag: "CBSE 2023 PYQ · Neural Networks",
-    q: "In an Artificial Neural Network, which layer actually processes the data using weights and biases to extract features?",
-    opts: ["Hidden Layer", "Input Layer", "Output Layer", "Storage Layer"],
-    a: 0,
-    tip: "Input Layer only receives data; Hidden Layers perform feature extraction and calculations; Output Layer delivers the prediction."
-  },
-  {
-    tag: "CBSE Competency PYQ · Evaluation",
-    q: "What does an F1 Score of 1.0 (or 100%) indicate about a classification model?",
-    opts: [
-      "Perfect Precision and perfect Recall (zero FP and zero FN)",
-      "The model is overfitting the training set",
-      "Precision is 100% but Recall is 0%",
-      "The dataset has 100% False Negatives"
-    ],
-    a: 0,
-    tip: "F1 Score = 2 × (P × R) / (P + R) is the harmonic mean of Precision and Recall. It reaches 1 only when both P = 1 and R = 1."
-  },
-  {
-    tag: "CBSE 2024 PYQ · NLP (TF-IDF)",
-    q: "Why do words like 'is', 'the', and 'and' have a very low TF-IDF score across a corpus of documents?",
-    opts: [
-      "They appear in almost every document, making their Inverse Document Frequency (IDF) very low",
-      "They never appear in any document",
-      "TF-IDF only counts uppercase words",
-      "They are always replaced by numbers"
-    ],
-    a: 0,
-    tip: "High document frequency (DF) means low IDF = log(N/DF), so common stopwords get tiny TF-IDF weights!"
-  },
-  {
-    tag: "CBSE 2023 PYQ · Employability (Green Skills)",
-    q: "How many Sustainable Development Goals (SDGs) were adopted by the United Nations to achieve a better and more sustainable future by 2030?",
-    opts: ["17 SDGs", "10 SDGs", "25 SDGs", "8 SDGs"],
-    a: 0,
-    tip: "The UN adopted 17 SDGs in 2015 (including Zero Hunger, Quality Education, Climate Action) with target year 2030."
-  },
-  {
-    tag: "CBSE Competency PYQ · AI Ethics",
-    q: "A hospital AI predicts lower risk for rural patients because its historical dataset mostly had urban clinic visits. Which ethical issue is this?",
-    opts: ["AI Data Bias", "Copyright Infringement", "Over-automation", "Hardware Failure"],
-    a: 0,
-    tip: "Unrepresentative training data causes AI Bias, leading to unfair predictions for underrepresented groups."
-  },
-  {
-    tag: "CBSE SQP 2024 · Assertion-Reason",
-    ar: [
-      "Assertion (A): A Script Bot requires a large labelled dataset and machine learning to reply to simple FAQ rules.",
-      "Reason (R): A Smart Bot learns from data and adapts to varied human language."
-    ],
-    q: "Choose the correct option for Assertion (A) and Reason (R):",
-    opts: [
-      "A is false, but R is true",
-      "Both A and R are true, and R explains A",
-      "Both A and R are false",
-      "A is true, but R is false"
-    ],
-    a: 0,
-    tip: "Script Bots follow fixed pre-written rules (no ML needed), whereas Smart Bots use NLP/ML to learn and adapt."
-  },
-  {
-    tag: "CBSE 2024 PYQ · Employability (Communication)",
-    q: "When a teacher speaks rapidly in technical jargon that new students cannot follow, this creates which communication barrier?",
-    opts: ["Linguistic Barrier", "Physical Barrier", "Mechanical Barrier", "Financial Barrier"],
-    a: 0,
-    tip: "Differences in language, vocabulary, or unfamiliar jargon cause Linguistic Barriers."
-  },
-  {
-    tag: "CBSE 2023 PYQ · Computer Vision",
-    q: "In an 8-bit grayscale image, what do pixel intensity values 0 and 255 represent respectively?",
-    opts: [
-      "0 = Black (no brightness), 255 = White (full brightness)",
-      "0 = White, 255 = Black",
-      "0 = Red, 255 = Blue",
-      "0 = Transparent, 255 = Blurry"
-    ],
-    a: 0,
-    tip: "8 bits give 2^8 = 256 shades from 0 (pure black) to 255 (pure white)."
-  }
-];
-
-/* ---------- Lobby ---------- */
 function showLobby() {
-  stopRush();
   curZone = -1;
+  curPollPrompt = { q: "Which Class 9 AI topic are you most excited to play first?", opts: ZONES.map(z => z.t) };
   renderZoneBar();
   renderSquads();
   $("stage").innerHTML = `
     <div class="c">
-      <div style="font-size:3rem">📜👾🏆</div>
-      <h1 style="margin:4px 0">Class 9 · Board Boss Quest</h1>
+      <div style="font-size:3rem">🌍📊🔢🔄✨</div>
+      <h1 style="margin:4px 0">Class 9 · AI Concept Quest</h1>
       <p class="mut" style="max-width:740px;margin:0 auto 12px">
-        Built from <b>CBSE Class 10 AI (Code 417) Previous Year Papers</b>! Form Student Squads, spin the Student Spotlight, build combos &amp; power-ups, and defeat <b>Prof. Perceptron</b>!
+        Drag, drop, click &amp; build across all 5 Class 9 AI topics: <b>SDGs · Data Literacy · Math for AI · AI Project Cycle · Generative AI</b>!
       </p>
       <div class="row" style="margin-bottom:14px">
         <span style="font-weight:800">Squads:</span>
@@ -793,889 +572,933 @@ function showLobby() {
       `).join("")}
     </div>
     <div class="row">
-      <button class="qbtn" onclick="enterZone(0)">🚀 Start Quest at Zone 1 ▶</button>
+      <button class="qbtn" onclick="enterZone(0)">🚀 Start Quest at Zone 1: SDGs ▶</button>
     </div>
   `;
 }
 
 function enterZone(z) {
-  stopRush();
   curZone = z;
   renderZoneBar();
   Portal.SFX.pop();
-  if (z === 0) startZone1();
-  else if (z === 1) startZone2();
-  else if (z === 2) startZone3();
-  else if (z === 3) startZone4();
-  else if (z === 4) startZone5();
+  if (z === 0) startZ1();
+  else if (z === 1) startZ2();
+  else if (z === 2) startZ3();
+  else if (z === 3) startZ4();
+  else if (z === 4) startZ5();
 }
 
-/* ---------- Zone 1: PYQ Blitz Arena ---------- */
+/* ==========================================================================
+   ZONE 1: SDGs (Drag-and-Drop Matchmaker + SDG Concept Clicks)
+   ========================================================================== */
+const Z1_PAIRS = [
+  { id: "sdg2", txt: "🌾 Drone scans leaves to save wheat crops", goal: "SDG 2 · Zero Hunger", ico: "🍽️" },
+  { id: "sdg4", txt: "📚 AI tutor teaches in local languages", goal: "SDG 4 · Quality Education", ico: "🎓" },
+  { id: "sdg6", txt: "💧 Smart sensors stop city pipe leaks", goal: "SDG 6 · Clean Water", ico: "🚰" },
+  { id: "sdg7", txt: "☀️ AI balances solar & wind power grids", goal: "SDG 7 · Clean Energy", ico: "⚡" },
+  { id: "sdg14", txt: "🛰️ Satellite AI spots illegal ocean fishing", goal: "SDG 14 · Life Below Water", ico: "🐠" },
+  { id: "sdg15", txt: "🌳 Acoustic AI detects illegal forest logging", goal: "SDG 15 · Life on Land", ico: "🦁" }
+];
+const Z1_CONCEPTS = [
+  {
+    q: "How many Sustainable Development Goals (SDGs) were adopted by the United Nations to achieve by 2030?",
+    opts: ["17 SDGs", "10 SDGs", "25 SDGs", "8 SDGs"],
+    a: 0,
+    tip: "The UN adopted 17 interconnected SDGs in 2015 as a global blueprint for 2030."
+  },
+  {
+    q: "An AI medical app only works on expensive phones in English. Which SDG principle is violated?",
+    opts: ["Inclusion & Equal Access (Reduced Inequalities)", "Zero Energy Consumption", "Automated Speed", "Cloud Storage"],
+    a: 0,
+    tip: "AI for SDGs must reduce inequalities (SDG 10) and include everyone, not leave communities behind."
+  }
+];
+
 let Z1 = {};
-function startZone1() {
-  Z1 = {
-    list: sh(PYQ_BANK).slice(0, 8),
-    idx: 0,
-    boosted: false,
-    shielded: false,
-    stealOpen: false,
-    answered: false
-  };
+function startZ1() {
+  Z1 = { step: 0, cards: sh(Z1_PAIRS), goals: sh(Z1_PAIRS), matched: {}, qIdx: 0 };
   renderZ1();
 }
-
 function renderZ1() {
-  stopRush();
-  const q = Z1.list[Z1.idx];
-  if (!q) {
-    zonesDone[0] = true;
-    Portal.unlockBadge("c9_pyq");
-    Portal.SFX.win();
-    Portal.confetti(28);
-    renderZoneBar();
+  const sq = squads[activeSq];
+  if (Z1.step === 0) {
+    curPollPrompt = { q: "Which SDG should each AI tool match?", opts: Z1_PAIRS.map(p => p.goal) };
+    const rem = Z1.cards.filter(c => !Z1.matched[c.id]);
     $("stage").innerHTML = `
       <div class="c">
-        <div style="font-size:3rem">🎯✨</div>
-        <h2>Zone 1 Complete · PYQ Blitz Cleared!</h2>
-        <p class="mut">Every squad tackled real Class 10 CBSE AI (417) Board Questions!</p>
-        <div class="row">
-          <button class="qbtn" onclick="enterZone(1)">Enter Zone 2: Vision &amp; Pixel Lab ▶</button>
-          <button class="p-pill" onclick="startZone1()">🔁 New PYQ Set</button>
-        </div>
+        <span class="topic-tag">Topic 1 · Sustainable Development Goals (SDGs)</span>
+        <span class="xp-pill">+15 XP per match</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h2 style="margin:6px 0">🌍 Drag &amp; Drop AI Solutions to the Right SDG!</h2>
+        <p class="mut" style="margin:0">Drag a card (or tap a card, then tap its matching SDG card below).</p>
       </div>
+      <div class="dd-tray">
+        ${rem.length ? rem.map(c => `<div class="dd-card" data-dd-card="${c.id}">${esc(c.txt)}</div>`).join("") : "✅ All 6 AI solutions matched!"}
+      </div>
+      <div class="dd-zones">
+        ${Z1.goals.map(g => {
+          const hit = Z1.matched[g.id];
+          return `
+            <div class="dd-zone ${hit ? "ok" : ""}" data-dd-zone="${g.id}">
+              <div class="dd-zone-hd">${g.ico} ${esc(g.goal)}</div>
+              ${hit ? `<div class="dd-card locked">${esc(g.txt)}</div>` : `<div class="dd-zone-sub">Drop matching AI tool here</div>`}
+            </div>`;
+        }).join("")}
+      </div>
+      <div class="fb-box" id="z1-fb">Match all 6 cards to unlock the SDG Concept Check!</div>
     `;
-    return;
-  }
-
-  Z1.answered = false;
-  Z1.stealOpen = false;
-  Z1.boosted = false;
-  Z1.shielded = false;
-  const sq = squads[activeSq];
-  const indexedOpts = sh(q.opts.map((text, origIdx) => ({ text, isRight: origIdx === q.a })));
-  Z1.curOpts = indexedOpts;
-
-  $("stage").innerHTML = `
-    <div class="c">
-      <span class="pyq-tag">${esc(q.tag)}</span>
-      <span class="xp-pill">+20 XP${rushOn ? " (+5 Speed)" : ""}</span>
-      <div style="margin-top:8px;font-weight:900;font-size:1.15rem;color:${sq.col}">
-        ${sq.ico} ${esc(sq.name)}'s Turn · Q${Z1.idx + 1}/${Z1.list.length}
-      </div>
-    </div>
-    ${rushOn ? `<div class="rush-wrap"><div class="rush-fill" id="z1-rush"></div></div><div class="c mut" id="z1-sec" style="font-size:0.85rem;font-weight:800">⏱️ 25s Speed Bonus</div>` : ""}
-    <div class="pwr-bar">
-      <button class="pwr-btn" id="pw-boost" ${sq.pwr.boost ? "" : "disabled"} onclick="armBoost()">🔥 2× Boost (${sq.pwr.boost})</button>
-      <button class="pwr-btn" id="pw-shield" ${sq.pwr.shield ? "" : "disabled"} onclick="armShield()">🛡️ Shield (${sq.pwr.shield})</button>
-      <button class="pwr-btn" id="pw-fifty" ${sq.pwr.fifty ? "" : "disabled"} onclick="useZ1Fifty()">⚡ 50/50 (${sq.pwr.fifty})</button>
-      <button class="pwr-btn" id="pw-poll" ${sq.pwr.poll ? "" : "disabled"} onclick="useZ1Poll()">🙋 Class Vote (${sq.pwr.poll})</button>
-    </div>
-    ${q.ar ? `<div class="ar-box"><p><b>${esc(q.ar[0])}</b></p><p><b>${esc(q.ar[1])}</b></p></div>` : ""}
-    <div class="q-title">${esc(q.q)}</div>
-    <div class="opts-grid" id="z1-opts">
-      ${indexedOpts.map((o, k) => `
-        <button class="opt-btn" data-k="${k}" onclick="pickZ1(${k})">
-          <span class="opt-k">${"ABCD"[k]}</span>
-          <span>${esc(o.text)}</span>
-        </button>
-      `).join("")}
-    </div>
-    <div class="fb-box" id="z1-fb">Tap an option above — or spin Spotlight Student to answer!</div>
-    <div id="z1-next"></div>
-  `;
-
-  if (rushOn) {
-    rushLeft = 25;
-    rushTimer = setInterval(() => {
-      if (Z1.answered) { stopRush(); return; }
-      rushLeft--;
-      const fill = $("z1-rush"), sec = $("z1-sec");
-      if (fill) fill.style.width = Math.max(0, (rushLeft / 25) * 100) + "%";
-      if (sec) sec.textContent = rushLeft > 0 ? `⏱️ ${rushLeft}s Speed Bonus` : "⏱️ Speed Bonus expired — normal XP!";
-      if (rushLeft <= 0) stopRush();
-    }, 1000);
-  }
-}
-
-function armBoost() {
-  if (Z1.answered || Z1.boosted || !squads[activeSq].pwr.boost) return;
-  squads[activeSq].pwr.boost--;
-  Z1.boosted = true;
-  $("pw-boost").classList.add("armed");
-  $("pw-boost").disabled = true;
-  renderSquads();
-  Portal.SFX.box();
-  Portal.toast("🔥 2× Boost armed!");
-}
-
-function armShield() {
-  if (Z1.answered || Z1.shielded || !squads[activeSq].pwr.shield) return;
-  squads[activeSq].pwr.shield--;
-  Z1.shielded = true;
-  $("pw-shield").classList.add("armed");
-  $("pw-shield").disabled = true;
-  renderSquads();
-  Portal.SFX.pop();
-  Portal.toast("🛡️ Streak Shield active!");
-}
-
-function useZ1Fifty() {
-  if (Z1.answered || !squads[activeSq].pwr.fifty) return;
-  squads[activeSq].pwr.fifty--;
-  $("pw-fifty").disabled = true;
-  const wrongIdx = Z1.curOpts.map((o, i) => o.isRight ? -1 : i).filter(i => i >= 0);
-  sh(wrongIdx).slice(0, 2).forEach(i => {
-    const btn = document.querySelector(`#z1-opts button[data-k="${i}"]`);
-    if (btn) { btn.disabled = true; btn.style.opacity = "0.24"; }
-  });
-  renderSquads();
-  Portal.SFX.box();
-}
-
-function useZ1Poll() {
-  if (Z1.answered || !squads[activeSq].pwr.poll) return;
-  squads[activeSq].pwr.poll--;
-  $("pw-poll").disabled = true;
-  renderSquads();
-  const q = Z1.list[Z1.idx];
-  const opts = Z1.curOpts.map((o, i) => `${"ABCD"[i]}: ${o.text}`);
-  Portal.openPoll(q.q, opts, (top, _c, total) => {
-    const fb = $("z1-fb");
-    if (fb && !Z1.answered) fb.innerHTML = `🙋 Class Poll (${total} votes) recommends: <b>${esc(top)}</b>`;
-  });
-}
-
-function pickZ1(k) {
-  if (Z1.answered) return;
-  stopRush();
-  const chosen = Z1.curOpts[k];
-  const btns = [...document.querySelectorAll("#z1-opts button")];
-  const fb = $("z1-fb");
-  const q = Z1.list[Z1.idx];
-
-  if (chosen.isRight) {
-    Z1.answered = true;
-    btns.forEach((b, i) => { b.disabled = true; if (Z1.curOpts[i].isRight) b.classList.add("good"); });
-    const speedBonus = (rushOn && rushLeft > 0) ? 5 : 0;
-    const base = (20 + speedBonus) * (Z1.boosted ? 2 : 1);
-    const gained = awardXP(activeSq, base);
-    Portal.SFX.good();
-    Portal.confetti(20);
-    fb.className = "fb-box ok";
-    fb.innerHTML = `✅ <b>Spot On! +${gained} XP</b>${Z1.boosted ? " (🔥 2× Boost!)" : ""}<br><span class="mut">📘 CBSE Key: ${esc(q.tip)}</span>`;
-    showZ1Next();
+    bindDragDrop((cid, zid, zn) => {
+      if (Z1.matched[zid]) return;
+      if (cid === zid) {
+        Z1.matched[zid] = true;
+        const xp = awardXP(activeSq, 15);
+        Portal.SFX.good();
+        nextSquad();
+        renderZ1();
+        $("z1-fb").className = "fb-box ok";
+        $("z1-fb").innerHTML = `✅ Perfect SDG match! +${xp} XP!`;
+        if (Object.keys(Z1.matched).length === Z1_PAIRS.length) {
+          Portal.confetti(22, ["🌍", "🌱", "⭐"]);
+          setTimeout(() => { Z1.step = 1; renderZ1(); }, 1100);
+        }
+      } else {
+        missTurn(activeSq);
+        Portal.SFX.bad();
+        zn.classList.add("shake");
+        setTimeout(() => zn.classList.remove("shake"), 350);
+        $("z1-fb").className = "fb-box bad";
+        $("z1-fb").innerHTML = "❌ Not that SDG — read what problem the AI solves!";
+      }
+    });
   } else {
-    const btn = btns[k];
-    btn.disabled = true;
-    btn.classList.add("bad", "shake");
-    Portal.SFX.bad();
-    breakStreak(activeSq, Z1.shielded);
-    if (!Z1.stealOpen && squadCount > 1) {
-      Z1.stealOpen = true;
-      fb.className = "fb-box bad";
-      fb.innerHTML = `❌ Not quite!${Z1.shielded ? " 🛡️ Shield saved your streak!" : ""} <b>Another Squad can STEAL for +15 XP!</b>
-        <div class="steal-bar">
-          ${squads.map((s, si) => si === activeSq ? "" : `<button class="p-pill warm" onclick="stealZ1(${si})">${s.ico} ${esc(s.name)} Steals!</button>`).join("")}
-          <button class="p-pill" onclick="revealZ1()">Reveal Answer</button>
-        </div>`;
-    } else {
-      revealZ1();
-    }
-  }
-}
-
-function stealZ1(stealSq) {
-  activeSq = stealSq;
-  renderSquads();
-  Z1.stealOpen = true;
-  Z1.boosted = false;
-  Portal.SFX.pop();
-  $("z1-fb").className = "fb-box";
-  $("z1-fb").innerHTML = `⚡ <b>${esc(squads[stealSq].name)}</b> stepped in to steal! Pick the right option above!`;
-}
-
-function revealZ1() {
-  Z1.answered = true;
-  const q = Z1.list[Z1.idx];
-  document.querySelectorAll("#z1-opts button").forEach((b, i) => {
-    b.disabled = true;
-    if (Z1.curOpts[i].isRight) b.classList.add("good");
-  });
-  $("z1-fb").className = "fb-box";
-  $("z1-fb").innerHTML = `📘 <b>CBSE Answer:</b> ${esc(q.opts[q.a])}<br><span class="mut">${esc(q.tip)}</span>`;
-  showZ1Next();
-}
-
-function showZ1Next() {
-  $("z1-next").innerHTML = `<div class="row"><button class="qbtn" onclick="Z1.idx++;nextSquad();renderZ1()">Next Question ▶</button></div>`;
-}
-
-/* ---------- Zone 2: Vision & Pixel Lab ---------- */
-let Z2 = {};
-function startZone2() {
-  Z2 = { step: 0, rgb: [120, 60, 200], taskIdx: 0 };
-  renderZ2();
-}
-
-const Z2_RGB_GOALS = [
-  { name: "Pure Green [0, 255, 0]", check: ([r, g, b]) => r <= 20 && g >= 235 && b <= 20, hint: "Max Green, zero Red & Blue!" },
-  { name: "Pure Yellow [255, 255, 0]", check: ([r, g, b]) => r >= 235 && g >= 235 && b <= 20, hint: "In additive RGB light, Red + Green = Yellow!" },
-  { name: "Pure White [255, 255, 255]", check: ([r, g, b]) => r >= 240 && g >= 240 && b >= 240, hint: "All 3 channels at maximum (255) = White!" }
-];
-
-const Z2_TASKS = [
-  {
-    q: "A security camera identifies 'Dog' as the only object in the frame AND draws ONE bounding box around it.",
-    opts: ["Classification + Localization", "Object Detection", "Instance Segmentation", "Image Classification"],
-    a: 0,
-    tip: "Single object + bounding box = Classification + Localization."
-  },
-  {
-    q: "A self-driving car spots multiple cars, pedestrians, and traffic lights in one frame, each with its own box.",
-    opts: ["Object Detection", "Image Classification", "Classification + Localization", "Grayscale Thresholding"],
-    a: 0,
-    tip: "Multiple objects with labels and bounding boxes = Object Detection."
-  },
-  {
-    q: "In Computer Vision, which image feature is EASIEST to uniquely track across shifted frames?",
-    opts: ["Corners", "Flat uniform areas", "Straight edges only", "Single random noise pixels"],
-    a: 0,
-    tip: "CBSE CV unit: Corners change intensity in ALL directions, making them unambiguous landmarks compared to flat regions or edges."
-  },
-  {
-    q: "Medical AI outlines the exact pixel-by-pixel shape of each individual tumour cell in a scan.",
-    opts: ["Instance Segmentation", "Image Classification", "Object Detection", "RGB Filtering"],
-    a: 0,
-    tip: "Pixel-level mask separating each individual object = Instance Segmentation."
-  }
-];
-
-function renderZ2() {
-  const sq = squads[activeSq];
-  if (Z2.step === 0) {
-    Z2.goalIdx = Z2.goalIdx || 0;
-    const goal = Z2_RGB_GOALS[Z2.goalIdx];
-    const [r, g, b] = Z2.rgb;
-    const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-    $("stage").innerHTML = `
-      <div class="c">
-        <span class="pyq-tag">CBSE Class 10 · Computer Vision Lab (Step 1/2)</span>
-        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Lab Turn</div>
-        <h2 style="margin:6px 0">🎨 RGB &amp; Grayscale Pixel Mixer</h2>
-        <p class="mut" style="margin:0 0 12px">Target (${Z2.goalIdx + 1}/${Z2_RGB_GOALS.length}): Create <b>${goal.name}</b> using the RGB sliders!</p>
-      </div>
-      <div class="lab-split">
-        <div>
-          <div class="rgb-swatch" id="z2-swatch" style="background:rgb(${r},${g},${b})">
-            RGB(${r}, ${g}, ${b}) · Grayscale: ${gray}
-          </div>
-          <div class="slider-row"><span style="color:#e63946;width:65px">Red</span><input type="range" min="0" max="255" value="${r}" oninput="updRGB(0,this.value)"><b id="rv">${r}</b></div>
-          <div class="slider-row"><span style="color:#1b9e5a;width:65px">Green</span><input type="range" min="0" max="255" value="${g}" oninput="updRGB(1,this.value)"><b id="gv">${g}</b></div>
-          <div class="slider-row"><span style="color:#1d70d6;width:65px">Blue</span><input type="range" min="0" max="255" value="${b}" oninput="updRGB(2,this.value)"><b id="bv">${b}</b></div>
-          <div class="row">
-            <button class="p-pill" onclick="setRGB(0,0,0)">⬛ [0,0,0]</button>
-            <button class="p-pill" onclick="setRGB(255,0,0)">🟥 [255,0,0]</button>
-            <button class="p-pill" onclick="setRGB(0,255,0)">🟩 [0,255,0]</button>
-            <button class="p-pill" onclick="setRGB(255,255,255)">⬜ [255,255,255]</button>
-          </div>
-          <div class="row"><button class="qbtn ok" onclick="checkRGB()">✅ Lock Color (+20 XP)</button></div>
-        </div>
-        <div>
-          <div class="ar-box" style="margin-top:0">
-            <p><b>📘 CBSE Exam Concept:</b></p>
-            <p>• Every colour pixel = <b>3 channels</b> (R, G, B), each 0–255.</p>
-            <p>• Grayscale pixel = <b>1 channel</b> (0 = Black, 255 = White).</p>
-            <p>• Tip: <i>${goal.hint}</i></p>
-          </div>
-          <h4 class="c" style="margin:12px 0 4px">5×5 Grayscale Pixel Grid (Click pixels to invert 0 ↔ 255!)</h4>
-          <div class="pix-grid-5" id="z2-grid"></div>
-        </div>
-      </div>
-      <div class="fb-box" id="z2-fb">Mix the target RGB values and click Lock Color!</div>
-    `;
-    renderZ2Grid();
-  } else {
-    const tk = Z2_TASKS[Z2.taskIdx];
-    if (!tk) {
-      zonesDone[1] = true;
+    const q = Z1_CONCEPTS[Z1.qIdx];
+    if (!q) {
+      zonesDone[0] = true;
       renderZoneBar();
       Portal.SFX.win();
-      Portal.confetti(24, ["👁️", "🎨", "⭐"]);
+      Portal.confetti(25, ["🌍", "⭐"]);
       $("stage").innerHTML = `
         <div class="c">
-          <div style="font-size:3rem">👁️✨</div>
-          <h2>Zone 2 Complete · Vision Mastered!</h2>
-          <p class="mut">Your class decoded RGB channels, Grayscale intensity, corners, and all 4 CV tasks!</p>
-          <div class="row">
-            <button class="qbtn" onclick="enterZone(2)">Enter Zone 3: NLP Token Forge ▶</button>
-          </div>
-        </div>
-      `;
+          <div style="font-size:3rem">🌍🏆</div>
+          <h2>Zone 1 Complete · SDG Matchmaker!</h2>
+          <p class="mut">Your class connected real AI applications to the 17 UN SDGs!</p>
+          <div class="row"><button class="qbtn" onclick="enterZone(1)">Enter Zone 2: Data Literacy Builder ▶</button></div>
+        </div>`;
       return;
     }
-    const opts = sh(tk.opts.map((t, i) => ({ t, ok: i === tk.a })));
-    Z2.curOpts = opts;
+    const opts = sh(q.opts.map((t, i) => ({ t, ok: i === q.a })));
+    Z1.curOpts = opts;
+    curPollPrompt = { q: q.q, opts: opts.map(o => o.t) };
     $("stage").innerHTML = `
       <div class="c">
-        <span class="pyq-tag">CBSE Class 10 · CV Task Spotter (${Z2.taskIdx + 1}/${Z2_TASKS.length})</span>
+        <span class="topic-tag">Topic 1 · SDG Concept Check (${Z1.qIdx + 1}/${Z1_CONCEPTS.length})</span>
         <span class="xp-pill">+20 XP</span>
         <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
       </div>
-      <div class="q-title">${esc(tk.q)}</div>
-      <div class="opts-grid" id="z2-opts">
-        ${opts.map((o, i) => `<button class="opt-btn" onclick="pickZ2Task(${i})"><span class="opt-k">${"ABCD"[i]}</span><span>${esc(o.t)}</span></button>`).join("")}
+      <div class="q-title">${esc(q.q)}</div>
+      <div class="opts-grid" id="z1-opts">
+        ${opts.map((o, i) => `<button class="opt-btn" onclick="pickZ1C(${i})"><span>${esc(o.t)}</span></button>`).join("")}
       </div>
-      <div class="fb-box" id="z2-fb">Match the Computer Vision task!</div>
-      <div id="z2-next"></div>
+      <div class="fb-box" id="z1-fb">Tap the right concept!</div>
+      <div id="z1-nx"></div>
     `;
   }
 }
 
-let pixPattern = [
-  255, 0, 0, 0, 255,
-  255, 0, 0, 0, 255,
-  255, 255, 255, 255, 255,
-  255, 0, 0, 0, 255,
-  255, 0, 0, 0, 255
-];
-function renderZ2Grid() {
-  const g = $("z2-grid");
-  if (!g) return;
-  g.innerHTML = pixPattern.map((v, i) => `
-    <div class="pix-cell" style="background:rgb(${v},${v},${v});color:${v > 128 ? "#14213d" : "#fff"}" onclick="pixPattern[${i}]=pixPattern[${i}]?0:255;Portal.SFX.tick();renderZ2Grid()">${v}</div>
-  `).join("");
-}
-
-function updRGB(ch, val) {
-  Z2.rgb[ch] = Number(val);
-  const [r, g, b] = Z2.rgb;
-  const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-  $("rv").textContent = r; $("gv").textContent = g; $("bv").textContent = b;
-  const sw = $("z2-swatch");
-  sw.style.background = `rgb(${r},${g},${b})`;
-  sw.textContent = `RGB(${r}, ${g}, ${b}) · Grayscale: ${gray}`;
-}
-function setRGB(r, g, b) { Z2.rgb = [r, g, b]; Portal.SFX.pop(); renderZ2(); }
-
-function checkRGB() {
-  const goal = Z2_RGB_GOALS[Z2.goalIdx];
-  const fb = $("z2-fb");
-  if (goal.check(Z2.rgb)) {
-    const xp = awardXP(activeSq, 20);
-    Portal.SFX.good(); Portal.confetti(18, ["🎨", "⭐"]);
-    Z2.goalIdx++;
-    if (Z2.goalIdx >= Z2_RGB_GOALS.length) {
-      fb.className = "fb-box ok";
-      fb.innerHTML = `✅ Perfect! +${xp} XP! Moving to CV Task Spotter…`;
-      setTimeout(() => { Z2.step = 1; nextSquad(); renderZ2(); }, 1300);
-    } else {
-      fb.className = "fb-box ok";
-      fb.innerHTML = `✅ Nailed it! +${xp} XP! Next target colour loading…`;
-      setTimeout(() => { nextSquad(); renderZ2(); }, 1100);
-    }
-  } else {
-    Portal.SFX.bad();
-    fb.className = "fb-box bad";
-    fb.innerHTML = `❌ Not quite ${goal.name}! Hint: ${goal.hint}`;
-  }
-}
-
-function pickZ2Task(i) {
-  const chosen = Z2.curOpts[i];
-  const tk = Z2_TASKS[Z2.taskIdx];
-  document.querySelectorAll("#z2-opts button").forEach((b, j) => {
+function pickZ1C(i) {
+  const q = Z1_CONCEPTS[Z1.qIdx];
+  const ok = Z1.curOpts[i].ok;
+  document.querySelectorAll("#z1-opts button").forEach((b, j) => {
     b.disabled = true;
-    if (Z2.curOpts[j].ok) b.classList.add("good");
+    if (Z1.curOpts[j].ok) b.classList.add("good");
   });
-  const fb = $("z2-fb");
-  if (chosen.ok) {
+  const fb = $("z1-fb");
+  if (ok) {
     const xp = awardXP(activeSq, 20);
     Portal.SFX.good(); Portal.confetti(18);
     fb.className = "fb-box ok";
-    fb.innerHTML = `✅ Correct! +${xp} XP! <span class="mut">${esc(tk.tip)}</span>`;
+    fb.innerHTML = `✅ Correct! +${xp} XP! <span class="mut">${esc(q.tip)}</span>`;
   } else {
-    document.querySelectorAll("#z2-opts button")[i].classList.add("bad", "shake");
-    breakStreak(activeSq);
+    document.querySelectorAll("#z1-opts button")[i].classList.add("bad", "shake");
+    missTurn(activeSq);
     Portal.SFX.bad();
     fb.className = "fb-box bad";
-    fb.innerHTML = `❌ Answer: <b>${esc(tk.opts[tk.a])}</b>. <span class="mut">${esc(tk.tip)}</span>`;
+    fb.innerHTML = `❌ <span class="mut">${esc(q.tip)}</span>`;
   }
-  $("z2-next").innerHTML = `<div class="row"><button class="qbtn" onclick="Z2.taskIdx++;nextSquad();renderZ2()">Continue ▶</button></div>`;
+  $("z1-nx").innerHTML = `<div class="row"><button class="qbtn" onclick="Z1.qIdx++;nextSquad();renderZ1()">Continue ▶</button></div>`;
 }
 
-/* ---------- Zone 3: NLP Token Forge ---------- */
-let Z3 = {};
-const Z3_SENTENCE = [
-  { w: "The", stop: true },
-  { w: "students", stop: false },
-  { w: "are", stop: true },
-  { w: "training", stop: false },
-  { w: "smart", stop: false },
-  { w: "AI", stop: false },
-  { w: "models", stop: false },
-  { w: "and", stop: true },
-  { w: "learning", stop: false },
-  { w: "in", stop: true },
-  { w: "class", stop: false }
+/* ==========================================================================
+   ZONE 2: DATA LITERACY (DIKW Pyramid + Data Types Drag-Drop + Privacy Click)
+   ========================================================================== */
+const DIKW_ITEMS = [
+  { id: "W", tier: "Wisdom", w: "58%", txt: "🏫 Shift morning assembly indoors & issue water breaks" },
+  { id: "K", tier: "Knowledge", w: "72%", txt: "🔥 Readings above 40°C for 3 days = heatwave risk" },
+  { id: "I", tier: "Information", w: "86%", txt: "🌡️ Today's Vijayawada school yard temp is 38°C–42°C" },
+  { id: "D", tier: "Data", w: "100%", txt: "🔢 Raw sensor numbers: 38, 39, 41, 42" }
 ];
-const Z3_BOW_WORDS = ["ai", "students", "learn", "games"];
-const Z3_BOW_ANS = [
-  [1, 1, 1, 0], // Doc 1: "AI helps students learn"
-  [1, 1, 0, 1]  // Doc 2: "Students love AI games"
+const DATA_TYPES = [
+  { id: "dt1", txt: "👥 36 students in Class 9A", type: "Discrete" },
+  { id: "dt2", txt: "📏 Height: 162.4 cm", type: "Continuous" },
+  { id: "dt3", txt: "💬 Review: 'Loved the AI lab!'", type: "Qualitative" },
+  { id: "dt4", txt: "⚽ 3 goals scored in match", type: "Discrete" },
+  { id: "dt5", txt: "🌧️ Rainfall: 14.8 mm", type: "Continuous" },
+  { id: "dt6", txt: "📷 Photo of a classroom", type: "Qualitative" }
+];
+const PRIVACY_ITEMS = [
+  { txt: "🔒 Remove student names (anonymise) before sharing data", safe: true },
+  { txt: "📢 Sell classmates' phone numbers to advertisers", safe: false },
+  { txt: "✋ Ask clear permission before recording voice samples", safe: true },
+  { txt: "🕵️ Secretly track students' GPS location without telling them", safe: false },
+  { txt: "🌐 Use verified open-source government datasets", safe: true }
 ];
 
-function startZone3() {
-  Z3 = {
-    step: 0,
-    zapped: Z3_SENTENCE.map(() => false),
-    bow: [[0, 0, 0, 0], [0, 0, 0, 0]],
-    stemIdx: 0
-  };
+let Z2 = {};
+function startZ2() {
+  Z2 = { step: 0, dikwCards: sh(DIKW_ITEMS), dikwPlaced: {}, dtCards: sh(DATA_TYPES), dtPlaced: {}, privPicked: PRIVACY_ITEMS.map(() => false) };
+  renderZ2();
+}
+function renderZ2() {
+  const sq = squads[activeSq];
+  if (Z2.step === 0) {
+    curPollPrompt = { q: "Which DIKW tier is 'Raw numbers: 38, 39, 41, 42'?", opts: ["Data", "Information", "Knowledge", "Wisdom"] };
+    const rem = Z2.dikwCards.filter(c => !Z2.dikwPlaced[c.id]);
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="topic-tag">Topic 2 · Data Literacy (1/3: DIKW Pyramid)</span>
+        <span class="xp-pill">+15 XP per tier</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h2 style="margin:6px 0">🔺 Drag &amp; Drop to Build the Data (DIKW) Pyramid!</h2>
+        <p class="mut" style="margin:0">From raw facts at the bottom (<b>Data</b>) to smart action at the top (<b>Wisdom</b>).</p>
+      </div>
+      <div class="dd-tray">
+        ${rem.length ? rem.map(c => `<div class="dd-card" data-dd-card="${c.id}">${esc(c.txt)}</div>`).join("") : "✅ Pyramid Built!"}
+      </div>
+      <div class="pyramid">
+        ${DIKW_ITEMS.map(t => {
+          const ok = Z2.dikwPlaced[t.id];
+          return `
+            <div class="pyr-tier ${ok ? "ok" : ""}" style="max-width:${t.w}" data-dd-zone="${t.id}">
+              <b>${t.tier}</b>
+              ${ok ? `<span class="dd-card locked">${esc(t.txt)}</span>` : `<span class="mut" style="font-size:0.86rem">Drop ${t.tier} example here</span>`}
+            </div>`;
+        }).join("")}
+      </div>
+      <div class="fb-box" id="z2-fb">Data (raw) → Information (context) → Knowledge (pattern) → Wisdom (decision)!</div>
+    `;
+    bindDragDrop((cid, zid, zn) => {
+      if (Z2.dikwPlaced[zid]) return;
+      if (cid === zid) {
+        Z2.dikwPlaced[zid] = true;
+        const xp = awardXP(activeSq, 15);
+        Portal.SFX.good();
+        nextSquad();
+        renderZ2();
+        $("z2-fb").className = "fb-box ok";
+        $("z2-fb").innerHTML = `✅ Placed in ${DIKW_ITEMS.find(x => x.id === zid).tier}! +${xp} XP!`;
+        if (Object.keys(Z2.dikwPlaced).length === DIKW_ITEMS.length) {
+          Portal.confetti(20);
+          setTimeout(() => { Z2.step = 1; renderZ2(); }, 1100);
+        }
+      } else {
+        missTurn(activeSq); Portal.SFX.bad();
+        zn.classList.add("shake"); setTimeout(() => zn.classList.remove("shake"), 350);
+        $("z2-fb").className = "fb-box bad";
+        $("z2-fb").innerHTML = "❌ Check whether it is raw facts, context, pattern, or action!";
+      }
+    });
+  } else if (Z2.step === 1) {
+    const rem = Z2.dtCards.filter(c => !Z2.dtPlaced[c.id]);
+    const bins = [
+      { k: "Discrete", ico: "🔢", sub: "Countable whole numbers" },
+      { k: "Continuous", ico: "📏", sub: "Measured values (decimals)" },
+      { k: "Qualitative", ico: "💬", sub: "Text, labels, photos" }
+    ];
+    curPollPrompt = { q: "Is 'Height: 162.4 cm' Discrete, Continuous, or Qualitative?", opts: bins.map(b => b.k) };
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="topic-tag">Topic 2 · Data Literacy (2/3: Data Types)</span>
+        <span class="xp-pill">+15 XP per sort</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h2 style="margin:6px 0">🗂️ Sort Cards into Discrete, Continuous, or Qualitative!</h2>
+      </div>
+      <div class="dd-tray">
+        ${rem.length ? rem.map(c => `<div class="dd-card" data-dd-card="${c.id}">${esc(c.txt)}</div>`).join("") : "✅ All Data Types Sorted!"}
+      </div>
+      <div class="dd-zones">
+        ${bins.map(b => {
+          const items = DATA_TYPES.filter(d => d.type === b.k && Z2.dtPlaced[d.id]);
+          return `
+            <div class="dd-zone ${items.length === 2 ? "ok" : ""}" data-dd-zone="${b.k}">
+              <div class="dd-zone-hd">${b.ico} ${b.k}</div>
+              <div class="dd-zone-sub">${b.sub}</div>
+              ${items.map(d => `<div class="dd-card locked">${esc(d.txt)}</div>`).join("")}
+            </div>`;
+        }).join("")}
+      </div>
+      <div class="fb-box" id="z2-fb">Quantitative data = numbers (Discrete or Continuous). Qualitative = words/media!</div>
+    `;
+    bindDragDrop((cid, zid, zn) => {
+      if (Z2.dtPlaced[cid]) return;
+      const item = DATA_TYPES.find(d => d.id === cid);
+      if (item && item.type === zid) {
+        Z2.dtPlaced[cid] = true;
+        const xp = awardXP(activeSq, 15);
+        Portal.SFX.good(); nextSquad(); renderZ2();
+        $("z2-fb").className = "fb-box ok";
+        $("z2-fb").innerHTML = `✅ Sorted into ${zid}! +${xp} XP!`;
+        if (Object.keys(Z2.dtPlaced).length === DATA_TYPES.length) {
+          Portal.confetti(20);
+          setTimeout(() => { Z2.step = 2; renderZ2(); }, 1100);
+        }
+      } else {
+        missTurn(activeSq); Portal.SFX.bad();
+        zn.classList.add("shake"); setTimeout(() => zn.classList.remove("shake"), 350);
+        $("z2-fb").className = "fb-box bad";
+        $("z2-fb").innerHTML = "❌ Not that bin! Can you count it, measure it, or is it descriptive?";
+      }
+    });
+  } else {
+    const safeCount = PRIVACY_ITEMS.filter(x => x.safe).length;
+    const found = PRIVACY_ITEMS.filter((x, i) => x.safe && Z2.privPicked[i]).length;
+    curPollPrompt = { q: "Which practices protect Data Privacy?", opts: PRIVACY_ITEMS.map(x => x.txt) };
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="topic-tag">Topic 2 · Data Literacy (3/3: Data Privacy Shield)</span>
+        <span class="xp-pill">+25 XP</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h2 style="margin:6px 0">🛡️ Tap ONLY the Safe &amp; Ethical Data Practices! (${found}/${safeCount})</h2>
+      </div>
+      <div class="opts-grid">
+        ${PRIVACY_ITEMS.map((p, i) => `
+          <button class="opt-btn ${Z2.privPicked[i] ? "good" : ""}" onclick="tapPriv(${i})">${esc(p.txt)}</button>
+        `).join("")}
+      </div>
+      <div class="fb-box" id="z2-fb">Tap all 3 safe practices — avoid the privacy traps!</div>
+    `;
+  }
+}
+
+function tapPriv(i) {
+  if (Z2.privPicked[i]) return;
+  const p = PRIVACY_ITEMS[i];
+  if (p.safe) {
+    Z2.privPicked[i] = true;
+    Portal.SFX.good();
+    renderZ2();
+    const done = PRIVACY_ITEMS.every((x, idx) => !x.safe || Z2.privPicked[idx]);
+    if (done) {
+      const xp = awardXP(activeSq, 25);
+      zonesDone[1] = true;
+      Portal.unlockBadge("c9_pyq");
+      Portal.SFX.win();
+      Portal.confetti(24, ["📊", "🛡️", "⭐"]);
+      renderZoneBar();
+      $("stage").innerHTML = `
+        <div class="c">
+          <div style="font-size:3rem">📊🛡️</div>
+          <h2>Zone 2 Complete · Data Literacy Mastered! (+${xp} XP)</h2>
+          <p class="mut">DIKW Pyramid, Discrete vs Continuous vs Qualitative data, and Data Privacy — nailed!</p>
+          <div class="row"><button class="qbtn" onclick="enterZone(2)">Enter Zone 3: Math for AI Lab ▶</button></div>
+        </div>`;
+    }
+  } else {
+    missTurn(activeSq);
+    Portal.SFX.bad();
+    $("z2-fb").className = "fb-box bad";
+    $("z2-fb").innerHTML = `⚠️ Risky trap! "${esc(p.txt)}" violates Data Privacy & Consent!`;
+  }
+}
+
+/* ==========================================================================
+   ZONE 3: MATH FOR AI (Patterns + Live Mean/Median/Mode + Drag-Drop Probability)
+   ========================================================================== */
+const PROB_EVENTS = [
+  { id: "p0", txt: "🎲 Rolling a 7 on a standard 6-sided die", bin: "0" },
+  { id: "p25", txt: "📅 Picking 'Sunday' randomly from 7 days", bin: "0.25" },
+  { id: "p50", txt: "🪙 Getting Heads on a fair coin flip", bin: "0.5" },
+  { id: "p75", txt: "🎲 Rolling a number less than 6 on a die", bin: "0.75" },
+  { id: "p100", txt: "☀️ Sun rising in the East tomorrow", bin: "1" }
+];
+
+let Z3 = {};
+function startZ3() {
+  Z3 = { step: 0, bars: [10, 12, 12, 16, 20], mathGoal: 0, probCards: sh(PROB_EVENTS), probPlaced: {} };
   renderZ3();
 }
 
-const Z3_STEM_DUELS = [
-  { word: "studies", q: "What is the STEMMED output vs LEMMATIZED output for 'studies'?", opts: ["Stem: 'studi' · Lemma: 'study'", "Stem: 'study' · Lemma: 'studi'", "Both output 'studies'", "Stem removes the word completely"], a: 0, tip: "Stemming blindly chops '-es/-ies' → 'studi'; Lemmatization uses dictionary lookup → 'study'." },
-  { word: "caring", q: "Which technique returns the meaningful dictionary word 'care' for 'caring' (instead of 'car')?", opts: ["Lemmatization", "Stemming", "Tokenisation", "Bag of Words"], a: 0, tip: "Classic CBSE 417 PYQ example: Stemming('caring') → 'car' (wrong meaning!), Lemmatization('caring') → 'care'!" }
-];
+function calcStats(arr) {
+  const mean = +(arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1);
+  const sorted = [...arr].sort((a, b) => a - b);
+  const mid = sorted.length >> 1;
+  const median = sorted.length % 2 ? sorted[mid] : +((sorted[mid - 1] + sorted[mid]) / 2).toFixed(1);
+  const freq = {};
+  arr.forEach(v => freq[v] = (freq[v] || 0) + 1);
+  const maxF = Math.max(...Object.values(freq));
+  const modes = Object.keys(freq).filter(k => freq[k] === maxF);
+  const mode = maxF === 1 ? "None" : modes.join(", ");
+  return { mean, median, mode };
+}
 
 function renderZ3() {
   const sq = squads[activeSq];
   if (Z3.step === 0) {
-    const totalStops = Z3_SENTENCE.filter(x => x.stop).length;
-    const zappedStops = Z3_SENTENCE.filter((x, i) => x.stop && Z3.zapped[i]).length;
+    curPollPrompt = { q: "What is the next number in AI pattern: 2, 6, 12, 20, 30, ___?", opts: ["42", "36", "40", "44"] };
     $("stage").innerHTML = `
       <div class="c">
-        <span class="pyq-tag">CBSE Class 10 · NLP Pipeline (Step 1/3)</span>
-        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Forge</div>
-        <h2 style="margin:6px 0">⚡ Stopword Zapper &amp; Tokeniser</h2>
-        <p class="mut">Tap ONLY the <b>Stopwords</b> (common filler words like <i>the, are, and, in</i>) to clean the corpus! (${zappedStops}/${totalStops} zapped)</p>
+        <span class="topic-tag">Topic 3 · Math for AI (1/3: Finding Patterns)</span>
+        <span class="xp-pill">+20 XP</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h2 style="margin:6px 0">🔍 Spot the Mathematical Pattern!</h2>
+        <p class="mut">AI learns patterns from numbers! Look at the gaps: <b>+4, +6, +8, +10…</b></p>
+        <div class="q-title" style="font-size:1.7rem;letter-spacing:2px">2, &nbsp; 6, &nbsp; 12, &nbsp; 20, &nbsp; 30, &nbsp; <span style="color:var(--b)">?</span></div>
       </div>
-      <div class="tok-box">
-        ${Z3_SENTENCE.map((t, i) => `
-          <button class="tok-chip ${Z3.zapped[i] ? "zapped" : ""}" onclick="zapToken(${i})">${esc(t.w)}</button>
-        `).join("")}
+      <div class="opts-grid" id="z3-p">
+        ${sh([42, 36, 40, 44]).map(v => `<button class="opt-btn" onclick="pickZ3Pat(${v})"><b>${v}</b></button>`).join("")}
       </div>
-      <div class="fb-box" id="z3-fb">Tap all ${totalStops} stopwords to produce clean lowercased tokens!</div>
+      <div class="fb-box" id="z3-fb">Find the next difference (+12) and tap the answer!</div>
     `;
   } else if (Z3.step === 1) {
-    const d = Z3_STEM_DUELS[Z3.stemIdx];
-    const opts = sh(d.opts.map((t, i) => ({ t, ok: i === d.a })));
-    Z3.curOpts = opts;
+    const st = calcStats(Z3.bars);
+    const goalTxt = Z3.mathGoal === 0
+      ? "Click + / - on the bars until <b>Mean = 16</b> (currently " + st.mean + ")!"
+      : "Now push the last bar up to <b>30+</b> to see an <b>Outlier</b> pull the Mean while Median stays steady — then click Check!";
+    curPollPrompt = { q: "In a dataset with one extreme outlier, which stays steadier: Mean or Median?", opts: ["Median", "Mean"] };
     $("stage").innerHTML = `
       <div class="c">
-        <span class="pyq-tag">CBSE Class 10 · NLP Pipeline (Step 2/3)</span>
-        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
-        <h2 style="margin:6px 0">🌱 Stemming vs Lemmatization</h2>
+        <span class="topic-tag">Topic 3 · Math for AI (2/3: Live Statistics Lab)</span>
+        <span class="xp-pill">+25 XP</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Lab</div>
+        <h2 style="margin:6px 0">📈 Click Bars to Explore Mean, Median &amp; Mode!</h2>
+        <p class="mut" style="margin:0">${goalTxt}</p>
       </div>
-      <div class="q-title">${esc(d.q)}</div>
-      <div class="opts-grid" id="z3-opts">
-        ${opts.map((o, i) => `<button class="opt-btn" onclick="pickZ3Stem(${i})"><span class="opt-k">${"ABCD"[i]}</span><span>${esc(o.t)}</span></button>`).join("")}
-      </div>
-      <div class="fb-box" id="z3-fb">Pick the CBSE-accurate answer!</div>
-      <div id="z3-next"></div>
-    `;
-  } else {
-    $("stage").innerHTML = `
-      <div class="c">
-        <span class="pyq-tag">CBSE Class 10 · Bag of Words (Step 3/3)</span>
-        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Final Forge</div>
-        <h2 style="margin:6px 0">🎒 Build the Bag-of-Words Document Vector</h2>
-        <div class="ar-box">
-          <p><b>Document 1:</b> "AI helps students learn"</p>
-          <p><b>Document 2:</b> "Students love AI games"</p>
-        </div>
-        <p class="mut">Tap each cell to toggle its frequency count (<b>0</b> or <b>1</b>), then click Verify Matrix (+25 XP)!</p>
-      </div>
-      <table class="bow-table">
-        <tr><th>Document</th>${Z3_BOW_WORDS.map(w => `<th>${w}</th>`).join("")}</tr>
-        ${[0, 1].map(r => `
-          <tr>
-            <td><b>Doc ${r + 1}</b></td>
-            ${Z3_BOW_WORDS.map((_, c) => `<td><button class="bow-cell-btn" onclick="toggleBow(${r},${c})">${Z3.bow[r][c]}</button></td>`).join("")}
-          </tr>
+      <div class="math-bars">
+        ${Z3.bars.map((v, i) => `
+          <div class="m-col">
+            <div class="m-bar" style="height:${Math.min(130, Math.max(24, v * 3.5))}px">${v}</div>
+            <div class="m-ctrl">
+              <button onclick="adjBar(${i},-2)">-</button>
+              <button onclick="adjBar(${i},2)">+</button>
+            </div>
+          </div>
         `).join("")}
-      </table>
-      <div class="row"><button class="qbtn ok" onclick="checkBow()">✅ Verify Document Vector (+25 XP)</button></div>
-      <div class="fb-box" id="z3-fb">Fill in the word counts (ignoring word order — that's why it's called Bag of Words!).</div>
+      </div>
+      <div class="stat-strip">
+        <span class="stat-pill">Mean: <b style="color:var(--a)">${st.mean}</b></span>
+        <span class="stat-pill">Median: <b style="color:var(--ok)">${st.median}</b></span>
+        <span class="stat-pill">Mode: <b style="color:var(--b)">${st.mode}</b></span>
+      </div>
+      <div class="row">
+        <button class="qbtn ok" onclick="checkMathLab()">✅ Check My Dataset</button>
+      </div>
+      <div class="fb-box" id="z3-fb">Notice how Mean = sum ÷ count, Median = middle sorted value, Mode = most frequent!</div>
     `;
-  }
-}
-
-function zapToken(i) {
-  if (Z3.zapped[i]) return;
-  const tok = Z3_SENTENCE[i];
-  const fb = $("z3-fb");
-  if (tok.stop) {
-    Z3.zapped[i] = true;
-    Portal.SFX.good();
-    renderZ3();
-    const done = Z3_SENTENCE.every((x, idx) => !x.stop || Z3.zapped[idx]);
-    if (done) {
-      const xp = awardXP(activeSq, 20);
-      Portal.confetti(16, ["💬", "⚡", "⭐"]);
-      const clean = Z3_SENTENCE.filter(x => !x.stop).map(x => x.w.toLowerCase());
-      $("z3-fb").className = "fb-box ok";
-      $("z3-fb").innerHTML = `✅ Clean Tokens: <code>[${clean.join(", ")}]</code> (+${xp} XP)! Moving to Stemming vs Lemmatization…`;
-      setTimeout(() => { Z3.step = 1; nextSquad(); renderZ3(); }, 1700);
-    }
   } else {
-    Portal.SFX.bad();
-    fb.className = "fb-box bad";
-    fb.innerHTML = `❌ "<b>${esc(tok.w)}</b>" carries real meaning — keep it! Zap only filler stopwords.`;
+    const rem = Z3.probCards.filter(c => !Z3.probPlaced[c.id]);
+    const scale = [
+      { k: "0", t: "0 · Impossible", sub: "Never happens" },
+      { k: "0.25", t: "~0.14–0.25 · Unlikely", sub: "Low chance" },
+      { k: "0.5", t: "0.5 · Equal Chance", sub: "50-50" },
+      { k: "0.75", t: "~0.83 · Likely", sub: "High chance" },
+      { k: "1", t: "1.0 · Certain", sub: "Always happens" }
+    ];
+    curPollPrompt = { q: "What is the probability of rolling < 6 on a fair 6-sided die?", opts: scale.map(s => s.t) };
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="topic-tag">Topic 3 · Math for AI (3/3: Probability Meter)</span>
+        <span class="xp-pill">+15 XP per event</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h2 style="margin:6px 0">🎲 Drag &amp; Drop Each Event onto the Probability Scale!</h2>
+      </div>
+      <div class="dd-tray">
+        ${rem.length ? rem.map(c => `<div class="dd-card" data-dd-card="${c.id}">${esc(c.txt)}</div>`).join("") : "✅ Probability Scale Mastered!"}
+      </div>
+      <div class="prob-scale">
+        ${scale.map(s => {
+          const hit = Z3.probCards.find(c => c.bin === s.k && Z3.probPlaced[c.id]);
+          return `
+            <div class="dd-zone ${hit ? "ok" : ""}" data-dd-zone="${s.k}">
+              <div class="dd-zone-hd">${s.t}</div>
+              <div class="dd-zone-sub">${s.sub}</div>
+              ${hit ? `<div class="dd-card locked">${esc(hit.txt)}</div>` : ""}
+            </div>`;
+        }).join("")}
+      </div>
+      <div class="fb-box" id="z3-fb">Probability is always between 0 (Impossible) and 1 (Certain)!</div>
+    `;
+    bindDragDrop((cid, zid, zn) => {
+      const ev = PROB_EVENTS.find(e => e.id === cid);
+      if (Z3.probPlaced[cid]) return;
+      if (ev && ev.bin === zid) {
+        Z3.probPlaced[cid] = true;
+        const xp = awardXP(activeSq, 15);
+        Portal.SFX.good(); nextSquad(); renderZ3();
+        $("z3-fb").className = "fb-box ok";
+        $("z3-fb").innerHTML = `✅ Exact probability! +${xp} XP!`;
+        if (Object.keys(Z3.probPlaced).length === PROB_EVENTS.length) {
+          zonesDone[2] = true;
+          renderZoneBar();
+          Portal.SFX.win();
+          Portal.confetti(25, ["🔢", "🎲", "⭐"]);
+          setTimeout(() => {
+            $("stage").innerHTML = `
+              <div class="c">
+                <div style="font-size:3rem">🔢🎲</div>
+                <h2>Zone 3 Complete · Math for AI Mastered!</h2>
+                <p class="mut">Patterns, Mean/Median/Mode, and Probability (0 to 1) — ready for the AI Project Cycle!</p>
+                <div class="row"><button class="qbtn" onclick="enterZone(3)">Enter Zone 4: AI Project Cycle ▶</button></div>
+              </div>`;
+          }, 950);
+        }
+      } else {
+        missTurn(activeSq); Portal.SFX.bad();
+        zn.classList.add("shake"); setTimeout(() => zn.classList.remove("shake"), 350);
+        $("z3-fb").className = "fb-box bad";
+        $("z3-fb").innerHTML = "❌ Not that probability — count favourable outcomes ÷ total outcomes!";
+      }
+    });
   }
 }
 
-function pickZ3Stem(i) {
-  const chosen = Z3.curOpts[i];
-  const d = Z3_STEM_DUELS[Z3.stemIdx];
-  document.querySelectorAll("#z3-opts button").forEach((b, j) => {
+function pickZ3Pat(val) {
+  document.querySelectorAll("#z3-p button").forEach(b => {
     b.disabled = true;
-    if (Z3.curOpts[j].ok) b.classList.add("good");
+    if (Number(b.textContent) === 42) b.classList.add("good");
   });
-  const fb = $("z3-fb");
-  if (chosen.ok) {
+  if (val === 42) {
     const xp = awardXP(activeSq, 20);
-    Portal.SFX.good();
-    fb.className = "fb-box ok";
-    fb.innerHTML = `✅ Correct! +${xp} XP! <span class="mut">${esc(d.tip)}</span>`;
+    Portal.SFX.good(); Portal.confetti(18);
+    $("z3-fb").className = "fb-box ok";
+    $("z3-fb").innerHTML = `✅ 30 + 12 = <b>42</b>! (+${xp} XP) Launching Live Statistics Lab…`;
+    setTimeout(() => { Z3.step = 1; nextSquad(); renderZ3(); }, 1300);
   } else {
-    document.querySelectorAll("#z3-opts button")[i].classList.add("bad", "shake");
-    breakStreak(activeSq);
-    Portal.SFX.bad();
-    fb.className = "fb-box bad";
-    fb.innerHTML = `❌ <span class="mut">${esc(d.tip)}</span>`;
+    missTurn(activeSq); Portal.SFX.bad();
+    $("z3-fb").className = "fb-box bad";
+    $("z3-fb").innerHTML = "❌ The gap increases by +2 each step (+4, +6, +8, +10, +12 → 42)!";
+    setTimeout(() => { Z3.step = 1; nextSquad(); renderZ3(); }, 1700);
   }
-  $("z3-next").innerHTML = `<div class="row"><button class="qbtn" onclick="Z3.stemIdx++; if(Z3.stemIdx>=Z3_STEM_DUELS.length){Z3.step=2;} nextSquad(); renderZ3();">Next Step ▶</button></div>`;
 }
 
-function toggleBow(r, c) {
-  Z3.bow[r][c] = Z3.bow[r][c] === 0 ? 1 : 0;
-  Portal.SFX.pop();
+function adjBar(i, delta) {
+  Z3.bars[i] = Math.max(2, Math.min(40, Z3.bars[i] + delta));
+  Portal.SFX.tick();
   renderZ3();
 }
 
-function checkBow() {
-  let wrong = 0;
-  for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) if (Z3.bow[r][c] !== Z3_BOW_ANS[r][c]) wrong++;
+function checkMathLab() {
+  const st = calcStats(Z3.bars);
   const fb = $("z3-fb");
-  if (wrong === 0) {
-    const xp = awardXP(activeSq, 25);
-    zonesDone[2] = true;
-    Portal.unlockBadge("c9_nlp_cv");
-    Portal.SFX.win();
-    Portal.confetti(28, ["💬", "🎒", "⭐"]);
-    renderZoneBar();
-    $("stage").innerHTML = `
-      <div class="c">
-        <div style="font-size:3rem">💬🏅</div>
-        <h2>Zone 3 Complete · NLP Token Forge Mastered! (+${xp} XP)</h2>
-        <p class="mut">You built a clean Bag-of-Words matrix just like a 4-mark CBSE Class 10 AI Board question!</p>
-        <div class="row"><button class="qbtn" onclick="enterZone(3)">Enter Zone 4: Confusion Matrix Rescue ▶</button></div>
-      </div>
-    `;
+  if (Z3.mathGoal === 0) {
+    if (st.mean === 16) {
+      const xp = awardXP(activeSq, 25);
+      Z3.mathGoal = 1;
+      Portal.SFX.good(); Portal.confetti(16);
+      renderZ3();
+      $("z3-fb").className = "fb-box ok";
+      $("z3-fb").innerHTML = `✅ Mean = 16 achieved! (+${xp} XP) Now try pushing the last bar to 30+ to see the Outlier effect!`;
+    } else {
+      Portal.SFX.bad();
+      fb.className = "fb-box bad";
+      fb.innerHTML = `❌ Mean is currently <b>${st.mean}</b>. Adjust the bars so total = 80 (Mean = 16)!`;
+    }
   } else {
-    Portal.SFX.bad();
-    fb.className = "fb-box bad";
-    fb.innerHTML = `❌ ${wrong} cell${wrong > 1 ? "s" : ""} need fixing! Check carefully which words appear in Doc 1 and Doc 2.`;
+    if (Math.max(...Z3.bars) >= 30) {
+      const xp = awardXP(activeSq, 20);
+      Portal.SFX.good();
+      fb.className = "fb-box ok";
+      fb.innerHTML = `✅ Look! Mean jumped to <b>${st.mean}</b> while Median stayed closer to the centre (<b>${st.median}</b>)! (+${xp} XP)`;
+      setTimeout(() => { Z3.step = 2; nextSquad(); renderZ3(); }, 1500);
+    } else {
+      Portal.SFX.bad();
+      fb.className = "fb-box bad";
+      fb.innerHTML = "❌ Push at least one bar up to 30+ using + to create an outlier!";
+    }
   }
 }
 
-/* ---------- Zone 4: Confusion Matrix Rescue ---------- */
-const Z4_CASES = [
-  {
-    title: "🔥 Forest Fire Alert AI (CBSE Board Pattern)",
-    story: "Over 100 days, a forest-fire AI model was evaluated. Fires actually broke out on 20 days (the model predicted Fire on 18 of them, and missed 2). On the 80 safe days, it raised 12 false alarms and correctly stayed quiet on 68 days.",
-    counts: { TP: 18, FN: 2, FP: 12, TN: 68 },
-    nums: [18, 2, 12, 68],
-    dangerQ: "Missing a real forest fire (FN = 2) can burn down a forest! Which metric should be prioritized?",
-    dangerOpts: ["Recall (TP ÷ [TP + FN])", "Precision (TP ÷ [TP + FP])", "True Negative Rate only", "Training Loss"],
-    dangerAns: 0,
-    calcQ: "Calculate Recall and F1 Score for this Forest Fire model (TP=18, FN=2, FP=12, TN=68):",
-    calcOpts: ["Recall = 90% · F1 = 72%", "Recall = 60% · F1 = 86%", "Recall = 86% · F1 = 90%", "Recall = 75% · F1 = 60%"],
-    calcAns: 0,
-    calcTip: "Precision = 18/(18+12) = 60%, Recall = 18/(18+2) = 90%, F1 = 2×0.6×0.9 / (0.6+0.9) = 72%."
-  },
-  {
-    title: "📧 Smart Email Spam Filter (CBSE 2024 Pattern)",
-    story: "Out of 100 incoming emails, 60 were real Spam (the filter caught 36 and missed 24). Out of 40 important personal emails, it wrongly marked 4 as spam and kept 36 safe in the inbox.",
-    counts: { TP: 36, FN: 24, FP: 4, TN: 36 },
-    nums: [36, 24, 4, 36],
-    dangerQ: "Flagging an important personal email as spam (FP = 4) is very costly here! Which metric keeps False Positives low?",
-    dangerOpts: ["Precision (TP ÷ [TP + FP])", "Recall (TP ÷ [TP + FN])", "Error Rate", "Word Count"],
-    dangerAns: 0,
-    calcQ: "Calculate Precision and Accuracy for this Spam Filter (TP=36, FN=24, FP=4, TN=36):",
-    calcOpts: ["Precision = 90% · Accuracy = 72%", "Precision = 60% · Accuracy = 80%", "Precision = 72% · Accuracy = 90%", "Precision = 80% · Accuracy = 60%"],
-    calcAns: 0,
-    calcTip: "Precision = 36/(36+4) = 90%, Accuracy = (36+36)/100 = 72%, Recall = 36/60 = 60%, F1 = 72%."
-  }
+/* ==========================================================================
+   ZONE 4: AI PROJECT CYCLE (Drag-Drop Stage Order + 4Ws Canvas + Model Sorter)
+   ========================================================================== */
+const CYCLE_STAGES = [
+  { id: "c1", pos: 1, txt: "🎯 Problem Scoping" },
+  { id: "c2", pos: 2, txt: "📥 Data Acquisition" },
+  { id: "c3", pos: 3, txt: "🔎 Data Exploration" },
+  { id: "c4", pos: 4, txt: "⚙️ Modelling" },
+  { id: "c5", pos: 5, txt: "✅ Evaluation" }
+];
+const FOUR_WS = [
+  { id: "Who", txt: "🚌 Students, bus drivers & parents", hint: "Stakeholders" },
+  { id: "What", txt: "🌊 Buses get delayed on flooded roads", hint: "Problem + Evidence" },
+  { id: "Where", txt: "📍 Low-lying school streets on rainy mornings", hint: "Context / Location" },
+  { id: "Why", txt: "⏰ Students arrive safely & on time", hint: "Benefit / Value" }
+];
+const MODEL_CARDS = [
+  { id: "m1", txt: "🚦 Traffic light on fixed 60-second timer", kind: "Rule-Based" },
+  { id: "m2", txt: "💬 Chatbot answering only exact keyword matches", kind: "Rule-Based" },
+  { id: "m3", txt: "✉️ Spam filter learning new scam patterns", kind: "Learning-Based" },
+  { id: "m4", txt: "🎬 Video app recommending shows from your history", kind: "Learning-Based" },
+  { id: "m5", txt: "🧮 Calculator computing 15% discount", kind: "Rule-Based" },
+  { id: "m6", txt: "🌱 AI recognising diseased leaves from 1,000 photos", kind: "Learning-Based" }
 ];
 
 let Z4 = {};
-function startZone4() {
-  Z4 = { caseIdx: 0, step: 0, pickedNum: null, placed: { TP: null, FN: null, FP: null, TN: null }, usedNums: [] };
+function startZ4() {
+  Z4 = { step: 0, stageCards: sh(CYCLE_STAGES), stageSlots: {}, wCards: sh(FOUR_WS), wPlaced: {}, mCards: sh(MODEL_CARDS), mPlaced: {} };
   renderZ4();
 }
-
 function renderZ4() {
-  const cs = Z4_CASES[Z4.caseIdx];
-  if (!cs) {
-    zonesDone[3] = true;
-    renderZoneBar();
-    Portal.SFX.win();
-    Portal.confetti(28, ["🧮", "✅", "⭐"]);
-    $("stage").innerHTML = `
-      <div class="c">
-        <div style="font-size:3rem">🧮🏆</div>
-        <h2>Zone 4 Complete · Evaluation Case Studies Conquered!</h2>
-        <p class="mut">Every squad can now build Confusion Matrices and solve Precision / Recall / F1 questions!</p>
-        <div class="row"><button class="qbtn warm" onclick="enterZone(4)">⚔️ Enter Final Zone: Examiner Boss Raid ▶</button></div>
-      </div>
-    `;
-    return;
-  }
-
   const sq = squads[activeSq];
   if (Z4.step === 0) {
-    const avail = sh(cs.nums).map((n, idx) => ({ n, idx }));
-    if (!Z4.tray) Z4.tray = avail;
+    const rem = Z4.stageCards.filter(s => !Z4.stageSlots[s.pos]);
+    curPollPrompt = { q: "Which stage comes right after Data Acquisition?", opts: CYCLE_STAGES.map(s => s.txt) };
     $("stage").innerHTML = `
       <div class="c">
-        <span class="pyq-tag">CBSE 4-Mark Case Study (${Z4.caseIdx + 1}/${Z4_CASES.length}) · Step 1/3</span>
-        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Case</div>
-        <h2 style="margin:6px 0">${cs.title}</h2>
-      </div>
-      <div class="ar-box">${esc(cs.story)}</div>
-      <p class="c mut">Tap a number below, then tap its matching cell (<b>TP, FN, FP, TN</b>) in the Confusion Matrix:</p>
-      <div class="num-tray">
-        ${Z4.tray.map((item, i) => Z4.usedNums.includes(i) ? "" : `<button class="num-pill ${Z4.pickedNum === i ? "sel" : ""}" onclick="Z4.pickedNum=${i};Portal.SFX.pop();renderZ4()">${item.n}</button>`).join("")}
-      </div>
-      <div class="cm-grid">
-        <div></div><div class="cm-hd">Predicted: YES</div><div class="cm-hd">Predicted: NO</div>
-        <div class="cm-hd">Reality: YES</div>
-        <div class="cm-slot ${Z4.placed.TP !== null ? "filled" : ""}" onclick="placeCM('TP')"><b>TP</b><div style="font-size:1.4rem;font-weight:900">${Z4.placed.TP ?? "?"}</div></div>
-        <div class="cm-slot ${Z4.placed.FN !== null ? "filled" : ""}" onclick="placeCM('FN')"><b>FN</b><div style="font-size:1.4rem;font-weight:900">${Z4.placed.FN ?? "?"}</div></div>
-        <div class="cm-hd">Reality: NO</div>
-        <div class="cm-slot ${Z4.placed.FP !== null ? "filled" : ""}" onclick="placeCM('FP')"><b>FP</b><div style="font-size:1.4rem;font-weight:900">${Z4.placed.FP ?? "?"}</div></div>
-        <div class="cm-slot ${Z4.placed.TN !== null ? "filled" : ""}" onclick="placeCM('TN')"><b>TN</b><div style="font-size:1.4rem;font-weight:900">${Z4.placed.TN ?? "?"}</div></div>
-      </div>
-      <div class="fb-box" id="z4-fb">Positive class = Reality YES (Fire / Spam).</div>
-    `;
-  } else {
-    const isCalc = Z4.step === 2;
-    const rawOpts = isCalc ? cs.calcOpts : cs.dangerOpts;
-    const ansIdx = isCalc ? cs.calcAns : cs.dangerAns;
-    const opts = sh(rawOpts.map((t, i) => ({ t, ok: i === ansIdx })));
-    Z4.curOpts = opts;
-    $("stage").innerHTML = `
-      <div class="c">
-        <span class="pyq-tag">CBSE 4-Mark Case Study · Step ${Z4.step + 1}/3</span>
-        <span class="xp-pill">+25 XP</span>
+        <span class="topic-tag">Topic 4 · AI Project Cycle (1/3: Stage Sequencer)</span>
+        <span class="xp-pill">+15 XP per stage</span>
         <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
-        <h3 style="margin:6px 0">${cs.title}</h3>
+        <h2 style="margin:6px 0">🔄 Drag &amp; Drop the 5 Stages in Exact Order!</h2>
       </div>
-      <div class="q-title">${esc(isCalc ? cs.calcQ : cs.dangerQ)}</div>
-      <div class="opts-grid" id="z4-opts">
-        ${opts.map((o, i) => `<button class="opt-btn" onclick="pickZ4Q(${i})"><span class="opt-k">${"ABCD"[i]}</span><span>${esc(o.t)}</span></button>`).join("")}
+      <div class="dd-tray">
+        ${rem.length ? rem.map(s => `<div class="dd-card" data-dd-card="${s.id}">${esc(s.txt)}</div>`).join("") : "✅ Pipeline Complete!"}
       </div>
-      <div class="fb-box" id="z4-fb">Solve with your squad!</div>
-      <div id="z4-next"></div>
+      <div class="dd-zones" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+        ${CYCLE_STAGES.map(s => {
+          const ok = Z4.stageSlots[s.pos];
+          return `
+            <div class="dd-zone ${ok ? "ok" : ""}" data-dd-zone="${s.pos}">
+              <div class="dd-zone-hd">Step ${s.pos}</div>
+              ${ok ? `<div class="dd-card locked">${esc(s.txt)}</div>` : `<div class="dd-zone-sub">Drop Step ${s.pos}</div>`}
+            </div>`;
+        }).join("")}
+      </div>
+      <div class="fb-box" id="z4-fb">Think: Define problem → Gather data → Visualise data → Train model → Test model!</div>
     `;
-  }
-}
-
-function placeCM(slot) {
-  if (Z4.pickedNum === null || Z4.placed[slot] !== null) return;
-  const cs = Z4_CASES[Z4.caseIdx];
-  const val = Z4.tray[Z4.pickedNum].n;
-  if (cs.counts[slot] === val) {
-    Z4.placed[slot] = val;
-    Z4.usedNums.push(Z4.pickedNum);
-    Z4.pickedNum = null;
-    Portal.SFX.good();
-    renderZ4();
-    if (["TP", "FN", "FP", "TN"].every(k => Z4.placed[k] !== null)) {
-      const xp = awardXP(activeSq, 20);
-      $("z4-fb").className = "fb-box ok";
-      $("z4-fb").innerHTML = `✅ Matrix Complete! +${xp} XP! Advancing to Metric Selection…`;
-      setTimeout(() => { Z4.step = 1; nextSquad(); renderZ4(); }, 1300);
-    }
+    bindDragDrop((cid, zid, zn) => {
+      const st = CYCLE_STAGES.find(s => s.id === cid);
+      if (Z4.stageSlots[zid]) return;
+      if (st && String(st.pos) === zid) {
+        Z4.stageSlots[st.pos] = true;
+        const xp = awardXP(activeSq, 15);
+        Portal.SFX.good(); nextSquad(); renderZ4();
+        $("z4-fb").className = "fb-box ok";
+        $("z4-fb").innerHTML = `✅ Step ${zid} locked! +${xp} XP!`;
+        if (Object.keys(Z4.stageSlots).length === CYCLE_STAGES.length) {
+          Portal.confetti(20);
+          setTimeout(() => { Z4.step = 1; renderZ4(); }, 1100);
+        }
+      } else {
+        missTurn(activeSq); Portal.SFX.bad();
+        zn.classList.add("shake"); setTimeout(() => zn.classList.remove("shake"), 350);
+        $("z4-fb").className = "fb-box bad";
+        $("z4-fb").innerHTML = `❌ Not Step ${zid}! Check the AI Project Cycle order.`;
+      }
+    });
+  } else if (Z4.step === 1) {
+    const rem = Z4.wCards.filter(w => !Z4.wPlaced[w.id]);
+    curPollPrompt = { q: "In the 4Ws Canvas, which block identifies the Stakeholders?", opts: ["Who", "What", "Where", "Why"] };
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="topic-tag">Topic 4 · AI Project Cycle (2/3: 4Ws Problem Canvas)</span>
+        <span class="xp-pill">+15 XP per block</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h2 style="margin:6px 0">🗺️ Build the 4Ws Canvas: Flood-Safe School Bus AI</h2>
+      </div>
+      <div class="dd-tray">
+        ${rem.length ? rem.map(w => `<div class="dd-card" data-dd-card="${w.id}">${esc(w.txt)}</div>`).join("") : "✅ 4Ws Canvas Complete!"}
+      </div>
+      <div class="dd-zones" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+        ${FOUR_WS.map(w => {
+          const ok = Z4.wPlaced[w.id];
+          return `
+            <div class="dd-zone ${ok ? "ok" : ""}" data-dd-zone="${w.id}">
+              <div class="dd-zone-hd">${w.id}?</div>
+              <div class="dd-zone-sub">${w.hint}</div>
+              ${ok ? `<div class="dd-card locked">${esc(w.txt)}</div>` : ""}
+            </div>`;
+        }).join("")}
+      </div>
+      <div class="fb-box" id="z4-fb">Drag each clue into Who, What, Where, or Why!</div>
+    `;
+    bindDragDrop((cid, zid, zn) => {
+      if (Z4.wPlaced[zid]) return;
+      if (cid === zid) {
+        Z4.wPlaced[zid] = true;
+        const xp = awardXP(activeSq, 15);
+        Portal.SFX.good(); nextSquad(); renderZ4();
+        $("z4-fb").className = "fb-box ok";
+        $("z4-fb").innerHTML = `✅ Nailed "${zid}"! +${xp} XP!`;
+        if (Object.keys(Z4.wPlaced).length === FOUR_WS.length) {
+          Portal.confetti(20);
+          setTimeout(() => { Z4.step = 2; renderZ4(); }, 1100);
+        }
+      } else {
+        missTurn(activeSq); Portal.SFX.bad();
+        zn.classList.add("shake"); setTimeout(() => zn.classList.remove("shake"), 350);
+        $("z4-fb").className = "fb-box bad";
+        $("z4-fb").innerHTML = "❌ Match Stakeholders → Who, Issue → What, Place → Where, Benefit → Why!";
+      }
+    });
   } else {
-    Portal.SFX.bad();
-    $("z4-fb").className = "fb-box bad";
-    $("z4-fb").innerHTML = `❌ ${val} does not belong in <b>${slot}</b>! Re-read Reality vs Prediction.`;
+    const rem = Z4.mCards.filter(m => !Z4.mPlaced[m.id]);
+    curPollPrompt = { q: "Is a fixed-timer traffic light Rule-Based or Learning-Based?", opts: ["Rule-Based", "Learning-Based"] };
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="topic-tag">Topic 4 · AI Project Cycle (3/3: Modelling Approaches)</span>
+        <span class="xp-pill">+15 XP per sort</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h2 style="margin:6px 0">⚙️ Sort into Rule-Based vs Learning-Based Models!</h2>
+      </div>
+      <div class="dd-tray">
+        ${rem.length ? rem.map(m => `<div class="dd-card" data-dd-card="${m.id}">${esc(m.txt)}</div>`).join("") : "✅ All Models Sorted!"}
+      </div>
+      <div class="dd-zones" style="grid-template-columns:1fr 1fr">
+        ${["Rule-Based", "Learning-Based"].map(k => {
+          const items = MODEL_CARDS.filter(m => m.kind === k && Z4.mPlaced[m.id]);
+          return `
+            <div class="dd-zone ${items.length === 3 ? "ok" : ""}" data-dd-zone="${k}">
+              <div class="dd-zone-hd">${k === "Rule-Based" ? "📏 Rule-Based" : "🧠 Learning-Based"}</div>
+              <div class="dd-zone-sub">${k === "Rule-Based" ? "Fixed rules written by humans; doesn't adapt" : "Learns patterns from data & improves"}</div>
+              ${items.map(m => `<div class="dd-card locked">${esc(m.txt)}</div>`).join("")}
+            </div>`;
+        }).join("")}
+      </div>
+      <div class="fb-box" id="z4-fb">Rule-based follows static rules; Learning-based adapts from data!</div>
+    `;
+    bindDragDrop((cid, zid, zn) => {
+      if (Z4.mPlaced[cid]) return;
+      const item = MODEL_CARDS.find(m => m.id === cid);
+      if (item && item.kind === zid) {
+        Z4.mPlaced[cid] = true;
+        const xp = awardXP(activeSq, 15);
+        Portal.SFX.good(); nextSquad(); renderZ4();
+        $("z4-fb").className = "fb-box ok";
+        $("z4-fb").innerHTML = `✅ Correct! +${xp} XP!`;
+        if (Object.keys(Z4.mPlaced).length === MODEL_CARDS.length) {
+          zonesDone[3] = true;
+          Portal.unlockBadge("c9_nlp_cv");
+          renderZoneBar();
+          Portal.SFX.win();
+          Portal.confetti(25, ["🔄", "⚙️", "⭐"]);
+          setTimeout(() => {
+            $("stage").innerHTML = `
+              <div class="c">
+                <div style="font-size:3rem">🔄🏆</div>
+                <h2>Zone 4 Complete · AI Project Cycle Mastered!</h2>
+                <p class="mut">5 Stages, 4Ws Problem Canvas &amp; Rule-Based vs Learning-Based — ready for the Final Zone!</p>
+                <div class="row"><button class="qbtn warm" onclick="enterZone(4)">Enter Zone 5: Generative AI Studio ▶</button></div>
+              </div>`;
+          }, 950);
+        }
+      } else {
+        missTurn(activeSq); Portal.SFX.bad();
+        zn.classList.add("shake"); setTimeout(() => zn.classList.remove("shake"), 350);
+        $("z4-fb").className = "fb-box bad";
+        $("z4-fb").innerHTML = "❌ Does it follow fixed human rules or learn patterns from data?";
+      }
+    });
   }
 }
 
-function pickZ4Q(i) {
-  const cs = Z4_CASES[Z4.caseIdx];
-  const chosen = Z4.curOpts[i];
-  document.querySelectorAll("#z4-opts button").forEach((b, j) => {
-    b.disabled = true;
-    if (Z4.curOpts[j].ok) b.classList.add("good");
-  });
-  const fb = $("z4-fb");
-  if (chosen.ok) {
-    const xp = awardXP(activeSq, 25);
-    Portal.SFX.good(); Portal.confetti(20);
-    fb.className = "fb-box ok";
-    fb.innerHTML = `✅ Brilliant! +${xp} XP! ${Z4.step === 2 ? `<br><span class="mut">📘 ${esc(cs.calcTip)}</span>` : ""}`;
-  } else {
-    document.querySelectorAll("#z4-opts button")[i].classList.add("bad", "shake");
-    breakStreak(activeSq);
-    Portal.SFX.bad();
-    fb.className = "fb-box bad";
-    fb.innerHTML = `❌ Not quite! ${Z4.step === 2 ? esc(cs.calcTip) : ""}`;
+/* ==========================================================================
+   ZONE 5: GENERATIVE AI (Discriminative vs Generative + Prompt Studio + Ethics)
+   ========================================================================== */
+const GEN_CARDS = [
+  { id: "g1", txt: "✍️ Writing a brand-new poem about Mars", kind: "Generative" },
+  { id: "g2", txt: "📧 Labelling an email as Spam or Not Spam", kind: "Discriminative" },
+  { id: "g3", txt: "🎨 Generating a new poster image from text", kind: "Generative" },
+  { id: "g4", txt: "🌡️ Predicting tomorrow's temperature (34°C)", kind: "Discriminative" },
+  { id: "g5", txt: "💻 Creating original Python game code from a prompt", kind: "Generative" },
+  { id: "g6", txt: "🩺 Classifying an X-ray as Healthy vs Fracture", kind: "Discriminative" }
+];
+const GEN_ETHICS = [
+  {
+    q: "A GenAI chatbot confidently invents a fake book citation that does not exist. What is this called?",
+    opts: ["AI Hallucination", "Data Compression", "Over-cooling", "Tokenisation"],
+    a: 0,
+    tip: "When Generative AI invents plausible-sounding false facts or citations, it is called a Hallucination — always fact-check!"
+  },
+  {
+    q: "Someone uses Generative AI to clone a classmate's voice and post a fake video online. Which harm is this, and what should you do?",
+    opts: ["Deepfake Misinformation — verify sources, report it & never share without consent", "Harmless Creativity — forward it to the whole school", "Hardware Bug — restart Wi-Fi", "Data Cleaning — delete all photos"],
+    a: 0,
+    tip: "Deepfakes misuse Generative AI to fake real people's faces or voices. Always verify and respect consent & privacy!"
   }
-  $("z4-next").innerHTML = `<div class="row"><button class="qbtn" onclick="advanceZ4()">Continue ▶</button></div>`;
-}
-
-function advanceZ4() {
-  nextSquad();
-  if (Z4.step === 1) { Z4.step = 2; }
-  else {
-    Z4.caseIdx++;
-    Z4.step = 0;
-    Z4.tray = null;
-    Z4.pickedNum = null;
-    Z4.placed = { TP: null, FN: null, FP: null, TN: null };
-    Z4.usedNums = [];
-  }
-  renderZ4();
-}
-
-/* ---------- Zone 5: Examiner Boss Raid ---------- */
-const BOSS_BANK = [
-  { q: "In an Artificial Neural Network, which layer receives raw input without performing any computation?", opts: ["Input Layer", "Hidden Layer", "Output Layer", "Activation Layer"], a: 0 },
-  { q: "Which AI domain powers Google Translate and Spam Email Detection?", opts: ["Natural Language Processing (NLP)", "Computer Vision", "Data Clustering", "Robotics Kinematics"], a: 0 },
-  { q: "A model gets 99% accuracy on training data but only 54% on test data. What happened?", opts: ["Overfitting", "Underfitting", "Perfect Generalisation", "Data Augmentation"], a: 0 },
-  { q: "A model performs poorly on BOTH training data and testing data. What is this called?", opts: ["Underfitting", "Overfitting", "Over-training", "Bagging"], a: 0 },
-  { q: "In Computer Vision, what is the full form of 'Pixel'?", opts: ["Picture Element", "Pixelated Index Level", "Photo Integration Cell", "Point Input Element"], a: 0 },
-  { q: "Which CBSE AI Project Cycle stage uses graphs and charts to spot trends, outliers, and missing values?", opts: ["Data Exploration", "Problem Scoping", "Deployment", "Rule Writing"], a: 0 },
-  { q: "If a dataset has 98% healthy patients and 2% sick patients, why is Accuracy misleading?", opts: ["Predicting 'Healthy' for everyone gives 98% accuracy while missing 100% of sick patients!", "Accuracy cannot exceed 50%", "Accuracy only works on images", "Accuracy ignores True Negatives"], a: 0 },
-  { q: "Which NLP model gives us a Vocabulary of unique words and their frequency counts while ignoring word order?", opts: ["Bag of Words (BoW)", "TF-IDF Matrix", "Word2Vec Sequence", "Decision Tree"], a: 0 },
-  { q: "In RGB [255, 0, 0], which colour channel is at full intensity?", opts: ["Red", "Green", "Blue", "Black"], a: 0 },
-  { q: "Which type of Supervised Learning predicts a continuous number like house price or temperature?", opts: ["Regression", "Classification", "Clustering", "Tokenisation"], a: 0 }
 ];
 
 let Z5 = {};
-function startZone5() {
-  Z5 = { hp: 100, list: sh(BOSS_BANK), idx: 0, boosted: false, shielded: false };
+function startZ5() {
+  Z5 = { step: 0, cards: sh(GEN_CARDS), placed: {}, blocks: { role: false, task: false, aud: false, fmt: false }, ethIdx: 0 };
+  renderZ5();
+}
+function renderZ5() {
+  const sq = squads[activeSq];
+  if (Z5.step === 0) {
+    const rem = Z5.cards.filter(c => !Z5.placed[c.id]);
+    curPollPrompt = { q: "Is 'Writing a brand-new poem about Mars' Generative or Discriminative AI?", opts: ["Generative AI", "Discriminative AI"] };
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="topic-tag">Topic 5 · Generative AI (1/3: Discriminative vs Generative)</span>
+        <span class="xp-pill">+15 XP per sort</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h2 style="margin:6px 0">✨ Drag &amp; Drop: Predicts/Classifies vs Creates New Content!</h2>
+      </div>
+      <div class="dd-tray">
+        ${rem.length ? rem.map(c => `<div class="dd-card" data-dd-card="${c.id}">${esc(c.txt)}</div>`).join("") : "✅ All Sorted!"}
+      </div>
+      <div class="dd-zones" style="grid-template-columns:1fr 1fr">
+        ${["Discriminative", "Generative"].map(k => {
+          const items = GEN_CARDS.filter(c => c.kind === k && Z5.placed[c.id]);
+          return `
+            <div class="dd-zone ${items.length === 3 ? "ok" : ""}" data-dd-zone="${k}">
+              <div class="dd-zone-hd">${k === "Discriminative" ? "🏷️ Discriminative / Predictive" : "✨ Generative AI"}</div>
+              <div class="dd-zone-sub">${k === "Discriminative" ? "Draws boundaries to classify or predict numbers" : "Learns patterns to CREATE brand-new text, images, code, audio"}</div>
+              ${items.map(c => `<div class="dd-card locked">${esc(c.txt)}</div>`).join("")}
+            </div>`;
+        }).join("")}
+      </div>
+      <div class="fb-box" id="z5-fb">Discriminative = labels/predicts existing things; Generative = creates new content!</div>
+    `;
+    bindDragDrop((cid, zid, zn) => {
+      if (Z5.placed[cid]) return;
+      const item = GEN_CARDS.find(c => c.id === cid);
+      if (item && item.kind === zid) {
+        Z5.placed[cid] = true;
+        const xp = awardXP(activeSq, 15);
+        Portal.SFX.good(); nextSquad(); renderZ5();
+        $("z5-fb").className = "fb-box ok";
+        $("z5-fb").innerHTML = `✅ Spot on! +${xp} XP!`;
+        if (Object.keys(Z5.placed).length === GEN_CARDS.length) {
+          Portal.confetti(20);
+          setTimeout(() => { Z5.step = 1; renderZ5(); }, 1100);
+        }
+      } else {
+        missTurn(activeSq); Portal.SFX.bad();
+        zn.classList.add("shake"); setTimeout(() => zn.classList.remove("shake"), 350);
+        $("z5-fb").className = "fb-box bad";
+        $("z5-fb").innerHTML = "❌ Ask: Is it classifying/predicting, or generating brand-new content?";
+      }
+    });
+  } else if (Z5.step === 1) {
+    const b = Z5.blocks;
+    const count = Object.values(b).filter(Boolean).length;
+    const pct = 20 + count * 20;
+    const parts = [
+      b.role ? "Act as a friendly Science Museum Guide." : "",
+      b.task ? "Explain how solar panels help SDG 7 (Clean Energy)" : "Tell me about solar power",
+      b.aud ? "for Class 9 students using simple everyday examples" : "",
+      b.fmt ? "in 3 bullet points + 1 quiz question." : "."
+    ].filter(Boolean).join(" ");
+    const preview = count === 0
+      ? "🤖 Weak Output: 'Solar power comes from the sun. It uses photovoltaic cells...' (Too vague & textbook-like!)"
+      : count < 4
+        ? "🤖 Getting Better! Add all 4 Prompt Blocks (Role, Specific Task, Audience, Format) for 100% clarity!"
+        : "🤖 Crystal-Clear Output: '1) Rooftop sunlight hits silicon panels... 2) Cuts coal pollution for SDG 7... 3) Quick Quiz: What energy turns into electricity?'";
+    curPollPrompt = { q: "Which block makes a Generative AI prompt clearest?", opts: ["Role", "Specific Task", "Audience", "Output Format"] };
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="topic-tag">Topic 5 · Generative AI (2/3: Prompt Engineering Studio)</span>
+        <span class="xp-pill">+25 XP</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Studio</div>
+        <h2 style="margin:6px 0">🪄 Click Prompt Blocks to Upgrade a Weak Prompt to 100%!</h2>
+      </div>
+      <div class="row">
+        <button class="blk-chip ${b.role ? "on" : ""}" onclick="toggleBlk('role')">🎭 + Role</button>
+        <button class="blk-chip ${b.task ? "on" : ""}" onclick="toggleBlk('task')">🎯 + Specific Task</button>
+        <button class="blk-chip ${b.aud ? "on" : ""}" onclick="toggleBlk('aud')">🎓 + Audience (Class 9)</button>
+        <button class="blk-chip ${b.fmt ? "on" : ""}" onclick="toggleBlk('fmt')">📋 + Format (3 Bullets + Quiz)</button>
+      </div>
+      <div class="meter-wrap"><div class="meter-fill" style="width:${pct}%"></div></div>
+      <div class="c mut" style="font-size:0.86rem;font-weight:800">Prompt Power: ${pct}%</div>
+      <div class="prompt-box"><b>Prompt:</b> "${esc(parts)}"</div>
+      <div class="fb-box ${pct === 100 ? "ok" : ""}" id="z5-fb">${esc(preview)}</div>
+      <div class="row">
+        <button class="qbtn ok" ${pct === 100 ? "" : "disabled"} onclick="finishPromptLab()">🚀 Lock 100% Prompt (+25 XP) ▶</button>
+      </div>
+    `;
+  } else {
+    const q = GEN_ETHICS[Z5.ethIdx];
+    if (!q) {
+      zonesDone[4] = true;
+      renderZoneBar();
+      Portal.unlockBadge("c9_boss");
+      Portal.SFX.win();
+      Portal.confetti(55, ["🏆", "✨", "🎉", "⭐"]);
+      const ranked = [...squads].sort((a, b) => b.xp - a.xp);
+      const champ = ranked[0];
+      Portal.recordC9Quest(`${champ.name} (${champ.xp} XP) completed Class 9 Concept Quest!`, champ.xp);
+      $("stage").innerHTML = `
+        <div class="c">
+          <div style="font-size:4rem">🏆✨🎉</div>
+          <h1>CLASS 9 CONCEPT QUEST COMPLETE!</h1>
+          <p class="mut">Your class mastered <b>SDGs · Data Literacy · Math for AI · AI Project Cycle · Generative AI</b>!</p>
+          <div class="dd-zones" style="max-width:640px;margin:14px auto;grid-template-columns:1fr">
+            <div class="dd-zone ok" style="min-height:auto">
+              <div class="dd-zone-hd">🥇 Final Squad Leaderboard</div>
+              ${ranked.map((s, i) => `<div style="font-size:1.12rem;font-weight:800">#${i + 1} ${s.ico} ${esc(s.name)} — <span style="color:${s.col}">${s.xp} XP</span></div>`).join("")}
+            </div>
+          </div>
+          <div class="row">
+            <button class="qbtn" onclick="showLobby()">🏠 Play Another Zone</button>
+            <a class="p-pill primary" href="index.html">🏫 Back to Portal Hub</a>
+          </div>
+        </div>`;
+      return;
+    }
+    const opts = sh(q.opts.map((t, i) => ({ t, ok: i === q.a })));
+    Z5.curOpts = opts;
+    curPollPrompt = { q: q.q, opts: opts.map(o => o.t) };
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="topic-tag">Topic 5 · GenAI Safety &amp; Ethics (${Z5.ethIdx + 1}/${GEN_ETHICS.length})</span>
+        <span class="xp-pill">+25 XP</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+      </div>
+      <div class="q-title">${esc(q.q)}</div>
+      <div class="opts-grid" id="z5-opts">
+        ${opts.map((o, i) => `<button class="opt-btn" onclick="pickZ5Eth(${i})"><span>${esc(o.t)}</span></button>`).join("")}
+      </div>
+      <div class="fb-box" id="z5-fb">Spot the responsible Generative AI practice!</div>
+      <div id="z5-nx"></div>
+    `;
+  }
+}
+
+function toggleBlk(k) {
+  Z5.blocks[k] = !Z5.blocks[k];
+  Portal.SFX.pop();
   renderZ5();
 }
 
-function renderZ5() {
-  if (Z5.hp <= 0) {
-    zonesDone[4] = true;
-    renderZoneBar();
-    Portal.unlockBadge("c9_boss");
-    Portal.unlockBadge("c9_pyq");
-    Portal.SFX.win();
-    Portal.confetti(55, ["🏆", "👾", "🎉", "⭐", "🔥"]);
-    const ranked = [...squads].sort((a, b) => b.xp - a.xp);
-    const champ = ranked[0];
-    Portal.recordC9Quest(`${champ.name} (${champ.xp} XP) defeated Prof. Perceptron!`, champ.xp);
-    $("stage").innerHTML = `
-      <div class="c">
-        <div style="font-size:4rem">🏆👾💥</div>
-        <h1>PROF. PERCEPTRON DEFEATED!</h1>
-        <p class="mut">Your Class 9 Squads conquered CBSE Class 10 AI (417) Previous Year Questions!</p>
-        <div class="ar-box" style="max-width:560px;text-align:center">
-          <h3>🥇 Final Squad Standings</h3>
-          ${ranked.map((s, i) => `<p style="font-size:1.15rem"><b>#${i + 1} ${s.ico} ${esc(s.name)}</b> — <span style="color:${s.col};font-weight:900">${s.xp} XP</span></p>`).join("")}
-        </div>
-        <div class="row">
-          <button class="qbtn" onclick="startZone5()">⚔️ Rematch Boss</button>
-          <button class="p-pill" onclick="showLobby()">🏠 Quest Lobby</button>
-          <a class="p-pill primary" href="index.html">🏫 Portal Hub</a>
-        </div>
-      </div>
-    `;
-    return;
-  }
-
-  if (Z5.idx >= Z5.list.length) {
-    Z5.list = sh(BOSS_BANK);
-    Z5.idx = 0;
-  }
-  const q = Z5.list[Z5.idx];
-  const sq = squads[activeSq];
-  const opts = sh(q.opts.map((t, i) => ({ t, ok: i === q.a })));
-  Z5.curOpts = opts;
-  Z5.boosted = false;
-  Z5.shielded = false;
-
-  $("stage").innerHTML = `
-    <div class="boss-banner">
-      <div class="boss-avatar">👾</div>
-      <div style="flex:1;min-width:220px">
-        <div style="display:flex;justify-content:space-between;font-weight:900;margin-bottom:5px">
-          <span>Prof. Perceptron · CBSE Board Boss</span>
-          <span>${Z5.hp} / 100 HP</span>
-        </div>
-        <div class="hp-track"><div class="hp-fill" style="width:${Z5.hp}%"></div></div>
-        <small style="opacity:0.85">Right answers deal 20+ Boss Damage! Wrong answers let Boss heal +10 HP!</small>
-      </div>
-    </div>
-    <div class="c">
-      <span class="pyq-tag">Final Boss Raid · Rapid PYQ</span>
-      <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)} Attacks!</div>
-      <div class="pwr-bar">
-        <button class="pwr-btn" id="b-boost" ${sq.pwr.boost ? "" : "disabled"} onclick="armBossBoost()">🔥 2× Damage (${sq.pwr.boost})</button>
-        <button class="pwr-btn" id="b-shield" ${sq.pwr.shield ? "" : "disabled"} onclick="armBossShield()">🛡️ Block Counter (${sq.pwr.shield})</button>
-      </div>
-    </div>
-    <div class="q-title">${esc(q.q)}</div>
-    <div class="opts-grid" id="z5-opts">
-      ${opts.map((o, i) => `<button class="opt-btn" onclick="hitBoss(${i})"><span class="opt-k">${"ABCD"[i]}</span><span>${esc(o.t)}</span></button>`).join("")}
-    </div>
-    <div class="fb-box" id="z5-fb">Pick fast to strike Prof. Perceptron!</div>
-  `;
+function finishPromptLab() {
+  const xp = awardXP(activeSq, 25);
+  Portal.SFX.good(); Portal.confetti(20, ["✨", "🪄", "⭐"]);
+  Z5.step = 2;
+  nextSquad();
+  renderZ5();
+  Portal.toast(`🪄 Prompt upgraded! +${xp} XP`);
 }
 
-function armBossBoost() {
-  if (Z5.boosted || !squads[activeSq].pwr.boost) return;
-  squads[activeSq].pwr.boost--;
-  Z5.boosted = true;
-  $("b-boost").classList.add("armed");
-  $("b-boost").disabled = true;
-  renderSquads();
-  Portal.SFX.box();
-}
-
-function armBossShield() {
-  if (Z5.shielded || !squads[activeSq].pwr.shield) return;
-  squads[activeSq].pwr.shield--;
-  Z5.shielded = true;
-  $("b-shield").classList.add("armed");
-  $("b-shield").disabled = true;
-  renderSquads();
-  Portal.SFX.pop();
-}
-
-function hitBoss(i) {
-  const chosen = Z5.curOpts[i];
+function pickZ5Eth(i) {
+  const q = GEN_ETHICS[Z5.ethIdx];
+  const ok = Z5.curOpts[i].ok;
   document.querySelectorAll("#z5-opts button").forEach((b, j) => {
     b.disabled = true;
     if (Z5.curOpts[j].ok) b.classList.add("good");
   });
   const fb = $("z5-fb");
-  if (chosen.ok) {
-    const dmg = (20 + Math.min(10, squads[activeSq].streak * 5)) * (Z5.boosted ? 2 : 1);
-    Z5.hp = Math.max(0, Z5.hp - dmg);
-    const xp = awardXP(activeSq, dmg);
-    Portal.SFX.good(); Portal.confetti(18, ["💥", "⚡", "⭐"]);
+  if (ok) {
+    const xp = awardXP(activeSq, 25);
+    Portal.SFX.good(); Portal.confetti(18);
     fb.className = "fb-box ok";
-    fb.innerHTML = `💥 <b>DIRECT HIT! -${dmg} Boss HP!</b> (+${xp} XP)`;
+    fb.innerHTML = `✅ Wise choice! +${xp} XP! <span class="mut">${esc(q.tip)}</span>`;
   } else {
     document.querySelectorAll("#z5-opts button")[i].classList.add("bad", "shake");
-    breakStreak(activeSq, Z5.shielded);
+    missTurn(activeSq);
     Portal.SFX.bad();
-    if (!Z5.shielded) Z5.hp = Math.min(100, Z5.hp + 10);
     fb.className = "fb-box bad";
-    fb.innerHTML = Z5.shielded ? "🛡️ Shield blocked Prof. Perceptron's counter-heal!" : "😈 Prof. Perceptron countered and healed +10 HP!";
+    fb.innerHTML = `❌ <span class="mut">${esc(q.tip)}</span>`;
   }
-  setTimeout(() => { Z5.idx++; nextSquad(); renderZ5(); }, 1350);
+  $("z5-nx").innerHTML = `<div class="row"><button class="qbtn" onclick="Z5.ethIdx++;nextSquad();renderZ5()">Continue ▶</button></div>`;
 }
 
 /* ---------- Boot ---------- */

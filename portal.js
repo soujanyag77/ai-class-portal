@@ -11,9 +11,9 @@
     { id: "c9_strategist", icon: "🎯", title: "Arena Strategist (C9)", desc: "Completed a Class 9 Battle" },
     { id: "c9_ml", icon: "🧪", title: "ML Engineer (C9)", desc: "Finished the 4-step ML Lab" },
     { id: "c9_ethics", icon: "⚖️", title: "Ethics Guardian (C9)", desc: "Nailed an Ethics fix" },
-    { id: "c9_pyq", icon: "📜", title: "Board Paper Ace (C9)", desc: "Conquered Class 10 CBSE AI PYQs" },
-    { id: "c9_nlp_cv", icon: "🔤", title: "NLP & Vision Crafter (C9)", desc: "Completed Vision & NLP Forge" },
-    { id: "c9_boss", icon: "👾", title: "Boss Slayer (C9)", desc: "Defeated Prof. Perceptron Boss" },
+    { id: "c9_pyq", icon: "🌍", title: "SDG & Data Ace (C9)", desc: "Mastered SDGs & Data Literacy" },
+    { id: "c9_nlp_cv", icon: "🔢", title: "Math & Cycle Pro (C9)", desc: "Solved Math for AI & Project Cycle" },
+    { id: "c9_boss", icon: "✨", title: "GenAI Creator (C9)", desc: "Completed Generative AI Studio" },
     { id: "all_class", icon: "🙋", title: "Whole-Class Hero", desc: "Used Student Picker or Class Poll" }
   ];
 
@@ -464,7 +464,7 @@
       <a class="p-pill ${opts.active === "home" ? "primary" : ""}" href="index.html">🏠 Hub</a>
       <a class="p-pill ${opts.active === "7" ? "primary" : ""}" href="class7.html">🧪 Class 7</a>
       <a class="p-pill ${opts.active === "9" ? "primary" : ""}" href="class9.html">⚔️ C9 Arena</a>
-      <a class="p-pill ${opts.active === "9q" ? "primary" : ""}" href="class9_quest.html">👾 C9 PYQ Quest</a>
+      <a class="p-pill ${opts.active === "9q" ? "primary" : ""}" href="class9_quest.html">🎮 C9 Concept Quest</a>
       <button class="p-pill warm" id="p-pick-btn">🎲 Pick Student</button>
       <button class="p-pill" id="p-sound-btn">${state.sound ? "🔊 Sound" : "🔇 Muted"}</button>
       <button class="p-pill" id="p-theme-btn">🌓 Auto</button>
