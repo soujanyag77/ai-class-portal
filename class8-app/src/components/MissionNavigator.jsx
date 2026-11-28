@@ -17,13 +17,13 @@ export default function MissionNavigator({
         <button
           type="button"
           onClick={() => onNavigate('home')}
-          className="px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-100 font-bold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
+          className="px-3 py-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 font-bold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
         >
-          <Home className="w-4 h-4 text-cyan-300" /> Start
+          <Home className="w-4 h-4 text-sky-600" /> Start
         </button>
         <a
           href="../index.html"
-          className="px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-200 font-bold text-xs sm:text-sm no-underline"
+          className="px-3 py-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 font-bold text-xs sm:text-sm no-underline"
         >
           🏫 Portal Hub
         </a>
@@ -40,10 +40,10 @@ export default function MissionNavigator({
               onClick={() => onSelectMission(m.id)}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-black border-2 transition-all cursor-pointer ${
                 isCur
-                  ? 'bg-cyan-400 text-slate-950 border-cyan-300 scale-105'
+                  ? 'bg-sky-600 text-white border-sky-700 scale-105 shadow-sm'
                   : isDone
-                    ? 'bg-emerald-500/20 text-emerald-200 border-emerald-400/60'
-                    : 'bg-slate-900/70 text-slate-300 border-slate-700'
+                    ? 'bg-emerald-100 text-emerald-900 border-emerald-400'
+                    : 'bg-slate-100 text-slate-700 border-slate-300'
               }`}
               title={m.title}
             >
@@ -57,39 +57,39 @@ export default function MissionNavigator({
         <button
           type="button"
           onClick={() => onNavigate('concepts')}
-          className="px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-100 font-bold text-xs sm:text-sm flex items-center gap-1 cursor-pointer"
+          className="px-3 py-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 font-bold text-xs sm:text-sm flex items-center gap-1 cursor-pointer"
         >
-          <Compass className="w-4 h-4 text-emerald-300" /> Concepts
+          <Compass className="w-4 h-4 text-emerald-600" /> Concepts
         </button>
         <button
           type="button"
           onClick={() => onNavigate('reports')}
-          className="px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-100 font-bold text-xs sm:text-sm flex items-center gap-1 cursor-pointer"
+          className="px-3 py-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 font-bold text-xs sm:text-sm flex items-center gap-1 cursor-pointer"
         >
-          <FileBarChart2 className="w-4 h-4 text-amber-300" /> Report
+          <FileBarChart2 className="w-4 h-4 text-amber-600" /> Report
         </button>
         <button
           type="button"
           onClick={() => onNavigate('teacher')}
-          className="px-3 py-2 rounded-xl bg-indigo-900/80 border border-indigo-400/60 text-indigo-100 font-bold text-xs sm:text-sm flex items-center gap-1 cursor-pointer"
+          className="px-3 py-2 rounded-xl bg-indigo-100 border border-indigo-300 text-indigo-900 font-bold text-xs sm:text-sm flex items-center gap-1 cursor-pointer"
         >
-          <ShieldCheck className="w-4 h-4 text-cyan-300" /> Teacher
+          <ShieldCheck className="w-4 h-4 text-indigo-700" /> Teacher
         </button>
         <button
           type="button"
           onClick={onToggleSound}
-          className="px-2.5 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-100 cursor-pointer"
+          className="px-2.5 py-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 cursor-pointer"
           title={soundEnabled ? 'Mute sound' : 'Unmute sound'}
         >
-          {soundEnabled ? <Volume2 className="w-4 h-4 text-cyan-300" /> : <VolumeX className="w-4 h-4 text-rose-400" />}
+          {soundEnabled ? <Volume2 className="w-4 h-4 text-sky-600" /> : <VolumeX className="w-4 h-4 text-rose-600" />}
         </button>
         <button
           type="button"
           onClick={onFullscreen}
-          className="px-2.5 py-2 rounded-xl bg-slate-800 border border-slate-600 text-slate-100 cursor-pointer"
+          className="px-2.5 py-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 cursor-pointer"
           title="Toggle Fullscreen"
         >
-          <Maximize2 className="w-4 h-4 text-slate-200" />
+          <Maximize2 className="w-4 h-4 text-slate-700" />
         </button>
       </div>
     </div>

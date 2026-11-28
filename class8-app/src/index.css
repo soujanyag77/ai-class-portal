@@ -7,22 +7,24 @@
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    color: #0f172a;
+    background-color: #eef4ff;
   }
 }
 
 @keyframes floatSlow {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-7px); }
 }
 
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 18px rgba(34, 211, 238, 0.35); }
-  50% { box-shadow: 0 0 32px rgba(34, 211, 238, 0.7); }
+  0%, 100% { box-shadow: 0 8px 22px rgba(2, 132, 199, 0.25); }
+  50% { box-shadow: 0 10px 30px rgba(2, 132, 199, 0.48); }
 }
 
 @keyframes popBounce {
-  0% { transform: scale(0.82); opacity: 0; }
-  65% { transform: scale(1.04); opacity: 1; }
+  0% { transform: scale(0.88); opacity: 0; }
+  65% { transform: scale(1.03); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
 }
 
@@ -39,7 +41,7 @@
 
 .animate-float { animation: floatSlow 3s ease-in-out infinite; }
 .animate-glow { animation: pulseGlow 2.4s ease-in-out infinite; }
-.animate-pop { animation: popBounce 0.3s ease-out; }
+.animate-pop { animation: popBounce 0.28s ease-out; }
 .animate-shake { animation: shakeX 0.35s ease-in-out; }
 .confetti-piece {
   position: fixed;
@@ -49,19 +51,22 @@
   animation: confettiDrop linear forwards;
 }
 
-/* Futuristic circuit grid backdrop */
+/* Bright Futuristic Classroom Light Arena */
 .ai-arena-bg {
   background:
-    radial-gradient(circle at 14% 18%, rgba(34, 211, 238, 0.16), transparent 36%),
-    radial-gradient(circle at 86% 20%, rgba(251, 146, 60, 0.16), transparent 38%),
-    radial-gradient(circle at 50% 88%, rgba(168, 85, 247, 0.16), transparent 44%),
-    linear-gradient(145deg, #070b1e 0%, #11163b 52%, #19123c 100%);
+    radial-gradient(circle at 10% 15%, rgba(14, 165, 233, 0.16), transparent 38%),
+    radial-gradient(circle at 90% 18%, rgba(249, 115, 22, 0.15), transparent 38%),
+    radial-gradient(circle at 50% 90%, rgba(139, 92, 246, 0.12), transparent 45%),
+    linear-gradient(150deg, #eff6ff 0%, #f8fafc 52%, #fff7ed 100%);
+  color: #0f172a;
 }
 
 .glass-panel {
-  background: rgba(17, 25, 62, 0.72);
-  backdrop-filter: blur(12px);
-  border: 2px solid rgba(148, 163, 184, 0.22);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+  color: #0f172a;
 }
 
 .touch-btn {

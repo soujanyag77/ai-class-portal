@@ -12,14 +12,16 @@ function shuffle(arr) {
   return a;
 }
 
+const teamLabel = (t) => (t === 'blue' ? 'TEAM BLUE (CYBER TITANS)' : 'TEAM ORANGE (DATA DRAGONS)');
+
 export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCompleteMission }) {
-  const [tab, setTab] = useState('A'); // A = Spot Bias, B = Fair vs Unfair Drag-Drop, C = Repair Dataset
+  const [tab, setTab] = useState('A');
   const [flaggedIds, setFlaggedIds] = useState({});
   const scenarios = useMemo(() => shuffle(FAIRNESS_SCENARIOS).slice(0, 6), []);
   const [placed, setPlaced] = useState({});
   const [selId, setSelId] = useState(null);
   const [repaired, setRepaired] = useState({ girls: false, rural: false, para: false });
-  const [byteMsg, setByteMsg] = useState('Investigation Room: Examine the fictional Sports AI dataset and tap the biased / excluded rows!');
+  const [byteMsg, setByteMsg] = useState('Investigation Room (+100 pts/clue): Examine the fictional Sports AI dataset and tap the biased / excluded rows!');
 
   const biasedRows = SPORTS_BIASED_DATASET.filter((r) => r.selected !== 'Selected');
   const diversityScore = 25 + (repaired.girls ? 25 : 0) + (repaired.rural ? 25 : 0) + (repaired.para ? 25 : 0);
@@ -30,12 +32,12 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
       const next = { ...flaggedIds, [row.id]: true };
       setFlaggedIds(next);
       onAward({ teamId: activeTeam, points: 100, correct: true, concept: 'Spotting Data Bias', aiChapter: 'ai-ch4' });
-      setByteMsg(`🔍 Sharp eye! ${row.id} (${row.category}) had ${row.attendance} attendance & score ${row.pastScore}, yet was excluded due to missing representation!`);
+      setByteMsg(`🔍 ${teamLabel(activeTeam)} +100 pts! ${row.id} (${row.category}) had ${row.attendance} attendance & score ${row.pastScore}, yet was excluded due to missing representation!`);
       onSwitchTurn();
       if (Object.keys(next).length === biasedRows.length) {
         setTimeout(() => {
           setTab('B');
-          setByteMsg('Activity B: Drag each scenario card into FAIR or NEEDS IMPROVEMENT!');
+          setByteMsg('Activity B (+100/+150 pts): Drag each scenario card into FAIR or NEEDS IMPROVEMENT!');
         }, 1100);
       }
     } else {
@@ -51,17 +53,17 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
       const next = { ...placed, [id]: bucket };
       setPlaced(next);
       onAward({ teamId: activeTeam, points: sc.points, correct: true, concept: sc.concept, aiChapter: 'ai-ch4' });
-      setByteMsg(`⚖️ ${sc.concept}: ${sc.explanation}`);
+      setByteMsg(`⚖️ ${teamLabel(activeTeam)} +${sc.points} pts! ${sc.concept}: ${sc.explanation}`);
       onSwitchTurn();
       if (Object.keys(next).length === scenarios.length) {
         setTimeout(() => {
           setTab('C');
-          setByteMsg('🛠️ Activity C: Repair the Sports Dataset by adding balanced representation!');
+          setByteMsg('🛠️ Activity C (+100 pts each): Repair the Sports Dataset by adding balanced representation!');
         }, 1100);
       }
     } else {
       onAward({ teamId: activeTeam, points: 20, correct: false, concept: sc?.concept || 'Fairness', misconception: 'Identifying AI Fairness vs Bias' });
-      setByteMsg('❌ Ask: Does this give every group an equal, inclusive chance, or does it leave some people out?');
+      setByteMsg(`❌ ${teamLabel(activeTeam)} (+20 learning pts) — Ask: Does this give every group an equal, inclusive chance?`);
     }
   };
 
@@ -77,7 +79,7 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
       concept: 'Dataset Repair & Inclusion',
       aiChapter: 'ai-ch4'
     });
-    setByteMsg(`✅ Added ${label}! Dataset representation improved!`);
+    setByteMsg(`✅ ${teamLabel(activeTeam)} +100 pts! Added ${label}! Dataset representation improved!`);
     if (next.girls && next.rural && next.para) {
       onCompleteMission(5, 'fairness_champion');
     }
@@ -86,7 +88,7 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-2xl md:text-3xl font-black text-amber-300 m-0">
+        <h2 className="text-2xl md:text-3xl font-black text-orange-700 m-0">
           🔍 Mission 5 · Data Detectives &amp; Fairness
         </h2>
         <div className="flex gap-2 flex-wrap">
@@ -100,7 +102,7 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
               type="button"
               onClick={() => setTab(t.id)}
               className={`px-3.5 py-2 rounded-xl font-black text-sm border-2 cursor-pointer ${
-                tab === t.id ? 'bg-amber-400 text-slate-950 border-amber-200' : 'bg-slate-800 text-slate-200 border-slate-600'
+                tab === t.id ? 'bg-orange-500 text-white border-orange-600' : 'bg-slate-100 text-slate-800 border-slate-300'
               }`}
             >
               {t.label}
@@ -113,13 +115,13 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
 
       {tab === 'A' && (
         <div className="space-y-3">
-          <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-400/50 text-lg font-bold text-amber-100">
-            📁 Fictional Case: An AI selects students for a school sports event using past records. Tap the rows showing unfair exclusion!
+          <div className="p-3 rounded-2xl bg-amber-100 border-2 border-amber-400 text-lg font-bold text-amber-950">
+            📁 Fictional Case: An AI selects students for a school sports event using past records. Tap the rows showing unfair exclusion! <span className="text-emerald-800">(+100 pts/row)</span>
           </div>
-          <div className="overflow-x-auto glass-panel rounded-2xl p-3">
+          <div className="overflow-x-auto rounded-2xl p-3 bg-white border-2 border-slate-200">
             <table className="w-full text-left border-collapse text-base md:text-lg">
               <thead>
-                <tr className="border-b-2 border-slate-700 text-amber-300">
+                <tr className="border-b-2 border-slate-300 text-orange-800 bg-orange-50">
                   <th className="p-2.5">Student ID</th>
                   <th className="p-2.5">Attendance</th>
                   <th className="p-2.5">Past Score</th>
@@ -134,14 +136,14 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
                     <tr
                       key={r.id}
                       onClick={() => flagRow(r)}
-                      className={`border-b border-slate-800 cursor-pointer ${hit ? 'bg-rose-500/20' : 'hover:bg-slate-800/70'}`}
+                      className={`border-b border-slate-200 cursor-pointer ${hit ? 'bg-rose-50' : 'hover:bg-slate-50'}`}
                     >
-                      <td className="p-2.5 font-black">{r.id}</td>
-                      <td className="p-2.5">{r.attendance}</td>
-                      <td className="p-2.5 font-bold">{r.pastScore}</td>
-                      <td className="p-2.5 font-bold text-cyan-200">{r.category}</td>
-                      <td className="p-2.5 flex items-center gap-1.5 font-bold">
-                        {hit ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <AlertCircle className="w-4 h-4 text-amber-300" />}
+                      <td className="p-2.5 font-black text-slate-900">{r.id}</td>
+                      <td className="p-2.5 text-slate-800">{r.attendance}</td>
+                      <td className="p-2.5 font-bold text-slate-900">{r.pastScore}</td>
+                      <td className="p-2.5 font-bold text-sky-800">{r.category}</td>
+                      <td className="p-2.5 flex items-center gap-1.5 font-bold text-slate-800">
+                        {hit ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : <AlertCircle className="w-4 h-4 text-orange-600" />}
                         {r.selected}
                       </td>
                     </tr>
@@ -155,7 +157,7 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
 
       {tab === 'B' && (
         <div className="space-y-3">
-          <div className="glass-panel rounded-2xl p-3 flex flex-wrap gap-2 justify-center">
+          <div className="rounded-2xl p-3 bg-slate-100 border-2 border-dashed border-slate-300 flex flex-wrap gap-2 justify-center">
             {scenarios.filter((s) => !placed[s.id]).map((s) => (
               <button
                 key={s.id}
@@ -164,10 +166,10 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
                 onDragStart={(e) => { e.dataTransfer.setData('text/plain', s.id); setSelId(s.id); }}
                 onClick={() => setSelId(selId === s.id ? null : s.id)}
                 className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-bold text-base text-left max-w-md cursor-grab ${
-                  selId === s.id ? 'bg-amber-400 text-slate-950 border-white' : 'bg-slate-800 text-white border-slate-600'
+                  selId === s.id ? 'bg-orange-500 text-white border-orange-700' : 'bg-white text-slate-900 border-slate-300 shadow-sm'
                 }`}
               >
-                {s.text}
+                {s.text} <span className="ml-1 text-xs font-black text-emerald-700">(+{s.points})</span>
               </button>
             ))}
           </div>
@@ -183,15 +185,15 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
                 }}
                 onClick={() => selId && placeScenario(selId, bucket)}
                 className={`rounded-3xl p-4 border-4 border-dashed min-h-[170px] cursor-pointer ${
-                  bucket === 'Fair' ? 'border-emerald-400 bg-emerald-500/10' : 'border-rose-400 bg-rose-500/10'
+                  bucket === 'Fair' ? 'border-emerald-500 bg-emerald-50' : 'border-rose-500 bg-rose-50'
                 }`}
               >
-                <div className={`text-xl font-black mb-2 ${bucket === 'Fair' ? 'text-emerald-300' : 'text-rose-300'}`}>
+                <div className={`text-xl font-black mb-2 ${bucket === 'Fair' ? 'text-emerald-800' : 'text-rose-800'}`}>
                   {bucket === 'Fair' ? '⚖️ FAIR & INCLUSIVE' : '🚨 NEEDS IMPROVEMENT (BIAS)'}
                 </div>
                 <div className="space-y-2">
                   {scenarios.filter((s) => placed[s.id] === bucket).map((s) => (
-                    <div key={s.id} className="p-2 rounded-xl bg-slate-900/90 text-sm font-bold text-slate-100 border border-slate-700">
+                    <div key={s.id} className="p-2 rounded-xl bg-white text-sm font-bold text-slate-800 border border-slate-300">
                       ✅ {s.text}
                     </div>
                   ))}
@@ -203,15 +205,15 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
       )}
 
       {tab === 'C' && (
-        <div className="glass-panel rounded-3xl p-6 space-y-4 border-emerald-400/50">
+        <div className="rounded-3xl p-6 space-y-4 bg-emerald-50 border-2 border-emerald-400">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <h3 className="text-2xl font-black text-emerald-300 m-0 flex items-center gap-2">
-              <Wrench className="w-6 h-6" /> Repair Representation in the Sports Dataset
+            <h3 className="text-2xl font-black text-emerald-900 m-0 flex items-center gap-2">
+              <Wrench className="w-6 h-6" /> Repair Representation in the Sports Dataset <span className="text-base">(+100 pts each)</span>
             </h3>
-            <span className="text-xl font-black text-cyan-300">Dataset Fairness: {diversityScore}%</span>
+            <span className="text-xl font-black text-sky-800">Dataset Fairness: {diversityScore}%</span>
           </div>
-          <div className="h-4 bg-slate-800 rounded-full overflow-hidden border border-slate-600">
-            <div className="h-full bg-gradient-to-r from-amber-400 to-emerald-400 transition-all duration-300" style={{ width: `${diversityScore}%` }} />
+          <div className="h-4 bg-slate-200 rounded-full overflow-hidden border border-slate-300">
+            <div className="h-full bg-gradient-to-r from-orange-400 to-emerald-500 transition-all duration-300" style={{ width: `${diversityScore}%` }} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -225,10 +227,10 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
                 type="button"
                 disabled={repaired[btn.key]}
                 onClick={() => addCategory(btn.key, btn.label)}
-                className={`touch-btn p-4 rounded-2xl border-2 font-black text-lg cursor-pointer ${
+                className={`touch-btn p-4 rounded-2xl border-2 font-black text-lg cursor-pointer shadow-sm ${
                   repaired[btn.key]
-                    ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200'
-                    : 'bg-slate-800 border-amber-400/70 text-white'
+                    ? 'bg-emerald-600 border-emerald-700 text-white'
+                    : 'bg-white border-orange-400 text-slate-900'
                 }`}
               >
                 {repaired[btn.key] ? `✅ ${btn.label.replace('Add ', 'Added ')}` : btn.label}
@@ -241,7 +243,7 @@ export default function DataDetective({ activeTeam, onAward, onSwitchTurn, onCom
               <button
                 type="button"
                 onClick={() => onCompleteMission(5, 'fairness_champion', true)}
-                className="touch-btn px-6 py-3 rounded-2xl bg-emerald-400 text-slate-950 font-black text-lg cursor-pointer"
+                className="touch-btn px-6 py-3 rounded-2xl bg-emerald-600 text-white font-black text-lg cursor-pointer"
               >
                 ⚖️ Dataset Repaired (100%)! Proceed to Ethics Courtroom ▶
               </button>

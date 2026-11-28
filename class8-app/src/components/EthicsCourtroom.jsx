@@ -4,12 +4,14 @@ import ByteGuide from './ByteGuide.jsx';
 import { ETHICS_CASES } from '../data/questionBank.js';
 import { SCORE_VALUES } from '../utils/scoring.js';
 
+const teamLabel = (t) => (t === 'blue' ? 'TEAM BLUE (CYBER TITANS)' : 'TEAM ORANGE (DATA DRAGONS)');
+
 export default function EthicsCourtroom({ activeTeam, onAward, onSwitchTurn, onCompleteMission }) {
   const [caseIdx, setCaseIdx] = useState(0);
   const [verdictPicked, setVerdictPicked] = useState(false);
   const [actionPicked, setActionPicked] = useState(false);
   const [shields, setShields] = useState(0);
-  const [byteMsg, setByteMsg] = useState('Order in the AI Ethics Courtroom! First judge the case, then choose the best ethical action.');
+  const [byteMsg, setByteMsg] = useState('Order in the AI Ethics Courtroom! First judge the case (+100 pts), then choose the best ethical action (+50 bonus).');
 
   const cur = ETHICS_CASES[caseIdx];
   const coreCasesCount = 5;
@@ -19,10 +21,10 @@ export default function EthicsCourtroom({ activeTeam, onAward, onSwitchTurn, onC
     if (v === cur.verdict) {
       setVerdictPicked(true);
       onAward({ teamId: activeTeam, points: SCORE_VALUES.CORRECT, correct: true, concept: cur.principle, aiChapter: 'ai-ch4' });
-      setByteMsg(`⚖️ Sound judgement (${cur.verdict})! Now select the best ethical action below.`);
+      setByteMsg(`⚖️ ${teamLabel(activeTeam)} +100 pts! Sound judgement (${cur.verdict})! Now select the best ethical action below.`);
     } else {
       onAward({ teamId: activeTeam, points: 25, correct: false, concept: cur.principle, misconception: `Ethics Case: ${cur.principle}` });
-      setByteMsg(`🤔 Re-read carefully: check Privacy, Fairness, Transparency, and Consent. Official ruling: ${cur.verdict}.`);
+      setByteMsg(`🤔 ${teamLabel(activeTeam)} (+25 learning pts) — Official ruling: ${cur.verdict}. Check Privacy, Fairness, Transparency, and Consent.`);
       setVerdictPicked(true);
     }
   };
@@ -33,7 +35,7 @@ export default function EthicsCourtroom({ activeTeam, onAward, onSwitchTurn, onC
     if (act === cur.bestAction) {
       setShields((s) => s + 1);
       onAward({ teamId: activeTeam, points: SCORE_VALUES.EXPLANATION_BONUS, correct: true, earnStar: true, concept: cur.principle });
-      setByteMsg(`🛡️ Ethical Action Confirmed! ${cur.explanation}`);
+      setByteMsg(`🛡️ ${teamLabel(activeTeam)} +50 bonus pts! ${cur.explanation}`);
     } else {
       onAward({ teamId: activeTeam, points: 0, correct: false, concept: cur.principle });
       setByteMsg(`📘 Better action: "${cur.bestAction}". ${cur.explanation}`);
@@ -55,48 +57,48 @@ export default function EthicsCourtroom({ activeTeam, onAward, onSwitchTurn, onC
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-2xl md:text-3xl font-black text-rose-300 m-0">
+        <h2 className="text-2xl md:text-3xl font-black text-rose-700 m-0">
           ⚖️ Mission 6 · AI Ethics Guardians Courtroom ({caseIdx + 1}/{coreCasesCount})
         </h2>
         <div className="flex gap-2">
-          <span className="px-3 py-1.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 font-bold text-xs flex items-center gap-1">
-            <Shield className="w-4 h-4" /> Privacy Shields: {shields}
+          <span className="px-3 py-1.5 rounded-full bg-sky-100 border border-sky-300 text-sky-900 font-bold text-xs flex items-center gap-1">
+            <Shield className="w-4 h-4 text-sky-700" /> Privacy Shields: {shields}
           </span>
-          <span className="px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-200 font-bold text-xs flex items-center gap-1">
-            <Scale className="w-4 h-4" /> Principle: {cur.principle}
+          <span className="px-3 py-1.5 rounded-full bg-amber-100 border border-amber-300 text-amber-900 font-bold text-xs flex items-center gap-1">
+            <Scale className="w-4 h-4 text-amber-700" /> Principle: {cur.principle}
           </span>
         </div>
       </div>
 
       <ByteGuide message={byteMsg} mood="thinking" compact />
 
-      <div className="glass-panel rounded-3xl p-5 md:p-6 border-2 border-rose-400/50 space-y-4">
+      <div className="rounded-3xl p-5 md:p-6 bg-rose-50/70 border-2 border-rose-300 space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <span className="px-3 py-1 rounded-full bg-rose-500/20 text-rose-200 font-black text-sm">{cur.title}</span>
-          <span className="text-xs font-bold text-slate-300 flex items-center gap-1">
-            <Award className="w-4 h-4 text-amber-300" /> Accountability &amp; Human Oversight
+          <span className="px-3 py-1 rounded-full bg-rose-200 text-rose-950 font-black text-sm">{cur.title}</span>
+          <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
+            <Award className="w-4 h-4 text-amber-600" /> Worth +100 pts Verdict &amp; +50 pts Action
           </span>
         </div>
 
-        <p className="text-xl md:text-2xl font-black text-white leading-snug m-0">
+        <p className="text-xl md:text-2xl font-black text-slate-900 leading-snug m-0">
           "{cur.scenario}"
         </p>
 
         <div>
-          <div className="text-sm font-black uppercase text-cyan-300 mb-2">Step 1 · Judge Verdict</div>
+          <div className="text-sm font-black uppercase text-sky-800 mb-2">Step 1 · Judge Verdict (+100 pts)</div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { v: 'Responsible', cls: 'border-emerald-400 bg-emerald-500/15 text-emerald-200' },
-              { v: 'Irresponsible', cls: 'border-rose-400 bg-rose-500/15 text-rose-200' },
-              { v: 'Needs More Information', cls: 'border-amber-400 bg-amber-500/15 text-amber-200' }
+              { v: 'Responsible', cls: 'border-emerald-500 bg-emerald-50 text-emerald-900' },
+              { v: 'Irresponsible', cls: 'border-rose-500 bg-rose-50 text-rose-900' },
+              { v: 'Needs More Information', cls: 'border-amber-500 bg-amber-50 text-amber-900' }
             ].map((b) => (
               <button
                 key={b.v}
                 type="button"
                 disabled={verdictPicked}
                 onClick={() => chooseVerdict(b.v)}
-                className={`touch-btn py-3.5 px-4 rounded-2xl border-2 font-black text-lg cursor-pointer ${
-                  verdictPicked && b.v === cur.verdict ? 'ring-4 ring-emerald-300 bg-emerald-500 text-slate-950' : b.cls
+                className={`touch-btn py-3.5 px-4 rounded-2xl border-2 font-black text-lg cursor-pointer shadow-sm ${
+                  verdictPicked && b.v === cur.verdict ? 'ring-4 ring-emerald-400 bg-emerald-600 text-white' : b.cls
                 }`}
               >
                 {b.v.toUpperCase()}
@@ -107,7 +109,7 @@ export default function EthicsCourtroom({ activeTeam, onAward, onSwitchTurn, onC
 
         {verdictPicked && (
           <div className="animate-pop pt-2">
-            <div className="text-sm font-black uppercase text-amber-300 mb-2">Step 2 · Choose the Best Ethical Action (+50 Bonus)</div>
+            <div className="text-sm font-black uppercase text-amber-800 mb-2">Step 2 · Choose the Best Ethical Action (+50 Bonus)</div>
             <div className="space-y-2.5">
               {cur.actions.map((a) => (
                 <button
@@ -115,10 +117,10 @@ export default function EthicsCourtroom({ activeTeam, onAward, onSwitchTurn, onC
                   type="button"
                   disabled={actionPicked}
                   onClick={() => chooseAction(a)}
-                  className={`w-full touch-btn p-4 rounded-2xl border-2 text-left font-bold text-base md:text-lg cursor-pointer ${
+                  className={`w-full touch-btn p-4 rounded-2xl border-2 text-left font-bold text-base md:text-lg cursor-pointer shadow-sm ${
                     actionPicked && a === cur.bestAction
-                      ? 'bg-emerald-500 text-slate-950 border-emerald-300'
-                      : 'bg-slate-800/90 text-slate-100 border-slate-600'
+                      ? 'bg-emerald-600 text-white border-emerald-700'
+                      : 'bg-white text-slate-900 border-slate-300'
                   }`}
                 >
                   {a}
@@ -133,7 +135,7 @@ export default function EthicsCourtroom({ activeTeam, onAward, onSwitchTurn, onC
             <button
               type="button"
               onClick={nextCase}
-              className="touch-btn px-7 py-3 rounded-2xl bg-gradient-to-r from-rose-400 to-orange-400 text-slate-950 font-black text-lg cursor-pointer"
+              className="touch-btn px-7 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-orange-500 text-white font-black text-lg cursor-pointer shadow-md"
             >
               {caseIdx + 1 < coreCasesCount ? 'Next Courtroom Case ▶' : '⚖️ Court Adjourned! Face THE BUG MASTER ▶'}
             </button>

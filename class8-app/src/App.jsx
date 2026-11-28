@@ -14,13 +14,13 @@ export default function App() {
   const [page, setPage] = useState('home'); // home | championship | teacher | concepts | reports
   const [revealHint, setRevealHint] = useState(false);
   const [revealAnswer, setRevealAnswer] = useState(false);
+  const [lastAward, setLastAward] = useState(null);
 
   useEffect(() => {
     saveState(state);
     sfx.setMuted(!state.settings.soundEnabled);
   }, [state]);
 
-  // Countdown tick during Championship
   useEffect(() => {
     if (page !== 'championship' || !state.timerRunning) return;
     const id = setInterval(() => {
@@ -63,6 +63,7 @@ export default function App() {
     const startM = startMissionOverride || (modSel !== 'all' ? Number(modSel) : 1);
     setRevealHint(false);
     setRevealAnswer(false);
+    setLastAward(null);
     sfx.bonus();
     setState((prev) => ({
       ...prev,
@@ -75,9 +76,7 @@ export default function App() {
     setPage('championship');
   };
 
-  const handleStartChampionship = () => {
-    startMode(state.settings.sessionMode);
-  };
+  const handleStartChampionship = () => startMode(state.settings.sessionMode);
 
   const selectMission = (mId) => {
     const modeCfg = SESSION_MODES[state.settings.sessionMode] || SESSION_MODES.full30;
@@ -108,6 +107,16 @@ export default function App() {
     } else {
       sfx.bad();
     }
+
+    const teamLabel = teamId === 'blue' ? 'TEAM BLUE (CYBER TITANS)' : 'TEAM ORANGE (DATA DRAGONS)';
+    setLastAward({
+      id: Date.now() + Math.random(),
+      teamId,
+      teamLabel,
+      points,
+      correct,
+      concept: concept || 'Activity'
+    });
 
     setState((prev) => ({
       ...prev,
@@ -180,6 +189,7 @@ export default function App() {
     setState(fresh);
     setRevealHint(false);
     setRevealAnswer(false);
+    setLastAward(null);
     sfx.pop();
   };
 
@@ -225,6 +235,7 @@ export default function App() {
     return (
       <Championship
         state={state}
+        lastAward={lastAward}
         revealHint={revealHint}
         revealAnswer={revealAnswer}
         onSelectTeam={(tid) => setState((p) => ({ ...p, activeTeam: tid }))}

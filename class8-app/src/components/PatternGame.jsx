@@ -14,8 +14,10 @@ function shuffle(arr) {
   return a;
 }
 
+const teamLabel = (t) => (t === 'blue' ? 'TEAM BLUE (CYBER TITANS)' : 'TEAM ORANGE (DATA DRAGONS)');
+
 export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompleteMission, revealHint, revealAnswer }) {
-  const [gameTab, setGameTab] = useState('A'); // A, B, C, D, BANK
+  const [gameTab, setGameTab] = useState('A');
   const patternPuzzles = useMemo(() => CT_PUZZLES.filter((p) => p.game === 'A'), []);
   const [patIdx, setPatIdx] = useState(0);
   const [patSelected, setPatSelected] = useState(null);
@@ -43,11 +45,11 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
     if (choice === curPat.correctAnswer) {
       setPatSolved(true);
       onAward({ teamId: activeTeam, points: curPat.points, correct: true, concept: curPat.concept, ctChapter: curPat.chapter });
-      setByteMsg(`✅ ${curPat.chapter}: ${curPat.explanation}`);
+      setByteMsg(`✅ ${teamLabel(activeTeam)} +${curPat.points} pts! ${curPat.chapter}: ${curPat.explanation}`);
       onSwitchTurn();
     } else {
       onAward({ teamId: activeTeam, points: 25, correct: false, concept: curPat.concept, misconception: curPat.concept });
-      setByteMsg(`❌ Not ${choice}! Look carefully at how each step changes.`);
+      setByteMsg(`❌ ${teamLabel(activeTeam)} (+25 learning pts) — Not ${choice}! Look carefully at how each step changes.`);
     }
   };
 
@@ -60,10 +62,10 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
       next[slotIdx] = stepText;
       setDecompPlaced(next);
       onAward({ teamId: activeTeam, points: 50, correct: true, concept: 'Decomposition', ctChapter: decompPuzzle.chapter });
-      setByteMsg(`✅ Step ${slotIdx + 1} in place: "${stepText}"`);
+      setByteMsg(`✅ ${teamLabel(activeTeam)} +50 pts! Step ${slotIdx + 1} in place: "${stepText}"`);
       if (next.filter(Boolean).length === decompPuzzle.steps.length) {
         onAward({ teamId: activeTeam, points: 100, correct: true, earnStar: true, concept: 'Decomposition' });
-        setByteMsg(`🎉 Decomposition complete! ${decompPuzzle.explanation}`);
+        setByteMsg(`🎉 Decomposition complete! ${teamLabel(activeTeam)} +100 bonus pts! ${decompPuzzle.explanation}`);
         onSwitchTurn();
       }
     } else {
@@ -78,7 +80,7 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
       const next = { ...absPicked, [clue.id]: true };
       setAbsPicked(next);
       onAward({ teamId: activeTeam, points: 50, correct: true, concept: 'Abstraction', ctChapter: absPuzzle.chapter });
-      setByteMsg(`✅ Essential clue found: "${clue.text}"`);
+      setByteMsg(`✅ ${teamLabel(activeTeam)} +50 pts! Essential clue found: "${clue.text}"`);
       const essentialTotal = absPuzzle.clues.filter((c) => c.essential).length;
       if (Object.keys(next).length === essentialTotal) {
         onCompleteMission(2, 'ct_master');
@@ -96,18 +98,18 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
     setBankAnswered(true);
     if (opt === curBank.correctAnswer) {
       onAward({ teamId: activeTeam, points: curBank.points, correct: true, concept: curBank.concept, ctChapter: curBank.chapter });
-      setByteMsg(`✅ ${curBank.chapter}: ${curBank.explanation}`);
+      setByteMsg(`✅ ${teamLabel(activeTeam)} +${curBank.points} pts! ${curBank.chapter}: ${curBank.explanation}`);
       onSwitchTurn();
     } else {
       onAward({ teamId: activeTeam, points: 25, correct: false, concept: curBank.concept, misconception: curBank.concept });
-      setByteMsg(`❌ Answer: ${curBank.correctAnswer}. ${curBank.explanation}`);
+      setByteMsg(`❌ ${teamLabel(activeTeam)} (+25 learning pts) — Answer: ${curBank.correctAnswer}. ${curBank.explanation}`);
     }
   };
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-2xl md:text-3xl font-black text-indigo-300 m-0">
+        <h2 className="text-2xl md:text-3xl font-black text-indigo-700 m-0">
           🧩 Mission 2 · Computational Thinking Challenge
         </h2>
         <div className="flex flex-wrap gap-1.5">
@@ -123,7 +125,7 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
               type="button"
               onClick={() => setGameTab(t.id)}
               className={`px-3.5 py-2 rounded-xl font-black text-sm border-2 cursor-pointer ${
-                gameTab === t.id ? 'bg-indigo-400 text-slate-950 border-indigo-200' : 'bg-slate-800 text-slate-200 border-slate-600'
+                gameTab === t.id ? 'bg-indigo-600 text-white border-indigo-700' : 'bg-slate-100 text-slate-800 border-slate-300'
               }`}
             >
               {t.label}
@@ -136,12 +138,12 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
 
       {gameTab === 'A' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/50 text-indigo-200 font-bold text-sm">
-              Chapter: {curPat.chapter} · Puzzle {patIdx + 1}/{patternPuzzles.length}
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <span className="px-3 py-1 rounded-full bg-indigo-100 border border-indigo-300 text-indigo-900 font-bold text-sm">
+              Chapter: {curPat.chapter} · Puzzle {patIdx + 1}/{patternPuzzles.length} · <b className="text-emerald-700">Worth +{curPat.points} pts</b>
             </span>
-            {revealHint && <span className="text-amber-300 font-bold text-sm">💡 {curPat.explanation.split('.')[0]}</span>}
-            {revealAnswer && <span className="text-emerald-300 font-bold text-sm">👩‍🏫 Answer: {curPat.correctAnswer}</span>}
+            {revealHint && <span className="text-amber-700 font-bold text-sm">💡 {curPat.explanation.split('.')[0]}</span>}
+            {revealAnswer && <span className="text-emerald-700 font-bold text-sm">👩‍🏫 Answer: {curPat.correctAnswer}</span>}
           </div>
 
           <div
@@ -152,13 +154,13 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
               if (val) solvePattern(val);
             }}
             onClick={() => patSelected && solvePattern(patSelected)}
-            className="glass-panel rounded-3xl p-6 text-center border-2 border-indigo-400/50 cursor-pointer"
+            className="rounded-3xl p-6 text-center bg-indigo-50 border-2 border-indigo-300 cursor-pointer"
           >
-            <div className="text-lg font-bold text-slate-300 mb-2">{curPat.instructions}</div>
-            <div className="text-2xl md:text-4xl font-black text-white tracking-wide py-3">
+            <div className="text-lg font-bold text-slate-700 mb-2">{curPat.instructions}</div>
+            <div className="text-2xl md:text-4xl font-black text-slate-900 tracking-wide py-3">
               {patSolved ? `${curPat.prompt.replace('?', curPat.correctAnswer)}` : curPat.prompt}
             </div>
-            <div className="text-sm font-bold text-cyan-300">
+            <div className="text-sm font-bold text-sky-700">
               {patSolved ? '✅ Pattern Solved!' : 'Drop or tap a tile below into this panel!'}
             </div>
           </div>
@@ -172,10 +174,10 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
                 onDragStart={(e) => { e.dataTransfer.setData('text/plain', opt); setPatSelected(opt); }}
                 onClick={() => solvePattern(opt)}
                 disabled={patSolved}
-                className={`touch-btn py-4 px-4 rounded-2xl border-2 font-black text-xl cursor-pointer ${
+                className={`touch-btn py-4 px-4 rounded-2xl border-2 font-black text-xl cursor-pointer shadow-sm ${
                   patSolved && opt === curPat.correctAnswer
-                    ? 'bg-emerald-500 text-slate-950 border-emerald-300'
-                    : 'bg-slate-800 text-white border-slate-600 hover:border-cyan-400'
+                    ? 'bg-emerald-600 text-white border-emerald-700'
+                    : 'bg-white text-slate-900 border-slate-300 hover:border-sky-500'
                 }`}
               >
                 {opt}
@@ -193,10 +195,10 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
                     setPatSolved(false);
                   } else {
                     setGameTab('B');
-                    setByteMsg('Game B: Decomposition! Break "Organise a school science exhibition" into 5 ordered steps!');
+                    setByteMsg('Game B (+50 pts/step + 100 bonus): Decomposition! Break "Organise a school science exhibition" into 5 ordered steps!');
                   }
                 }}
-                className="touch-btn px-6 py-3 rounded-2xl bg-cyan-400 text-slate-950 font-black text-lg cursor-pointer"
+                className="touch-btn px-6 py-3 rounded-2xl bg-sky-600 text-white font-black text-lg cursor-pointer"
               >
                 {patIdx + 1 < patternPuzzles.length ? 'Next Pattern Puzzle ▶' : 'Move to Game B: Decomposition ▶'}
               </button>
@@ -207,10 +209,10 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
 
       {gameTab === 'B' && (
         <div className="space-y-4">
-          <div className="p-3 rounded-2xl bg-indigo-500/20 border border-indigo-400/50 text-center text-xl font-black text-white">
-            🎯 Big Problem: "Organise a school science exhibition."
+          <div className="p-3 rounded-2xl bg-indigo-100 border border-indigo-300 text-center text-xl font-black text-indigo-950">
+            🎯 Big Problem: "Organise a school science exhibition." <span className="text-emerald-700 text-base">(+50 pts/step)</span>
           </div>
-          <div className="glass-panel rounded-2xl p-3 flex flex-wrap gap-2 justify-center">
+          <div className="rounded-2xl p-3 bg-slate-100 border-2 border-dashed border-slate-300 flex flex-wrap gap-2 justify-center">
             {decompPool.filter((s) => !decompPlaced.includes(s)).map((s) => (
               <button
                 key={s}
@@ -219,7 +221,7 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
                 onDragStart={(e) => { e.dataTransfer.setData('text/plain', s); setDecompSel(s); }}
                 onClick={() => setDecompSel(decompSel === s ? null : s)}
                 className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-black text-base cursor-grab ${
-                  decompSel === s ? 'bg-cyan-400 text-slate-950 border-white' : 'bg-slate-800 text-white border-slate-600'
+                  decompSel === s ? 'bg-sky-600 text-white border-sky-800' : 'bg-white text-slate-900 border-slate-300 shadow-sm'
                 }`}
               >
                 {s}
@@ -238,11 +240,11 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
                 }}
                 onClick={() => decompSel && placeDecompStep(decompSel, idx)}
                 className={`rounded-2xl p-3 border-2 border-dashed min-h-[100px] flex flex-col justify-center items-center text-center cursor-pointer ${
-                  decompPlaced[idx] ? 'border-emerald-400 bg-emerald-500/15 border-solid' : 'border-slate-600 bg-slate-900/60'
+                  decompPlaced[idx] ? 'border-emerald-500 bg-emerald-50 border-solid' : 'border-slate-300 bg-slate-50'
                 }`}
               >
-                <span className="text-xs font-black text-cyan-300">STEP {idx + 1}</span>
-                <span className="font-extrabold text-base text-white mt-1">
+                <span className="text-xs font-black text-sky-700">STEP {idx + 1}</span>
+                <span className="font-extrabold text-base text-slate-900 mt-1">
                   {decompPlaced[idx] || 'Drop task here'}
                 </span>
               </div>
@@ -262,11 +264,11 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
 
       {gameTab === 'D' && (
         <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-slate-900/80 border-2 border-cyan-400/50 text-center">
-            <h3 className="text-xl md:text-2xl font-black text-cyan-300 m-0">
-              🚌 Find the Essential Clue (Abstraction)
+          <div className="p-4 rounded-2xl bg-sky-50 border-2 border-sky-300 text-center">
+            <h3 className="text-xl md:text-2xl font-black text-sky-800 m-0">
+              🚌 Find the Essential Clue (Abstraction) · <span className="text-emerald-700">+50 pts/clue</span>
             </h3>
-            <p className="text-lg text-slate-200 mt-1 mb-0">
+            <p className="text-lg text-slate-700 mt-1 mb-0">
               Tap ONLY the essential clues needed to allocate school buses (ignore distracting facts!).
             </p>
           </div>
@@ -279,11 +281,11 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
                   type="button"
                   onClick={() => toggleClue(c)}
                   className={`touch-btn p-4 rounded-2xl border-2 text-left font-bold text-lg flex items-center justify-between gap-2 cursor-pointer ${
-                    picked ? 'bg-emerald-500/20 border-emerald-400 text-emerald-100' : 'bg-slate-800/90 border-slate-600 text-slate-100'
+                    picked ? 'bg-emerald-50 border-emerald-500 text-emerald-950' : 'bg-white border-slate-300 text-slate-900 shadow-sm'
                   }`}
                 >
                   <span>{c.text}</span>
-                  {picked && <CheckCircle2 className="w-6 h-6 text-emerald-400 shrink-0" />}
+                  {picked && <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />}
                 </button>
               );
             })}
@@ -292,7 +294,7 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
             <button
               type="button"
               onClick={() => onCompleteMission(2, 'ct_master', true)}
-              className="touch-btn px-6 py-3 rounded-2xl bg-emerald-400 text-slate-950 font-black text-lg flex items-center gap-2 cursor-pointer"
+              className="touch-btn px-6 py-3 rounded-2xl bg-emerald-600 text-white font-black text-lg flex items-center gap-2 cursor-pointer"
             >
               <Sparkles className="w-5 h-5" /> Complete Mission 2 ▶
             </button>
@@ -304,16 +306,16 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
         <div className="space-y-4">
           <div className="flex flex-wrap gap-1.5">
             {CT_CHAPTERS.map((ch) => (
-              <span key={ch.id} className="px-2.5 py-1 rounded-full bg-slate-800 border border-slate-600 text-xs font-bold text-slate-200">
+              <span key={ch.id} className="px-2.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-xs font-bold text-slate-800">
                 {ch.icon} {ch.number}. {ch.title}
               </span>
             ))}
           </div>
-          <div className="glass-panel rounded-2xl p-5 border-indigo-400/50">
-            <div className="text-sm font-black text-cyan-300 mb-1">
-              Chapter: {curBank.chapter} · Challenge {bankIdx + 1}/{bankPuzzles.length}
+          <div className="rounded-2xl p-5 bg-indigo-50 border-2 border-indigo-300">
+            <div className="text-sm font-black text-sky-800 mb-1">
+              Chapter: {curBank.chapter} · Challenge {bankIdx + 1}/{bankPuzzles.length} · <span className="text-emerald-700">Worth +{curBank.points} pts</span>
             </div>
-            <div className="text-xl md:text-2xl font-black text-white mb-4">{curBank.instructions}</div>
+            <div className="text-xl md:text-2xl font-black text-slate-900 mb-4">{curBank.instructions}</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {curBank.options.map((opt) => (
                 <button
@@ -321,10 +323,10 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
                   type="button"
                   disabled={bankAnswered}
                   onClick={() => answerBank(opt)}
-                  className={`touch-btn p-4 rounded-2xl border-2 font-black text-lg cursor-pointer ${
+                  className={`touch-btn p-4 rounded-2xl border-2 font-black text-lg cursor-pointer shadow-sm ${
                     bankAnswered && opt === curBank.correctAnswer
-                      ? 'bg-emerald-500 text-slate-950 border-emerald-300'
-                      : 'bg-slate-800 text-white border-slate-600'
+                      ? 'bg-emerald-600 text-white border-emerald-700'
+                      : 'bg-white text-slate-900 border-slate-300'
                   }`}
                 >
                   {opt}
@@ -339,7 +341,7 @@ export default function PatternGame({ activeTeam, onAward, onSwitchTurn, onCompl
                     setBankIdx((i) => (i + 1) % bankPuzzles.length);
                     setBankAnswered(false);
                   }}
-                  className="px-5 py-2.5 rounded-xl bg-cyan-400 text-slate-950 font-black cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-sky-600 text-white font-black cursor-pointer"
                 >
                   Next CT Chapter Puzzle ▶
                 </button>

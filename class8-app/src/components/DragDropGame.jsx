@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { CheckCircle2, Sparkles, AlertTriangle, RotateCcw } from 'lucide-react';
+import { CheckCircle2, Sparkles, AlertTriangle } from 'lucide-react';
 import ByteGuide from './ByteGuide.jsx';
 import {
   MISSION1_DEVICES,
@@ -18,9 +18,11 @@ function shuffle(arr) {
   return a;
 }
 
+const teamLabel = (t) => (t === 'blue' ? 'TEAM BLUE (CYBER TITANS)' : 'TEAM ORANGE (DATA DRAGONS)');
+
 export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMission, revealHint, revealAnswer }) {
   const items = useMemo(() => shuffle(MISSION1_DEVICES), []);
-  const [placed, setPlaced] = useState({}); // { id: 'ai' | 'non-ai' }
+  const [placed, setPlaced] = useState({});
   const [selectedId, setSelectedId] = useState(null);
   const [feedback, setFeedback] = useState({
     msg: 'Drag any device into Bucket A (Uses AI) or Bucket B (Does not necessarily use AI) — or tap a device, then tap a bucket!',
@@ -48,7 +50,7 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
       });
       setBonusClaimed(false);
       setFeedback({
-        msg: `✅ ${dev.name}: ${dev.explanation}`,
+        msg: `✅ ${teamLabel(activeTeam)} earned +${dev.points} pts! ${dev.name}: ${dev.explanation}`,
         mood: 'excited',
         canBonus: true
       });
@@ -60,13 +62,13 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
     } else {
       onAward({
         teamId: activeTeam,
-        points: 20, // partial learning points for attempting & learning
+        points: 20,
         correct: false,
         concept: dev.concept,
         misconception: dev.concept
       });
       setFeedback({
-        msg: `🤔 Not quite for ${dev.name}! Hint: ${dev.explanation}`,
+        msg: `🤔 ${teamLabel(activeTeam)} (+20 learning pts) — Not quite for ${dev.name}! Hint: ${dev.explanation}`,
         mood: 'thinking',
         canBonus: false
       });
@@ -76,8 +78,9 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
   const handleExplanationBonus = () => {
     if (bonusClaimed) return;
     setBonusClaimed(true);
+    const prevTeam = activeTeam === 'blue' ? 'orange' : 'blue';
     onAward({
-      teamId: activeTeam === 'blue' ? 'orange' : 'blue',
+      teamId: prevTeam,
       points: SCORE_VALUES.EXPLANATION_BONUS,
       correct: true,
       earnStar: true,
@@ -89,18 +92,18 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="text-2xl md:text-3xl font-black text-cyan-300 m-0">
+          <h2 className="text-2xl md:text-3xl font-black text-sky-700 m-0">
             🤖 Mission 1 · Human or Machine? ({Object.keys(placed).length}/{items.length})
           </h2>
-          <p className="text-lg md:text-xl text-slate-200 m-0">
-            Watch out for tricky automation vs real AI!
+          <p className="text-lg md:text-xl text-slate-700 m-0">
+            Watch out for tricky automation vs real AI! <span className="font-black text-emerald-700">(+100 / +150 pts per item)</span>
           </p>
         </div>
         {Object.keys(placed).length === items.length && (
           <button
             type="button"
             onClick={() => onCompleteMission(1, 'ai_spotter', true)}
-            className="touch-btn px-6 py-3 rounded-2xl bg-emerald-400 text-slate-950 font-black text-lg cursor-pointer"
+            className="touch-btn px-6 py-3 rounded-2xl bg-emerald-600 text-white font-black text-lg cursor-pointer"
           >
             Mission Complete! Next Mission ▶
           </button>
@@ -114,7 +117,7 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
           <button
             type="button"
             onClick={handleExplanationBonus}
-            className="px-4 py-2 rounded-xl bg-amber-400 text-slate-950 font-black text-sm flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-amber-400 text-slate-950 font-black text-sm flex items-center gap-1.5 cursor-pointer shadow-sm"
           >
             <Sparkles className="w-4 h-4" /> +50 Explanation Bonus (Student Explained Why!)
           </button>
@@ -122,17 +125,16 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
       )}
 
       {(revealHint || revealAnswer) && remaining[0] && (
-        <div className="p-3 rounded-xl bg-indigo-950/80 border border-indigo-400 text-indigo-100 text-base font-bold">
+        <div className="p-3 rounded-xl bg-indigo-50 border-2 border-indigo-300 text-indigo-950 text-base font-bold">
           {revealAnswer
             ? `👩‍🏫 Answer for ${remaining[0].name}: ${remaining[0].correctAnswer}`
             : `💡 Hint for ${remaining[0].name}: Ask — does it learn from data or follow a fixed rule?`}
         </div>
       )}
 
-      {/* Draggable Object Tray */}
-      <div className="glass-panel rounded-2xl p-3 border-dashed border-slate-500 flex flex-wrap gap-2.5 justify-center min-h-[86px]">
+      <div className="rounded-2xl p-3 bg-slate-100 border-2 border-dashed border-slate-400 flex flex-wrap gap-2.5 justify-center min-h-[86px]">
         {remaining.length === 0 ? (
-          <div className="text-xl font-black text-emerald-300 py-3">🎉 All 10 Objects Classified!</div>
+          <div className="text-xl font-black text-emerald-700 py-3">🎉 All 10 Objects Classified!</div>
         ) : (
           remaining.map((dev) => {
             const isSel = selectedId === dev.id;
@@ -146,25 +148,27 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
                   setSelectedId(dev.id);
                 }}
                 onClick={() => setSelectedId(isSel ? null : dev.id)}
-                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-extrabold text-base md:text-lg flex items-center gap-2 cursor-grab transition-all ${
+                className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-extrabold text-base md:text-lg flex items-center gap-2 cursor-grab transition-all shadow-sm ${
                   isSel
-                    ? 'bg-cyan-400 text-slate-950 border-white scale-105 shadow-lg'
-                    : 'bg-slate-800/95 text-slate-100 border-slate-600'
+                    ? 'bg-sky-600 text-white border-sky-800 scale-105'
+                    : 'bg-white text-slate-900 border-slate-300'
                 }`}
               >
                 <span className="text-2xl">{dev.icon}</span>
                 <span>{dev.name}</span>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-black ${isSel ? 'bg-white/25 text-white' : 'bg-emerald-100 text-emerald-800'}`}>
+                  +{dev.points}
+                </span>
               </button>
             );
           })
         )}
       </div>
 
-      {/* Two Buckets */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
-          { key: 'ai', title: 'BUCKET A: Uses AI', sub: 'Learns patterns, understands speech/vision, adapts', border: 'border-cyan-400 bg-cyan-500/10', head: 'text-cyan-300' },
-          { key: 'non-ai', title: 'BUCKET B: Does NOT Necessarily Use AI', sub: 'Fixed timers, simple sensor rules, basic arithmetic', border: 'border-orange-400 bg-orange-500/10', head: 'text-orange-300' }
+          { key: 'ai', title: 'BUCKET A: Uses AI', sub: 'Learns patterns, understands speech/vision, adapts', border: 'border-sky-500 bg-sky-50', head: 'text-sky-800' },
+          { key: 'non-ai', title: 'BUCKET B: Does NOT Necessarily Use AI', sub: 'Fixed timers, simple sensor rules, basic arithmetic', border: 'border-orange-500 bg-orange-50', head: 'text-orange-800' }
         ].map((b) => {
           const list = items.filter((d) => placed[d.id] === b.key);
           return (
@@ -182,11 +186,11 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
               className={`rounded-3xl p-4 border-4 border-dashed min-h-[180px] transition-all cursor-pointer ${b.border}`}
             >
               <div className={`text-xl md:text-2xl font-black ${b.head}`}>{b.title}</div>
-              <div className="text-sm font-bold text-slate-300 mb-3">{b.sub}</div>
+              <div className="text-sm font-bold text-slate-600 mb-3">{b.sub}</div>
               <div className="flex flex-wrap gap-2">
                 {list.map((d) => (
-                  <span key={d.id} className="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-400/60 text-emerald-200 font-bold text-sm flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {d.icon} {d.name}
+                  <span key={d.id} className="px-3 py-1.5 rounded-xl bg-white border-2 border-emerald-400 text-emerald-900 font-bold text-sm flex items-center gap-1.5 shadow-sm">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" /> {d.icon} {d.name}
                   </span>
                 ))}
               </div>
@@ -199,7 +203,7 @@ export function Mission1Warmup({ activeTeam, onAward, onSwitchTurn, onCompleteMi
 }
 
 export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onCompleteMission }) {
-  const [tab, setTab] = useState('A'); // A = Lifecycle Order, B = School Electricity, C = Data Cleaning
+  const [tab, setTab] = useState('A');
   const [stageOrderCards] = useState(() => shuffle(LIFECYCLE_STAGES));
   const [stageSlots, setStageSlots] = useState({});
   const [selStage, setSelStage] = useState(null);
@@ -209,7 +213,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
   const [selElec, setSelElec] = useState(null);
 
   const [cleanedRows, setCleanedRows] = useState({});
-  const [byteMsg, setByteMsg] = useState('Activity A: Drag the 4 AI Project Lifecycle stages into their circular order 1 → 4!');
+  const [byteMsg, setByteMsg] = useState('Activity A (+100 pts each): Drag the 4 AI Project Lifecycle stages into their circular order 1 → 4!');
 
   const badRowsCount = DATA_CLEANING_ROWS.filter((r) => r.badField).length;
   const fixedCount = Object.keys(cleanedRows).length;
@@ -222,17 +226,17 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
       const next = { ...stageSlots, [slotNum]: stage };
       setStageSlots(next);
       onAward({ teamId: activeTeam, points: 100, correct: true, concept: 'AI Project Lifecycle Order', aiChapter: 'ai-ch2' });
-      setByteMsg(`✅ Stage ${slotNum} locked: ${stage.title}! ${stage.desc}`);
+      setByteMsg(`✅ ${teamLabel(activeTeam)} +100 pts! Stage ${slotNum} locked: ${stage.title}! ${stage.desc}`);
       onSwitchTurn();
       if (Object.keys(next).length === 4) {
         setTimeout(() => {
           setTab('B');
-          setByteMsg('⚡ Great! Now Activity B: Drag each School Electricity Wastage card to its matching Lifecycle stage!');
+          setByteMsg('⚡ Great! Now Activity B (+100 pts each): Drag each School Electricity Wastage card to its matching Lifecycle stage!');
         }, 1000);
       }
     } else {
       onAward({ teamId: activeTeam, points: 25, correct: false, concept: 'AI Project Lifecycle Order', misconception: 'AI Project Lifecycle Sequence' });
-      setByteMsg('❌ Check the cycle order: Define Problem → Collect Data → Test AI Tools → Reflect & Improve!');
+      setByteMsg(`❌ ${teamLabel(activeTeam)} (+25 learning pts) — Check the cycle order: Define Problem → Collect Data → Test AI Tools → Reflect & Improve!`);
     }
   };
 
@@ -244,17 +248,17 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
       const next = { ...elecPlaced, [cardId]: stageId };
       setElecPlaced(next);
       onAward({ teamId: activeTeam, points: 100, correct: true, concept: card.concept, aiChapter: 'ai-ch2' });
-      setByteMsg(`✅ Correct! ${card.explanation}`);
+      setByteMsg(`✅ ${teamLabel(activeTeam)} +100 pts! ${card.explanation}`);
       onSwitchTurn();
       if (Object.keys(next).length === SCHOOL_ELECTRICITY_CARDS.length) {
         setTimeout(() => {
           setTab('C');
-          setByteMsg('🧹 Activity C: Tap the dirty/broken records in the School Electricity Dataset to clean them!');
+          setByteMsg('🧹 Activity C (+100 pts each): Tap the dirty/broken records in the School Electricity Dataset to clean them!');
         }, 1100);
       }
     } else {
       onAward({ teamId: activeTeam, points: 25, correct: false, concept: 'School Electricity AI Mapping' });
-      setByteMsg('❌ Match the action carefully with Define, Collect, Test, or Reflect!');
+      setByteMsg(`❌ ${teamLabel(activeTeam)} (+25 learning pts) — Match the action carefully with Define, Collect, Test, or Reflect!`);
     }
   };
 
@@ -271,7 +275,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
         concept: 'Data Cleaning & Quality',
         aiChapter: 'ai-ch2'
       });
-      setByteMsg(`🧹 Cleaned ${row.id} (${row.room}): ${row.issue}`);
+      setByteMsg(`🧹 ${teamLabel(activeTeam)} +100 pts! Cleaned ${row.id} (${row.room}): ${row.issue}`);
       onSwitchTurn();
       if (Object.keys(next).length === badRowsCount) {
         onCompleteMission(3, 'cycle_builder');
@@ -285,8 +289,8 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-2xl md:text-3xl font-black text-purple-300 m-0">
-          🔄 Mission 3 · AI Project Lifecycle
+        <h2 className="text-2xl md:text-3xl font-black text-purple-700 m-0">
+          🔄 Mission 3 · AI Project Lifecycle <span className="text-base font-black text-emerald-700">(+100 pts/step)</span>
         </h2>
         <div className="flex gap-2 flex-wrap">
           {[
@@ -299,7 +303,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
               type="button"
               onClick={() => setTab(t.id)}
               className={`px-4 py-2 rounded-xl font-black text-sm border-2 cursor-pointer ${
-                tab === t.id ? 'bg-purple-400 text-slate-950 border-purple-300' : 'bg-slate-800 text-slate-200 border-slate-600'
+                tab === t.id ? 'bg-purple-600 text-white border-purple-700' : 'bg-slate-100 text-slate-800 border-slate-300'
               }`}
             >
               {t.label}
@@ -312,7 +316,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
 
       {tab === 'A' && (
         <div className="space-y-4">
-          <div className="glass-panel rounded-2xl p-3 flex flex-wrap gap-2.5 justify-center">
+          <div className="rounded-2xl p-3 bg-slate-100 border-2 border-dashed border-slate-300 flex flex-wrap gap-2.5 justify-center">
             {stageOrderCards.filter((s) => !Object.values(stageSlots).some((v) => v.id === s.id)).map((s) => (
               <button
                 key={s.id}
@@ -321,7 +325,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
                 onDragStart={(e) => { e.dataTransfer.setData('text/plain', s.id); setSelStage(s.id); }}
                 onClick={() => setSelStage(selStage === s.id ? null : s.id)}
                 className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-black text-base cursor-grab ${
-                  selStage === s.id ? 'bg-cyan-400 text-slate-950 border-white' : 'bg-slate-800 text-white border-slate-600'
+                  selStage === s.id ? 'bg-sky-600 text-white border-sky-800' : 'bg-white text-slate-900 border-slate-300 shadow-sm'
                 }`}
               >
                 {s.icon} {s.title.replace(/^\d+\.\s*/, '')}
@@ -329,8 +333,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
             ))}
           </div>
 
-          {/* Circular 2x2 Lifecycle Loop */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
             {[1, 2, 4, 3].map((slotNum) => {
               const placedStage = stageSlots[slotNum];
               return (
@@ -344,18 +347,18 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
                   }}
                   onClick={() => selStage && placeStage(selStage, slotNum)}
                   className={`rounded-3xl p-4 border-4 border-dashed min-h-[110px] flex flex-col justify-center items-center text-center cursor-pointer transition-all ${
-                    placedStage ? placedStage.color + ' border-solid' : 'border-slate-600 bg-slate-900/60'
+                    placedStage ? 'bg-emerald-50 border-emerald-500 border-solid' : 'border-slate-300 bg-slate-50'
                   }`}
                 >
-                  <div className="text-xs font-black uppercase tracking-widest text-slate-300">
+                  <div className="text-xs font-black uppercase tracking-widest text-slate-500">
                     Cycle Stage {slotNum} {slotNum === 1 ? '➔ Next' : slotNum === 2 ? '⬇ Next' : slotNum === 3 ? '⬅ Next' : '⬆ Loop'}
                   </div>
                   {placedStage ? (
-                    <div className="text-xl font-black text-white mt-1">
+                    <div className="text-xl font-black text-emerald-900 mt-1">
                       {placedStage.icon} {placedStage.title}
                     </div>
                   ) : (
-                    <div className="text-slate-400 font-bold mt-1">Drop Stage {slotNum} Here</div>
+                    <div className="text-slate-500 font-bold mt-1">Drop Stage {slotNum} Here</div>
                   )}
                 </div>
               );
@@ -366,10 +369,10 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
 
       {tab === 'B' && (
         <div className="space-y-4">
-          <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-400/50 text-amber-100 text-lg md:text-xl font-bold text-center">
+          <div className="p-3 rounded-2xl bg-amber-100 border-2 border-amber-400 text-amber-950 text-lg md:text-xl font-bold text-center">
             💡 School Problem: "Our school wants to reduce electricity wastage in classrooms."
           </div>
-          <div className="glass-panel rounded-2xl p-3 flex flex-wrap gap-2.5 justify-center">
+          <div className="rounded-2xl p-3 bg-slate-100 border-2 border-dashed border-slate-300 flex flex-wrap gap-2.5 justify-center">
             {elecCards.filter((c) => !elecPlaced[c.id]).map((c) => (
               <button
                 key={c.id}
@@ -378,7 +381,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
                 onDragStart={(e) => { e.dataTransfer.setData('text/plain', c.id); setSelElec(c.id); }}
                 onClick={() => setSelElec(selElec === c.id ? null : c.id)}
                 className={`touch-btn px-4 py-2.5 rounded-2xl border-2 font-bold text-base cursor-grab ${
-                  selElec === c.id ? 'bg-amber-400 text-slate-950 border-white' : 'bg-slate-800 text-white border-slate-600'
+                  selElec === c.id ? 'bg-amber-400 text-slate-950 border-amber-600' : 'bg-white text-slate-900 border-slate-300 shadow-sm'
                 }`}
               >
                 {c.text}
@@ -398,13 +401,13 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
                     if (cid) placeElec(cid, st.id);
                   }}
                   onClick={() => selElec && placeElec(selElec, st.id)}
-                  className={`rounded-2xl p-4 border-2 border-dashed cursor-pointer ${matched ? st.color + ' border-solid' : 'border-slate-600 bg-slate-900/60'}`}
+                  className={`rounded-2xl p-4 border-2 border-dashed cursor-pointer ${matched ? 'bg-emerald-50 border-emerald-500 border-solid' : 'border-slate-300 bg-slate-50'}`}
                 >
-                  <div className="font-black text-lg text-white">{st.icon} {st.title}</div>
+                  <div className="font-black text-lg text-slate-900">{st.icon} {st.title}</div>
                   {matched ? (
-                    <div className="mt-2 text-emerald-200 font-bold text-base">✅ {matched.text}</div>
+                    <div className="mt-2 text-emerald-800 font-bold text-base">✅ {matched.text}</div>
                   ) : (
-                    <div className="mt-1 text-slate-400 text-sm font-bold">Drop matching school action here</div>
+                    <div className="mt-1 text-slate-500 text-sm font-bold">Drop matching school action here</div>
                   )}
                 </div>
               );
@@ -415,10 +418,10 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
 
       {tab === 'C' && (
         <div className="space-y-3">
-          <div className="overflow-x-auto glass-panel rounded-2xl p-3">
+          <div className="overflow-x-auto rounded-2xl p-3 bg-white border-2 border-slate-200">
             <table className="w-full text-left border-collapse text-base md:text-lg">
               <thead>
-                <tr className="border-b-2 border-slate-700 text-cyan-300">
+                <tr className="border-b-2 border-slate-300 text-sky-800 bg-sky-50">
                   <th className="p-2.5">Record</th>
                   <th className="p-2.5">Classroom</th>
                   <th className="p-2.5">Day</th>
@@ -434,24 +437,24 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
                     <tr
                       key={r.id}
                       onClick={() => tapRowCell(r)}
-                      className={`border-b border-slate-800 cursor-pointer transition-colors ${
-                        isFixed ? 'bg-emerald-500/20' : 'hover:bg-slate-800/70'
+                      className={`border-b border-slate-200 cursor-pointer transition-colors ${
+                        isFixed ? 'bg-emerald-50' : 'hover:bg-slate-50'
                       }`}
                     >
-                      <td className="p-2.5 font-black">{r.id}</td>
-                      <td className="p-2.5 font-bold">{r.room}</td>
-                      <td className="p-2.5">{r.day}</td>
-                      <td className={`p-2.5 font-black ${!isFixed && r.badField === 'kwh' ? 'text-rose-300' : ''}`}>
+                      <td className="p-2.5 font-black text-slate-900">{r.id}</td>
+                      <td className="p-2.5 font-bold text-slate-800">{r.room}</td>
+                      <td className="p-2.5 text-slate-700">{r.day}</td>
+                      <td className={`p-2.5 font-black ${!isFixed && r.badField === 'kwh' ? 'text-rose-600' : 'text-slate-800'}`}>
                         {isFixed && r.badField === 'kwh' ? 'Cleaned ✓' : r.kwh}
                       </td>
-                      <td className={`p-2.5 font-bold ${!isFixed && r.badField === 'status' ? 'text-amber-300' : ''}`}>
+                      <td className={`p-2.5 font-bold ${!isFixed && r.badField === 'status' ? 'text-amber-700' : 'text-slate-700'}`}>
                         {isFixed && r.badField === 'status' ? 'Deduplicated ✓' : r.status}
                       </td>
                       <td className="p-2.5">
                         {isFixed ? (
-                          <span className="px-3 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-xs">FIXED</span>
+                          <span className="px-3 py-1 rounded-full bg-emerald-600 text-white font-black text-xs">FIXED</span>
                         ) : (
-                          <span className="px-3 py-1 rounded-full bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-1 w-fit">
+                          <span className="px-3 py-1 rounded-full bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1 w-fit">
                             <AlertTriangle className="w-3.5 h-3.5" /> Inspect Row
                           </span>
                         )}
@@ -467,7 +470,7 @@ export function Mission3Lifecycle({ activeTeam, onAward, onSwitchTurn, onComplet
               <button
                 type="button"
                 onClick={() => onCompleteMission(3, 'cycle_builder', true)}
-                className="touch-btn px-6 py-3 rounded-2xl bg-emerald-400 text-slate-950 font-black text-lg cursor-pointer"
+                className="touch-btn px-6 py-3 rounded-2xl bg-emerald-600 text-white font-black text-lg cursor-pointer"
               >
                 🎉 Clean Data Unlocked! Proceed to Mission 4 ▶
               </button>
