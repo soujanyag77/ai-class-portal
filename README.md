@@ -5,6 +5,7 @@ Interactive smartboard and classroom portal for **Class 7 (AI Adventure Lab)** a
 ## Pages
 - `index.html` — Classroom Portal Hub (stats, badges, quick mission/round links, warmup poll)
 - `class7.html` — Class 7 AI Adventure Lab (5 interactive missions + Doodle Studio)
+- `class8/` & `class8-app/` — Class 8: The Ultimate AI Championship (React + Vite + Tailwind + Lucide, 7 Missions, Teacher Dashboard, Before/After Assessment & PDF/CSV Reports)
 - `class9.html` — Class 9 Activity 1: AI Battle Arena (5 rounds + 4-step Hands-On ML Lab & Confusion Matrix)
 - `class9_quest.html` — Class 9 Activity 2: Concept Quest (Interactive click & drag-drop games on SDGs, Data Literacy, Math for AI, AI Project Cycle & Generative AI)
 - `portal.js` & `portal.css` — Shared Student Spotlight Picker, Hands-Up Class Poll, Web Audio SFX, badges, and theme support

@@ -463,6 +463,7 @@
       <a class="p-brand" href="index.html">🏫 AI Class Portal</a>
       <a class="p-pill ${opts.active === "home" ? "primary" : ""}" href="index.html">🏠 Hub</a>
       <a class="p-pill ${opts.active === "7" ? "primary" : ""}" href="class7.html">🧪 Class 7</a>
+      <a class="p-pill" href="class8/index.html">🏆 Class 8</a>
       <a class="p-pill ${opts.active === "9" ? "primary" : ""}" href="class9.html">⚔️ C9 Arena</a>
       <a class="p-pill ${opts.active === "9q" ? "primary" : ""}" href="class9_quest.html">🎮 C9 Concept Quest</a>
       <button class="p-pill warm" id="p-pick-btn">🎲 Pick Student</button>
