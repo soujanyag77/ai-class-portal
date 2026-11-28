@@ -205,7 +205,10 @@ canvas#sc { height: auto; width: 260px; max-width: 100%; display: block; margin:
 
   <div class="spot-strip">
     <span id="spot-label">🎤 Challengers at Board: Pick 2 challengers or call any student!</span>
-    <button class="p-pill warm" onclick="Portal.openPicker('9', setChallengers)">⚔️ Pick Challengers</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="p-pill warm" onclick="Portal.openPicker('9', setChallengers)">⚔️ Pick Challengers</button>
+      <a class="p-pill primary" href="class9_quest.html">👾 New: Activity 2 (CBSE 10 PYQ Quest) →</a>
+    </div>
   </div>
 
   <div class="bar" id="bar"></div>

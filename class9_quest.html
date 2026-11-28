@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Board Boss Quest · Class 9 (CBSE AI 417 PYQs)</title>
+<link rel="stylesheet" href="portal.css">
+<style>
+body { font-size: 18px; }
+.q-wrap { max-width: 1120px; margin: 0 auto; padding: 14px 16px 40px; }
+
+/* Squad Scoreboard */
+.squads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+.sq-card {
+  background: var(--card);
+  border: 3px solid var(--line);
+  border-radius: 18px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+  transition: transform 0.16s, border-color 0.16s, box-shadow 0.16s;
+  position: relative;
+}
+.sq-card.on {
+  transform: translateY(-2px) scale(1.02);
+  border-color: var(--sq-col, var(--a));
+  box-shadow: 0 0 0 3px rgba(108, 76, 241, 0.18), var(--shadow);
+}
+.sq-top { display: flex; align-items: center; gap: 6px; }
+.sq-ico { font-size: 1.5rem; }
+.sq-name {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-weight: 800;
+  font-size: 1rem;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+.sq-xp { font-size: 1.85rem; font-weight: 900; line-height: 1.1; color: var(--sq-col, var(--a)); }
+.sq-meta { display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; font-weight: 800; color: var(--mut); margin-top: 2px; }
+.streak-pill {
+  background: linear-gradient(135deg, #ff7a59, #f4b400);
+  color: #14213d;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.78rem;
+}
+.pwr-mini { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.pwr-tag {
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.pwr-tag.empty { opacity: 0.35; text-decoration: line-through; }
+
+/* Spotlight & Controls Strip */
+.spot-strip {
+  margin-top: 10px;
+  background: var(--card);
+  border: 2px dashed var(--a);
+  border-radius: 14px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* Zone Navigation Bar */
+.zone-bar {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 12px 0 0;
+}
+.zone-btn {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.15s;
+}
+.zone-btn:hover { transform: translateY(-1px); border-color: var(--a); }
+.zone-btn.cur { background: var(--a); color: #fff; border-color: var(--a); }
+.zone-btn.done { border-color: var(--ok); }
+
+/* Main Stage Panel */
+.stage {
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 22px;
+  padding: 22px 20px;
+  margin-top: 12px;
+  min-height: 410px;
+  box-shadow: var(--shadow);
+}
+.c { text-align: center; }
+.mut { color: var(--mut); }
+.pyq-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(29, 112, 214, 0.14);
+  color: var(--blue);
+  border: 1px solid rgba(29, 112, 214, 0.35);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.xp-pill {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--ok);
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+.q-title {
+  font-size: 1.42rem;
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 12px auto;
+  max-width: 860px;
+  text-align: center;
+}
+.ar-box {
+  max-width: 820px;
+  margin: 10px auto;
+  text-align: left;
+  background: var(--bg);
+  border: 2px solid var(--line);
+  border-left: 6px solid var(--a);
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+.ar-box p { margin: 5px 0; }
+
+/* Timer Rush Bar */
+.rush-wrap {
+  max-width: 560px;
+  margin: 8px auto;
+  height: 12px;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.rush-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--ok), var(--gold), var(--red));
+  transition: width 0.25s linear;
+}
+
+/* Power-up Bar */
+.pwr-bar {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.pwr-btn {
+  padding: 7px 13px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.15s;
+}
+.pwr-btn:hover:not(:disabled) { border-color: var(--a); transform: translateY(-1px); }
+.pwr-btn.armed { background: var(--gold); color: #14213d; border-color: var(--gold); }
+.pwr-btn:disabled { opacity: 0.4; cursor: default; }
+
+/* Option Buttons */
+.opts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 11px;
+  max-width: 880px;
+  margin: 12px auto;
+}
+.opt-btn {
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.02rem;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 15px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 3px solid var(--line);
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: transform 0.1s, border-color 0.15s;
+}
+.opt-btn:hover:not(:disabled) { border-color: var(--a); transform: translateY(-1px); }
+.opt-btn .opt-k {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.opt-btn.good { background: var(--ok); color: #fff; border-color: var(--ok); }
+.opt-btn.good .opt-k { background: rgba(255, 255, 255, 0.25); border-color: #fff; color: #fff; }
+.opt-btn.bad { background: var(--no); color: #fff; border-color: var(--no); }
+.opt-btn.bad .opt-k { background: rgba(255, 255, 255, 0.25); border-color: #fff; color: #fff; }
+.opt-btn:disabled { cursor: default; }
+
+button.qbtn {
+  font: inherit;
+  font-weight: 800;
+  border: 0;
+  border-radius: 13px;
+  padding: 11px 20px;
+  background: var(--a);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+button.qbtn.warm { background: var(--b); }
+button.qbtn.ok { background: var(--ok); }
+button.qbtn:active { transform: scale(0.96); }
+button.qbtn:disabled { opacity: 0.48; cursor: default; }
+
+.fb-box {
+  max-width: 840px;
+  margin: 12px auto 0;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--bg);
+  border: 2px solid var(--line);
+  text-align: center;
+  font-weight: 700;
+  min-height: 48px;
+}
+.fb-box.ok { border-color: var(--ok); background: rgba(27, 158, 90, 0.1); }
+.fb-box.bad { border-color: var(--no); background: rgba(214, 48, 49, 0.1); }
+
+/* Steal Buzzer */
+.steal-bar {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(244, 180, 0, 0.16);
+  border: 2px dashed var(--gold);
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Zone 2: Vision & Pixel Lab */
+.lab-split {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 18px;
+  align-items: start;
+}
+@media (max-width: 800px) { .lab-split { grid-template-columns: 1fr; } }
+.rgb-swatch {
+  height: 110px;
+  border-radius: 16px;
+  border: 3px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.05rem;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+  color: #fff;
+  margin-bottom: 10px;
+}
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  font-weight: 800;
+}
+.slider-row input[type=range] { flex: 1; accent-color: var(--a); }
+.pix-grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  max-width: 280px;
+  margin: 10px auto;
+}
+.pix-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Zone 3: NLP Token Forge */
+.tok-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  justify-content: center;
+  padding: 16px;
+  background: var(--bg);
+  border: 3px dashed var(--line);
+  border-radius: 16px;
+  margin: 12px auto;
+  max-width: 780px;
+}
+.tok-chip {
+  padding: 9px 15px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 1.08rem;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s, background 0.2s;
+}
+.tok-chip:hover:not(:disabled) { border-color: var(--b); transform: translateY(-2px); }
+.tok-chip.zapped {
+  text-decoration: line-through;
+  opacity: 0.35;
+  background: rgba(214, 48, 49, 0.14);
+  border-color: var(--no);
+}
+.tok-chip.kept { border-color: var(--ok); background: rgba(27, 158, 90, 0.14); }
+.bow-table {
+  border-collapse: collapse;
+  margin: 12px auto;
+  font-size: 0.96rem;
+}
+.bow-table th, .bow-table td {
+  border: 2px solid var(--line);
+  padding: 8px 12px;
+  text-align: center;
+}
+.bow-table th { background: var(--bg); }
+.bow-cell-btn {
+  min-width: 44px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 2px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+.bow-cell-btn.ok { background: var(--ok); color: #fff; border-color: var(--ok); }
+
+/* Zone 4: Confusion Matrix Case Lab */
+.cm-grid {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 8px;
+  max-width: 580px;
+  margin: 12px auto;
+  align-items: center;
+}
+.cm-hd { font-weight: 900; text-align: center; font-size: 0.9rem; color: var(--mut); padding: 4px; }
+.cm-slot {
+  background: var(--bg);
+  border: 3px dashed var(--line);
+  border-radius: 14px;
+  padding: 12px 10px;
+  text-align: center;
+  cursor: pointer;
+  min-height: 76px;
+  transition: border-color 0.15s;
+}
+.cm-slot:hover { border-color: var(--a); }
+.cm-slot.filled { border-style: solid; border-color: var(--ok); background: rgba(27, 158, 90, 0.1); }
+.num-tray { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 10px 0; }
+.num-pill {
+  padding: 9px 18px;
+  border-radius: 12px;
+  border: 3px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 900;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.num-pill.sel { border-color: var(--a); background: rgba(108, 76, 241, 0.14); transform: scale(1.06); }
+
+/* Zone 5: Boss Raid */
+.boss-banner {
+  background: linear-gradient(135deg, #1b1536, #321b5c);
+  color: #fff;
+  border-radius: 18px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.boss-avatar { font-size: 3.3rem; animation: bossFloat 2s ease-in-out infinite; }
+@keyframes bossFloat { 50% { transform: translateY(-7px); } }
+.hp-track {
+  height: 18px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff4d6d, #ff9f1c);
+  transition: width 0.35s ease;
+}
+
+.row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+.shake { animation: sh 0.32s; }
+@keyframes sh { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.lobby-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+.lobby-tile {
+  background: var(--bg);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.14s, border-color 0.14s;
+}
+.lobby-tile:hover { transform: translateY(-2px); border-color: var(--a); }
+.lobby-tile b { display: block; font-size: 2rem; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<nav id="portal-nav"></nav>
+
+<div class="q-wrap">
+  <div class="squads-grid" id="squads-grid"></div>
+
+  <div class="spot-strip">
+    <span id="spot-label">🎤 Active Student: Spin the Spotlight or pick any Squad challenger!</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="p-pill warm" onclick="Portal.openPicker('9', setSpotStudent)">🎲 Spotlight Student</button>
+      <button class="p-pill" onclick="toggleRush()">⏱️ <span id="rush-lbl">25s Rush: ON</span></button>
+    </div>
+  </div>
+
+  <div class="zone-bar" id="zone-bar"></div>
+  <main class="stage" id="stage"></main>
+</div>
+
+<script src="portal.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const sh = arr => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0;
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+function setSpotStudent(txt) {
+  $("spot-label").innerHTML = `🎤 At the Board: <b style="color:var(--a)">${esc(txt)}</b>`;
+}
+Portal.mountBar("portal-nav", { active: "9q", cls: "9", onPick: setSpotStudent });
+
+/* ---------- Squad & Game State ---------- */
+const SQUAD_PRESETS = [
+  { name: "Cyber Foxes", ico: "🦊", col: "#e63946" },
+  { name: "Neural Sparks", ico: "⚡", col: "#1d70d6" },
+  { name: "Data Dragons", ico: "🐉", col: "#1b9e5a" },
+  { name: "Vision Hawks", ico: "🦅", col: "#9b5de5" }
+];
+
+let squadCount = 3;
+let squads = [];
+let activeSq = 0;
+let rushOn = true;
+let rushTimer = null;
+let rushLeft = 25;
+let curZone = -1;
+const zonesDone = [false, false, false, false, false];
+
+function initSquads(n) {
+  squadCount = n;
+  squads = SQUAD_PRESETS.slice(0, n).map(p => ({
+    name: p.name,
+    ico: p.ico,
+    col: p.col,
+    xp: 0,
+    streak: 0,
+    pwr: { fifty: 2, boost: 2, shield: 1, poll: 2 }
+  }));
+  activeSq = 0;
+  renderSquads();
+}
+
+const streakMult = st => st >= 3 ? 2 : st === 2 ? 1.5 : st === 1 ? 1.25 : 1;
+
+function awardXP(sqIdx, baseXP) {
+  const sq = squads[sqIdx];
+  const mult = streakMult(sq.streak);
+  const gained = Math.round(baseXP * mult);
+  sq.xp += gained;
+  sq.streak++;
+  renderSquads();
+  return gained;
+}
+
+function breakStreak(sqIdx, shielded = false) {
+  if (!shielded) squads[sqIdx].streak = 0;
+  renderSquads();
+}
+
+function renderSquads() {
+  $("squads-grid").innerHTML = squads.map((s, i) => `
+    <div class="sq-card ${i === activeSq ? "on" : ""}" style="--sq-col:${s.col}" onclick="selectSquad(${i})" title="Click to make this Squad active">
+      <div class="sq-top">
+        <span class="sq-ico">${s.ico}</span>
+        <input class="sq-name" value="${esc(s.name)}" aria-label="Squad ${i + 1} Name" onclick="event.stopPropagation()" oninput="squads[${i}].name=this.value||'Squad ${i + 1}'">
+      </div>
+      <div class="sq-meta">
+        <span class="sq-xp">${s.xp} XP</span>
+        <span class="streak-pill">🔥 ${s.streak} (${streakMult(s.streak)}×)</span>
+      </div>
+      <div class="pwr-mini">
+        <span class="pwr-tag ${s.pwr.fifty ? "" : "empty"}">⚡${s.pwr.fifty}</span>
+        <span class="pwr-tag ${s.pwr.boost ? "" : "empty"}">🔥2×:${s.pwr.boost}</span>
+        <span class="pwr-tag ${s.pwr.shield ? "" : "empty"}">🛡️${s.pwr.shield}</span>
+        <span class="pwr-tag ${s.pwr.poll ? "" : "empty"}">🙋${s.pwr.poll}</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+function selectSquad(i) {
+  activeSq = i;
+  Portal.SFX.pop();
+  renderSquads();
+}
+
+function nextSquad() {
+  activeSq = (activeSq + 1) % squadCount;
+  renderSquads();
+}
+
+function toggleRush() {
+  rushOn = !rushOn;
+  $("rush-lbl").textContent = rushOn ? "25s Rush: ON" : "25s Rush: OFF";
+  if (!rushOn) stopRush();
+  Portal.SFX.pop();
+}
+
+function stopRush() {
+  if (rushTimer) { clearInterval(rushTimer); rushTimer = null; }
+}
+
+const ZONES = [
+  { id: 0, ico: "🎯", t: "Z1 · PYQ Blitz", sub: "CBSE 10 AI MCQs + Assertion-Reason" },
+  { id: 1, ico: "👁️", t: "Z2 · Vision & Pixels", sub: "RGB, Grayscale & CV Tasks" },
+  { id: 2, ico: "💬", t: "Z3 · NLP Token Forge", sub: "Stopwords, Stemming & Bag of Words" },
+  { id: 3, ico: "🧮", t: "Z4 · Matrix Rescue", sub: "4-Mark Confusion Matrix Case Studies" },
+  { id: 4, ico: "👾", t: "Z5 · Examiner Boss", sub: "Defeat Prof. Perceptron (100 HP)" }
+];
+
+function renderZoneBar() {
+  $("zone-bar").innerHTML =
+    `<button class="zone-btn ${curZone === -1 ? "cur" : ""}" onclick="showLobby()">🏠 Lobby</button>` +
+    ZONES.map((z, i) => `<button class="zone-btn ${curZone === i ? "cur" : ""} ${zonesDone[i] ? "done" : ""}" onclick="enterZone(${i})">${z.ico} ${z.t.split(" · ")[1]}${zonesDone[i] ? " ✓" : ""}</button>`).join("");
+}
+
+/* ---------- CBSE Class 10 AI (417) PYQ Question Banks ---------- */
+const PYQ_BANK = [
+  {
+    tag: "CBSE 2024 PYQ · NLP",
+    q: "Which NLP text-normalisation step uses a dictionary & morphological analysis to return a valid root word (e.g. 'studies' → 'study')?",
+    opts: ["Lemmatization", "Stemming", "Tokenisation", "Stopword Removal"],
+    a: 0,
+    tip: "Stemming chops affixes quickly ('studies' → 'studi'), whereas Lemmatization checks vocabulary to give a meaningful lemma ('study')."
+  },
+  {
+    tag: "CBSE 2023 PYQ · 4Ws Canvas",
+    q: "In the 4Ws Problem Canvas of the AI Project Cycle, which block identifies the 'Stakeholders' facing the problem?",
+    opts: ["Who", "What", "Where", "Why"],
+    a: 0,
+    tip: "Who = Stakeholders; What = Nature & evidence of the problem; Where = Context/location; Why = Benefits of solving it."
+  },
+  {
+    tag: "CBSE SQP 2024 · Computer Vision",
+    q: "Why are RGB images commonly converted to Grayscale before feeding them into a Computer Vision model?",
+    opts: [
+      "To reduce computational complexity from 3 channels to 1 channel",
+      "To increase the image resolution automatically",
+      "To add extra colour features for object detection",
+      "To convert pixel values above 255 into negative numbers"
+    ],
+    a: 0,
+    tip: "RGB stores 3 values per pixel (R, G, B). Grayscale stores only 1 intensity value (0–255), cutting computation by 3×."
+  },
+  {
+    tag: "CBSE 2024 PYQ · Multiple Intelligences",
+    q: "Suhani easily recognises musical rhythms, pitches, and tones and can compose melodies effortlessly. According to Howard Gardner, she has high:",
+    opts: ["Musical Intelligence", "Spatial Intelligence", "Naturalist Intelligence", "Kinesthetic Intelligence"],
+    a: 0,
+    tip: "CBSE frequently asks Gardner's Multiple Intelligences: Musical (sound/rhythm), Spatial (visual/3D), Naturalist (nature), Kinesthetic (body/movement)."
+  },
+  {
+    tag: "CBSE 2023 PYQ · Evaluation",
+    q: "A forest-fire detector must NEVER miss an actual wildfire, even if it raises a few false alarms. Which metric should be prioritized?",
+    opts: ["Recall", "Precision", "Specificity", "Error Rate"],
+    a: 0,
+    tip: "Missing a fire is a False Negative (FN). Recall = TP / (TP + FN) directly minimizes False Negatives in life-safety alerts!"
+  },
+  {
+    tag: "CBSE 2024 PYQ · AI Modelling",
+    q: "A bank groups thousands of customers into spending clusters WITHOUT any pre-labelled categories. Which ML approach is this?",
+    opts: ["Unsupervised Learning (Clustering)", "Supervised Classification", "Reinforcement Learning", "Rule-based Scripting"],
+    a: 0,
+    tip: "Unlabelled data grouped by similarity = Unsupervised Learning (Clustering). Labelled categories = Supervised Classification."
+  },
+  {
+    tag: "CBSE SQP 2024-25 · Assertion-Reason",
+    ar: [
+      "Assertion (A): Training data and testing data must be kept separate in an AI project.",
+      "Reason (R): Testing a model on the exact same data it was trained on can hide overfitting and give falsely high accuracy."
+    ],
+    q: "Choose the correct option for Assertion (A) and Reason (R):",
+    opts: [
+      "Both A and R are true, and R is the correct explanation of A",
+      "Both A and R are true, but R is NOT the correct explanation of A",
+      "A is true, but R is false",
+      "A is false, but R is true"
+    ],
+    a: 0,
+    tip: "A model can memorize training examples (overfitting), so it must be evaluated on unseen testing data."
+  },
+  {
+    tag: "CBSE 2024 PYQ · Employability (SMART)",
+    q: "In the SMART method of goal setting for Self-Management, what does the letter 'A' stand for?",
+    opts: ["Achievable", "Abrupt", "Accountable", "Admirable"],
+    a: 0,
+    tip: "SMART = Specific, Measurable, Achievable, Realistic (or Relevant), Time-bound."
+  },
+  {
+    tag: "CBSE 2023 PYQ · Neural Networks",
+    q: "In an Artificial Neural Network, which layer actually processes the data using weights and biases to extract features?",
+    opts: ["Hidden Layer", "Input Layer", "Output Layer", "Storage Layer"],
+    a: 0,
+    tip: "Input Layer only receives data; Hidden Layers perform feature extraction and calculations; Output Layer delivers the prediction."
+  },
+  {
+    tag: "CBSE Competency PYQ · Evaluation",
+    q: "What does an F1 Score of 1.0 (or 100%) indicate about a classification model?",
+    opts: [
+      "Perfect Precision and perfect Recall (zero FP and zero FN)",
+      "The model is overfitting the training set",
+      "Precision is 100% but Recall is 0%",
+      "The dataset has 100% False Negatives"
+    ],
+    a: 0,
+    tip: "F1 Score = 2 × (P × R) / (P + R) is the harmonic mean of Precision and Recall. It reaches 1 only when both P = 1 and R = 1."
+  },
+  {
+    tag: "CBSE 2024 PYQ · NLP (TF-IDF)",
+    q: "Why do words like 'is', 'the', and 'and' have a very low TF-IDF score across a corpus of documents?",
+    opts: [
+      "They appear in almost every document, making their Inverse Document Frequency (IDF) very low",
+      "They never appear in any document",
+      "TF-IDF only counts uppercase words",
+      "They are always replaced by numbers"
+    ],
+    a: 0,
+    tip: "High document frequency (DF) means low IDF = log(N/DF), so common stopwords get tiny TF-IDF weights!"
+  },
+  {
+    tag: "CBSE 2023 PYQ · Employability (Green Skills)",
+    q: "How many Sustainable Development Goals (SDGs) were adopted by the United Nations to achieve a better and more sustainable future by 2030?",
+    opts: ["17 SDGs", "10 SDGs", "25 SDGs", "8 SDGs"],
+    a: 0,
+    tip: "The UN adopted 17 SDGs in 2015 (including Zero Hunger, Quality Education, Climate Action) with target year 2030."
+  },
+  {
+    tag: "CBSE Competency PYQ · AI Ethics",
+    q: "A hospital AI predicts lower risk for rural patients because its historical dataset mostly had urban clinic visits. Which ethical issue is this?",
+    opts: ["AI Data Bias", "Copyright Infringement", "Over-automation", "Hardware Failure"],
+    a: 0,
+    tip: "Unrepresentative training data causes AI Bias, leading to unfair predictions for underrepresented groups."
+  },
+  {
+    tag: "CBSE SQP 2024 · Assertion-Reason",
+    ar: [
+      "Assertion (A): A Script Bot requires a large labelled dataset and machine learning to reply to simple FAQ rules.",
+      "Reason (R): A Smart Bot learns from data and adapts to varied human language."
+    ],
+    q: "Choose the correct option for Assertion (A) and Reason (R):",
+    opts: [
+      "A is false, but R is true",
+      "Both A and R are true, and R explains A",
+      "Both A and R are false",
+      "A is true, but R is false"
+    ],
+    a: 0,
+    tip: "Script Bots follow fixed pre-written rules (no ML needed), whereas Smart Bots use NLP/ML to learn and adapt."
+  },
+  {
+    tag: "CBSE 2024 PYQ · Employability (Communication)",
+    q: "When a teacher speaks rapidly in technical jargon that new students cannot follow, this creates which communication barrier?",
+    opts: ["Linguistic Barrier", "Physical Barrier", "Mechanical Barrier", "Financial Barrier"],
+    a: 0,
+    tip: "Differences in language, vocabulary, or unfamiliar jargon cause Linguistic Barriers."
+  },
+  {
+    tag: "CBSE 2023 PYQ · Computer Vision",
+    q: "In an 8-bit grayscale image, what do pixel intensity values 0 and 255 represent respectively?",
+    opts: [
+      "0 = Black (no brightness), 255 = White (full brightness)",
+      "0 = White, 255 = Black",
+      "0 = Red, 255 = Blue",
+      "0 = Transparent, 255 = Blurry"
+    ],
+    a: 0,
+    tip: "8 bits give 2^8 = 256 shades from 0 (pure black) to 255 (pure white)."
+  }
+];
+
+/* ---------- Lobby ---------- */
+function showLobby() {
+  stopRush();
+  curZone = -1;
+  renderZoneBar();
+  renderSquads();
+  $("stage").innerHTML = `
+    <div class="c">
+      <div style="font-size:3rem">📜👾🏆</div>
+      <h1 style="margin:4px 0">Class 9 · Board Boss Quest</h1>
+      <p class="mut" style="max-width:740px;margin:0 auto 12px">
+        Built from <b>CBSE Class 10 AI (Code 417) Previous Year Papers</b>! Form Student Squads, spin the Student Spotlight, build combos &amp; power-ups, and defeat <b>Prof. Perceptron</b>!
+      </p>
+      <div class="row" style="margin-bottom:14px">
+        <span style="font-weight:800">Squads:</span>
+        ${[2, 3, 4].map(n => `<button class="p-pill ${squadCount === n ? "primary" : ""}" onclick="initSquads(${n});showLobby();Portal.SFX.pop()">${n} Squads</button>`).join("")}
+        <button class="p-pill warm" onclick="Portal.openPicker('9', setSpotStudent)">🎲 Spin Student Spotlight</button>
+      </div>
+    </div>
+    <div class="lobby-cards">
+      ${ZONES.map((z, i) => `
+        <div class="lobby-tile" onclick="enterZone(${i})">
+          <b>${z.ico}</b>
+          <div style="font-weight:900;font-size:1.05rem">${z.t}</div>
+          <small class="mut">${z.sub}</small>
+        </div>
+      `).join("")}
+    </div>
+    <div class="row">
+      <button class="qbtn" onclick="enterZone(0)">🚀 Start Quest at Zone 1 ▶</button>
+    </div>
+  `;
+}
+
+function enterZone(z) {
+  stopRush();
+  curZone = z;
+  renderZoneBar();
+  Portal.SFX.pop();
+  if (z === 0) startZone1();
+  else if (z === 1) startZone2();
+  else if (z === 2) startZone3();
+  else if (z === 3) startZone4();
+  else if (z === 4) startZone5();
+}
+
+/* ---------- Zone 1: PYQ Blitz Arena ---------- */
+let Z1 = {};
+function startZone1() {
+  Z1 = {
+    list: sh(PYQ_BANK).slice(0, 8),
+    idx: 0,
+    boosted: false,
+    shielded: false,
+    stealOpen: false,
+    answered: false
+  };
+  renderZ1();
+}
+
+function renderZ1() {
+  stopRush();
+  const q = Z1.list[Z1.idx];
+  if (!q) {
+    zonesDone[0] = true;
+    Portal.unlockBadge("c9_pyq");
+    Portal.SFX.win();
+    Portal.confetti(28);
+    renderZoneBar();
+    $("stage").innerHTML = `
+      <div class="c">
+        <div style="font-size:3rem">🎯✨</div>
+        <h2>Zone 1 Complete · PYQ Blitz Cleared!</h2>
+        <p class="mut">Every squad tackled real Class 10 CBSE AI (417) Board Questions!</p>
+        <div class="row">
+          <button class="qbtn" onclick="enterZone(1)">Enter Zone 2: Vision &amp; Pixel Lab ▶</button>
+          <button class="p-pill" onclick="startZone1()">🔁 New PYQ Set</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  Z1.answered = false;
+  Z1.stealOpen = false;
+  Z1.boosted = false;
+  Z1.shielded = false;
+  const sq = squads[activeSq];
+  const indexedOpts = sh(q.opts.map((text, origIdx) => ({ text, isRight: origIdx === q.a })));
+  Z1.curOpts = indexedOpts;
+
+  $("stage").innerHTML = `
+    <div class="c">
+      <span class="pyq-tag">${esc(q.tag)}</span>
+      <span class="xp-pill">+20 XP${rushOn ? " (+5 Speed)" : ""}</span>
+      <div style="margin-top:8px;font-weight:900;font-size:1.15rem;color:${sq.col}">
+        ${sq.ico} ${esc(sq.name)}'s Turn · Q${Z1.idx + 1}/${Z1.list.length}
+      </div>
+    </div>
+    ${rushOn ? `<div class="rush-wrap"><div class="rush-fill" id="z1-rush"></div></div><div class="c mut" id="z1-sec" style="font-size:0.85rem;font-weight:800">⏱️ 25s Speed Bonus</div>` : ""}
+    <div class="pwr-bar">
+      <button class="pwr-btn" id="pw-boost" ${sq.pwr.boost ? "" : "disabled"} onclick="armBoost()">🔥 2× Boost (${sq.pwr.boost})</button>
+      <button class="pwr-btn" id="pw-shield" ${sq.pwr.shield ? "" : "disabled"} onclick="armShield()">🛡️ Shield (${sq.pwr.shield})</button>
+      <button class="pwr-btn" id="pw-fifty" ${sq.pwr.fifty ? "" : "disabled"} onclick="useZ1Fifty()">⚡ 50/50 (${sq.pwr.fifty})</button>
+      <button class="pwr-btn" id="pw-poll" ${sq.pwr.poll ? "" : "disabled"} onclick="useZ1Poll()">🙋 Class Vote (${sq.pwr.poll})</button>
+    </div>
+    ${q.ar ? `<div class="ar-box"><p><b>${esc(q.ar[0])}</b></p><p><b>${esc(q.ar[1])}</b></p></div>` : ""}
+    <div class="q-title">${esc(q.q)}</div>
+    <div class="opts-grid" id="z1-opts">
+      ${indexedOpts.map((o, k) => `
+        <button class="opt-btn" data-k="${k}" onclick="pickZ1(${k})">
+          <span class="opt-k">${"ABCD"[k]}</span>
+          <span>${esc(o.text)}</span>
+        </button>
+      `).join("")}
+    </div>
+    <div class="fb-box" id="z1-fb">Tap an option above — or spin Spotlight Student to answer!</div>
+    <div id="z1-next"></div>
+  `;
+
+  if (rushOn) {
+    rushLeft = 25;
+    rushTimer = setInterval(() => {
+      if (Z1.answered) { stopRush(); return; }
+      rushLeft--;
+      const fill = $("z1-rush"), sec = $("z1-sec");
+      if (fill) fill.style.width = Math.max(0, (rushLeft / 25) * 100) + "%";
+      if (sec) sec.textContent = rushLeft > 0 ? `⏱️ ${rushLeft}s Speed Bonus` : "⏱️ Speed Bonus expired — normal XP!";
+      if (rushLeft <= 0) stopRush();
+    }, 1000);
+  }
+}
+
+function armBoost() {
+  if (Z1.answered || Z1.boosted || !squads[activeSq].pwr.boost) return;
+  squads[activeSq].pwr.boost--;
+  Z1.boosted = true;
+  $("pw-boost").classList.add("armed");
+  $("pw-boost").disabled = true;
+  renderSquads();
+  Portal.SFX.box();
+  Portal.toast("🔥 2× Boost armed!");
+}
+
+function armShield() {
+  if (Z1.answered || Z1.shielded || !squads[activeSq].pwr.shield) return;
+  squads[activeSq].pwr.shield--;
+  Z1.shielded = true;
+  $("pw-shield").classList.add("armed");
+  $("pw-shield").disabled = true;
+  renderSquads();
+  Portal.SFX.pop();
+  Portal.toast("🛡️ Streak Shield active!");
+}
+
+function useZ1Fifty() {
+  if (Z1.answered || !squads[activeSq].pwr.fifty) return;
+  squads[activeSq].pwr.fifty--;
+  $("pw-fifty").disabled = true;
+  const wrongIdx = Z1.curOpts.map((o, i) => o.isRight ? -1 : i).filter(i => i >= 0);
+  sh(wrongIdx).slice(0, 2).forEach(i => {
+    const btn = document.querySelector(`#z1-opts button[data-k="${i}"]`);
+    if (btn) { btn.disabled = true; btn.style.opacity = "0.24"; }
+  });
+  renderSquads();
+  Portal.SFX.box();
+}
+
+function useZ1Poll() {
+  if (Z1.answered || !squads[activeSq].pwr.poll) return;
+  squads[activeSq].pwr.poll--;
+  $("pw-poll").disabled = true;
+  renderSquads();
+  const q = Z1.list[Z1.idx];
+  const opts = Z1.curOpts.map((o, i) => `${"ABCD"[i]}: ${o.text}`);
+  Portal.openPoll(q.q, opts, (top, _c, total) => {
+    const fb = $("z1-fb");
+    if (fb && !Z1.answered) fb.innerHTML = `🙋 Class Poll (${total} votes) recommends: <b>${esc(top)}</b>`;
+  });
+}
+
+function pickZ1(k) {
+  if (Z1.answered) return;
+  stopRush();
+  const chosen = Z1.curOpts[k];
+  const btns = [...document.querySelectorAll("#z1-opts button")];
+  const fb = $("z1-fb");
+  const q = Z1.list[Z1.idx];
+
+  if (chosen.isRight) {
+    Z1.answered = true;
+    btns.forEach((b, i) => { b.disabled = true; if (Z1.curOpts[i].isRight) b.classList.add("good"); });
+    const speedBonus = (rushOn && rushLeft > 0) ? 5 : 0;
+    const base = (20 + speedBonus) * (Z1.boosted ? 2 : 1);
+    const gained = awardXP(activeSq, base);
+    Portal.SFX.good();
+    Portal.confetti(20);
+    fb.className = "fb-box ok";
+    fb.innerHTML = `✅ <b>Spot On! +${gained} XP</b>${Z1.boosted ? " (🔥 2× Boost!)" : ""}<br><span class="mut">📘 CBSE Key: ${esc(q.tip)}</span>`;
+    showZ1Next();
+  } else {
+    const btn = btns[k];
+    btn.disabled = true;
+    btn.classList.add("bad", "shake");
+    Portal.SFX.bad();
+    breakStreak(activeSq, Z1.shielded);
+    if (!Z1.stealOpen && squadCount > 1) {
+      Z1.stealOpen = true;
+      fb.className = "fb-box bad";
+      fb.innerHTML = `❌ Not quite!${Z1.shielded ? " 🛡️ Shield saved your streak!" : ""} <b>Another Squad can STEAL for +15 XP!</b>
+        <div class="steal-bar">
+          ${squads.map((s, si) => si === activeSq ? "" : `<button class="p-pill warm" onclick="stealZ1(${si})">${s.ico} ${esc(s.name)} Steals!</button>`).join("")}
+          <button class="p-pill" onclick="revealZ1()">Reveal Answer</button>
+        </div>`;
+    } else {
+      revealZ1();
+    }
+  }
+}
+
+function stealZ1(stealSq) {
+  activeSq = stealSq;
+  renderSquads();
+  Z1.stealOpen = true;
+  Z1.boosted = false;
+  Portal.SFX.pop();
+  $("z1-fb").className = "fb-box";
+  $("z1-fb").innerHTML = `⚡ <b>${esc(squads[stealSq].name)}</b> stepped in to steal! Pick the right option above!`;
+}
+
+function revealZ1() {
+  Z1.answered = true;
+  const q = Z1.list[Z1.idx];
+  document.querySelectorAll("#z1-opts button").forEach((b, i) => {
+    b.disabled = true;
+    if (Z1.curOpts[i].isRight) b.classList.add("good");
+  });
+  $("z1-fb").className = "fb-box";
+  $("z1-fb").innerHTML = `📘 <b>CBSE Answer:</b> ${esc(q.opts[q.a])}<br><span class="mut">${esc(q.tip)}</span>`;
+  showZ1Next();
+}
+
+function showZ1Next() {
+  $("z1-next").innerHTML = `<div class="row"><button class="qbtn" onclick="Z1.idx++;nextSquad();renderZ1()">Next Question ▶</button></div>`;
+}
+
+/* ---------- Zone 2: Vision & Pixel Lab ---------- */
+let Z2 = {};
+function startZone2() {
+  Z2 = { step: 0, rgb: [120, 60, 200], taskIdx: 0 };
+  renderZ2();
+}
+
+const Z2_RGB_GOALS = [
+  { name: "Pure Green [0, 255, 0]", check: ([r, g, b]) => r <= 20 && g >= 235 && b <= 20, hint: "Max Green, zero Red & Blue!" },
+  { name: "Pure Yellow [255, 255, 0]", check: ([r, g, b]) => r >= 235 && g >= 235 && b <= 20, hint: "In additive RGB light, Red + Green = Yellow!" },
+  { name: "Pure White [255, 255, 255]", check: ([r, g, b]) => r >= 240 && g >= 240 && b >= 240, hint: "All 3 channels at maximum (255) = White!" }
+];
+
+const Z2_TASKS = [
+  {
+    q: "A security camera identifies 'Dog' as the only object in the frame AND draws ONE bounding box around it.",
+    opts: ["Classification + Localization", "Object Detection", "Instance Segmentation", "Image Classification"],
+    a: 0,
+    tip: "Single object + bounding box = Classification + Localization."
+  },
+  {
+    q: "A self-driving car spots multiple cars, pedestrians, and traffic lights in one frame, each with its own box.",
+    opts: ["Object Detection", "Image Classification", "Classification + Localization", "Grayscale Thresholding"],
+    a: 0,
+    tip: "Multiple objects with labels and bounding boxes = Object Detection."
+  },
+  {
+    q: "In Computer Vision, which image feature is EASIEST to uniquely track across shifted frames?",
+    opts: ["Corners", "Flat uniform areas", "Straight edges only", "Single random noise pixels"],
+    a: 0,
+    tip: "CBSE CV unit: Corners change intensity in ALL directions, making them unambiguous landmarks compared to flat regions or edges."
+  },
+  {
+    q: "Medical AI outlines the exact pixel-by-pixel shape of each individual tumour cell in a scan.",
+    opts: ["Instance Segmentation", "Image Classification", "Object Detection", "RGB Filtering"],
+    a: 0,
+    tip: "Pixel-level mask separating each individual object = Instance Segmentation."
+  }
+];
+
+function renderZ2() {
+  const sq = squads[activeSq];
+  if (Z2.step === 0) {
+    Z2.goalIdx = Z2.goalIdx || 0;
+    const goal = Z2_RGB_GOALS[Z2.goalIdx];
+    const [r, g, b] = Z2.rgb;
+    const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="pyq-tag">CBSE Class 10 · Computer Vision Lab (Step 1/2)</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Lab Turn</div>
+        <h2 style="margin:6px 0">🎨 RGB &amp; Grayscale Pixel Mixer</h2>
+        <p class="mut" style="margin:0 0 12px">Target (${Z2.goalIdx + 1}/${Z2_RGB_GOALS.length}): Create <b>${goal.name}</b> using the RGB sliders!</p>
+      </div>
+      <div class="lab-split">
+        <div>
+          <div class="rgb-swatch" id="z2-swatch" style="background:rgb(${r},${g},${b})">
+            RGB(${r}, ${g}, ${b}) · Grayscale: ${gray}
+          </div>
+          <div class="slider-row"><span style="color:#e63946;width:65px">Red</span><input type="range" min="0" max="255" value="${r}" oninput="updRGB(0,this.value)"><b id="rv">${r}</b></div>
+          <div class="slider-row"><span style="color:#1b9e5a;width:65px">Green</span><input type="range" min="0" max="255" value="${g}" oninput="updRGB(1,this.value)"><b id="gv">${g}</b></div>
+          <div class="slider-row"><span style="color:#1d70d6;width:65px">Blue</span><input type="range" min="0" max="255" value="${b}" oninput="updRGB(2,this.value)"><b id="bv">${b}</b></div>
+          <div class="row">
+            <button class="p-pill" onclick="setRGB(0,0,0)">⬛ [0,0,0]</button>
+            <button class="p-pill" onclick="setRGB(255,0,0)">🟥 [255,0,0]</button>
+            <button class="p-pill" onclick="setRGB(0,255,0)">🟩 [0,255,0]</button>
+            <button class="p-pill" onclick="setRGB(255,255,255)">⬜ [255,255,255]</button>
+          </div>
+          <div class="row"><button class="qbtn ok" onclick="checkRGB()">✅ Lock Color (+20 XP)</button></div>
+        </div>
+        <div>
+          <div class="ar-box" style="margin-top:0">
+            <p><b>📘 CBSE Exam Concept:</b></p>
+            <p>• Every colour pixel = <b>3 channels</b> (R, G, B), each 0–255.</p>
+            <p>• Grayscale pixel = <b>1 channel</b> (0 = Black, 255 = White).</p>
+            <p>• Tip: <i>${goal.hint}</i></p>
+          </div>
+          <h4 class="c" style="margin:12px 0 4px">5×5 Grayscale Pixel Grid (Click pixels to invert 0 ↔ 255!)</h4>
+          <div class="pix-grid-5" id="z2-grid"></div>
+        </div>
+      </div>
+      <div class="fb-box" id="z2-fb">Mix the target RGB values and click Lock Color!</div>
+    `;
+    renderZ2Grid();
+  } else {
+    const tk = Z2_TASKS[Z2.taskIdx];
+    if (!tk) {
+      zonesDone[1] = true;
+      renderZoneBar();
+      Portal.SFX.win();
+      Portal.confetti(24, ["👁️", "🎨", "⭐"]);
+      $("stage").innerHTML = `
+        <div class="c">
+          <div style="font-size:3rem">👁️✨</div>
+          <h2>Zone 2 Complete · Vision Mastered!</h2>
+          <p class="mut">Your class decoded RGB channels, Grayscale intensity, corners, and all 4 CV tasks!</p>
+          <div class="row">
+            <button class="qbtn" onclick="enterZone(2)">Enter Zone 3: NLP Token Forge ▶</button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    const opts = sh(tk.opts.map((t, i) => ({ t, ok: i === tk.a })));
+    Z2.curOpts = opts;
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="pyq-tag">CBSE Class 10 · CV Task Spotter (${Z2.taskIdx + 1}/${Z2_TASKS.length})</span>
+        <span class="xp-pill">+20 XP</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+      </div>
+      <div class="q-title">${esc(tk.q)}</div>
+      <div class="opts-grid" id="z2-opts">
+        ${opts.map((o, i) => `<button class="opt-btn" onclick="pickZ2Task(${i})"><span class="opt-k">${"ABCD"[i]}</span><span>${esc(o.t)}</span></button>`).join("")}
+      </div>
+      <div class="fb-box" id="z2-fb">Match the Computer Vision task!</div>
+      <div id="z2-next"></div>
+    `;
+  }
+}
+
+let pixPattern = [
+  255, 0, 0, 0, 255,
+  255, 0, 0, 0, 255,
+  255, 255, 255, 255, 255,
+  255, 0, 0, 0, 255,
+  255, 0, 0, 0, 255
+];
+function renderZ2Grid() {
+  const g = $("z2-grid");
+  if (!g) return;
+  g.innerHTML = pixPattern.map((v, i) => `
+    <div class="pix-cell" style="background:rgb(${v},${v},${v});color:${v > 128 ? "#14213d" : "#fff"}" onclick="pixPattern[${i}]=pixPattern[${i}]?0:255;Portal.SFX.tick();renderZ2Grid()">${v}</div>
+  `).join("");
+}
+
+function updRGB(ch, val) {
+  Z2.rgb[ch] = Number(val);
+  const [r, g, b] = Z2.rgb;
+  const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+  $("rv").textContent = r; $("gv").textContent = g; $("bv").textContent = b;
+  const sw = $("z2-swatch");
+  sw.style.background = `rgb(${r},${g},${b})`;
+  sw.textContent = `RGB(${r}, ${g}, ${b}) · Grayscale: ${gray}`;
+}
+function setRGB(r, g, b) { Z2.rgb = [r, g, b]; Portal.SFX.pop(); renderZ2(); }
+
+function checkRGB() {
+  const goal = Z2_RGB_GOALS[Z2.goalIdx];
+  const fb = $("z2-fb");
+  if (goal.check(Z2.rgb)) {
+    const xp = awardXP(activeSq, 20);
+    Portal.SFX.good(); Portal.confetti(18, ["🎨", "⭐"]);
+    Z2.goalIdx++;
+    if (Z2.goalIdx >= Z2_RGB_GOALS.length) {
+      fb.className = "fb-box ok";
+      fb.innerHTML = `✅ Perfect! +${xp} XP! Moving to CV Task Spotter…`;
+      setTimeout(() => { Z2.step = 1; nextSquad(); renderZ2(); }, 1300);
+    } else {
+      fb.className = "fb-box ok";
+      fb.innerHTML = `✅ Nailed it! +${xp} XP! Next target colour loading…`;
+      setTimeout(() => { nextSquad(); renderZ2(); }, 1100);
+    }
+  } else {
+    Portal.SFX.bad();
+    fb.className = "fb-box bad";
+    fb.innerHTML = `❌ Not quite ${goal.name}! Hint: ${goal.hint}`;
+  }
+}
+
+function pickZ2Task(i) {
+  const chosen = Z2.curOpts[i];
+  const tk = Z2_TASKS[Z2.taskIdx];
+  document.querySelectorAll("#z2-opts button").forEach((b, j) => {
+    b.disabled = true;
+    if (Z2.curOpts[j].ok) b.classList.add("good");
+  });
+  const fb = $("z2-fb");
+  if (chosen.ok) {
+    const xp = awardXP(activeSq, 20);
+    Portal.SFX.good(); Portal.confetti(18);
+    fb.className = "fb-box ok";
+    fb.innerHTML = `✅ Correct! +${xp} XP! <span class="mut">${esc(tk.tip)}</span>`;
+  } else {
+    document.querySelectorAll("#z2-opts button")[i].classList.add("bad", "shake");
+    breakStreak(activeSq);
+    Portal.SFX.bad();
+    fb.className = "fb-box bad";
+    fb.innerHTML = `❌ Answer: <b>${esc(tk.opts[tk.a])}</b>. <span class="mut">${esc(tk.tip)}</span>`;
+  }
+  $("z2-next").innerHTML = `<div class="row"><button class="qbtn" onclick="Z2.taskIdx++;nextSquad();renderZ2()">Continue ▶</button></div>`;
+}
+
+/* ---------- Zone 3: NLP Token Forge ---------- */
+let Z3 = {};
+const Z3_SENTENCE = [
+  { w: "The", stop: true },
+  { w: "students", stop: false },
+  { w: "are", stop: true },
+  { w: "training", stop: false },
+  { w: "smart", stop: false },
+  { w: "AI", stop: false },
+  { w: "models", stop: false },
+  { w: "and", stop: true },
+  { w: "learning", stop: false },
+  { w: "in", stop: true },
+  { w: "class", stop: false }
+];
+const Z3_BOW_WORDS = ["ai", "students", "learn", "games"];
+const Z3_BOW_ANS = [
+  [1, 1, 1, 0], // Doc 1: "AI helps students learn"
+  [1, 1, 0, 1]  // Doc 2: "Students love AI games"
+];
+
+function startZone3() {
+  Z3 = {
+    step: 0,
+    zapped: Z3_SENTENCE.map(() => false),
+    bow: [[0, 0, 0, 0], [0, 0, 0, 0]],
+    stemIdx: 0
+  };
+  renderZ3();
+}
+
+const Z3_STEM_DUELS = [
+  { word: "studies", q: "What is the STEMMED output vs LEMMATIZED output for 'studies'?", opts: ["Stem: 'studi' · Lemma: 'study'", "Stem: 'study' · Lemma: 'studi'", "Both output 'studies'", "Stem removes the word completely"], a: 0, tip: "Stemming blindly chops '-es/-ies' → 'studi'; Lemmatization uses dictionary lookup → 'study'." },
+  { word: "caring", q: "Which technique returns the meaningful dictionary word 'care' for 'caring' (instead of 'car')?", opts: ["Lemmatization", "Stemming", "Tokenisation", "Bag of Words"], a: 0, tip: "Classic CBSE 417 PYQ example: Stemming('caring') → 'car' (wrong meaning!), Lemmatization('caring') → 'care'!" }
+];
+
+function renderZ3() {
+  const sq = squads[activeSq];
+  if (Z3.step === 0) {
+    const totalStops = Z3_SENTENCE.filter(x => x.stop).length;
+    const zappedStops = Z3_SENTENCE.filter((x, i) => x.stop && Z3.zapped[i]).length;
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="pyq-tag">CBSE Class 10 · NLP Pipeline (Step 1/3)</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Forge</div>
+        <h2 style="margin:6px 0">⚡ Stopword Zapper &amp; Tokeniser</h2>
+        <p class="mut">Tap ONLY the <b>Stopwords</b> (common filler words like <i>the, are, and, in</i>) to clean the corpus! (${zappedStops}/${totalStops} zapped)</p>
+      </div>
+      <div class="tok-box">
+        ${Z3_SENTENCE.map((t, i) => `
+          <button class="tok-chip ${Z3.zapped[i] ? "zapped" : ""}" onclick="zapToken(${i})">${esc(t.w)}</button>
+        `).join("")}
+      </div>
+      <div class="fb-box" id="z3-fb">Tap all ${totalStops} stopwords to produce clean lowercased tokens!</div>
+    `;
+  } else if (Z3.step === 1) {
+    const d = Z3_STEM_DUELS[Z3.stemIdx];
+    const opts = sh(d.opts.map((t, i) => ({ t, ok: i === d.a })));
+    Z3.curOpts = opts;
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="pyq-tag">CBSE Class 10 · NLP Pipeline (Step 2/3)</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h2 style="margin:6px 0">🌱 Stemming vs Lemmatization</h2>
+      </div>
+      <div class="q-title">${esc(d.q)}</div>
+      <div class="opts-grid" id="z3-opts">
+        ${opts.map((o, i) => `<button class="opt-btn" onclick="pickZ3Stem(${i})"><span class="opt-k">${"ABCD"[i]}</span><span>${esc(o.t)}</span></button>`).join("")}
+      </div>
+      <div class="fb-box" id="z3-fb">Pick the CBSE-accurate answer!</div>
+      <div id="z3-next"></div>
+    `;
+  } else {
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="pyq-tag">CBSE Class 10 · Bag of Words (Step 3/3)</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Final Forge</div>
+        <h2 style="margin:6px 0">🎒 Build the Bag-of-Words Document Vector</h2>
+        <div class="ar-box">
+          <p><b>Document 1:</b> "AI helps students learn"</p>
+          <p><b>Document 2:</b> "Students love AI games"</p>
+        </div>
+        <p class="mut">Tap each cell to toggle its frequency count (<b>0</b> or <b>1</b>), then click Verify Matrix (+25 XP)!</p>
+      </div>
+      <table class="bow-table">
+        <tr><th>Document</th>${Z3_BOW_WORDS.map(w => `<th>${w}</th>`).join("")}</tr>
+        ${[0, 1].map(r => `
+          <tr>
+            <td><b>Doc ${r + 1}</b></td>
+            ${Z3_BOW_WORDS.map((_, c) => `<td><button class="bow-cell-btn" onclick="toggleBow(${r},${c})">${Z3.bow[r][c]}</button></td>`).join("")}
+          </tr>
+        `).join("")}
+      </table>
+      <div class="row"><button class="qbtn ok" onclick="checkBow()">✅ Verify Document Vector (+25 XP)</button></div>
+      <div class="fb-box" id="z3-fb">Fill in the word counts (ignoring word order — that's why it's called Bag of Words!).</div>
+    `;
+  }
+}
+
+function zapToken(i) {
+  if (Z3.zapped[i]) return;
+  const tok = Z3_SENTENCE[i];
+  const fb = $("z3-fb");
+  if (tok.stop) {
+    Z3.zapped[i] = true;
+    Portal.SFX.good();
+    renderZ3();
+    const done = Z3_SENTENCE.every((x, idx) => !x.stop || Z3.zapped[idx]);
+    if (done) {
+      const xp = awardXP(activeSq, 20);
+      Portal.confetti(16, ["💬", "⚡", "⭐"]);
+      const clean = Z3_SENTENCE.filter(x => !x.stop).map(x => x.w.toLowerCase());
+      $("z3-fb").className = "fb-box ok";
+      $("z3-fb").innerHTML = `✅ Clean Tokens: <code>[${clean.join(", ")}]</code> (+${xp} XP)! Moving to Stemming vs Lemmatization…`;
+      setTimeout(() => { Z3.step = 1; nextSquad(); renderZ3(); }, 1700);
+    }
+  } else {
+    Portal.SFX.bad();
+    fb.className = "fb-box bad";
+    fb.innerHTML = `❌ "<b>${esc(tok.w)}</b>" carries real meaning — keep it! Zap only filler stopwords.`;
+  }
+}
+
+function pickZ3Stem(i) {
+  const chosen = Z3.curOpts[i];
+  const d = Z3_STEM_DUELS[Z3.stemIdx];
+  document.querySelectorAll("#z3-opts button").forEach((b, j) => {
+    b.disabled = true;
+    if (Z3.curOpts[j].ok) b.classList.add("good");
+  });
+  const fb = $("z3-fb");
+  if (chosen.ok) {
+    const xp = awardXP(activeSq, 20);
+    Portal.SFX.good();
+    fb.className = "fb-box ok";
+    fb.innerHTML = `✅ Correct! +${xp} XP! <span class="mut">${esc(d.tip)}</span>`;
+  } else {
+    document.querySelectorAll("#z3-opts button")[i].classList.add("bad", "shake");
+    breakStreak(activeSq);
+    Portal.SFX.bad();
+    fb.className = "fb-box bad";
+    fb.innerHTML = `❌ <span class="mut">${esc(d.tip)}</span>`;
+  }
+  $("z3-next").innerHTML = `<div class="row"><button class="qbtn" onclick="Z3.stemIdx++; if(Z3.stemIdx>=Z3_STEM_DUELS.length){Z3.step=2;} nextSquad(); renderZ3();">Next Step ▶</button></div>`;
+}
+
+function toggleBow(r, c) {
+  Z3.bow[r][c] = Z3.bow[r][c] === 0 ? 1 : 0;
+  Portal.SFX.pop();
+  renderZ3();
+}
+
+function checkBow() {
+  let wrong = 0;
+  for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) if (Z3.bow[r][c] !== Z3_BOW_ANS[r][c]) wrong++;
+  const fb = $("z3-fb");
+  if (wrong === 0) {
+    const xp = awardXP(activeSq, 25);
+    zonesDone[2] = true;
+    Portal.unlockBadge("c9_nlp_cv");
+    Portal.SFX.win();
+    Portal.confetti(28, ["💬", "🎒", "⭐"]);
+    renderZoneBar();
+    $("stage").innerHTML = `
+      <div class="c">
+        <div style="font-size:3rem">💬🏅</div>
+        <h2>Zone 3 Complete · NLP Token Forge Mastered! (+${xp} XP)</h2>
+        <p class="mut">You built a clean Bag-of-Words matrix just like a 4-mark CBSE Class 10 AI Board question!</p>
+        <div class="row"><button class="qbtn" onclick="enterZone(3)">Enter Zone 4: Confusion Matrix Rescue ▶</button></div>
+      </div>
+    `;
+  } else {
+    Portal.SFX.bad();
+    fb.className = "fb-box bad";
+    fb.innerHTML = `❌ ${wrong} cell${wrong > 1 ? "s" : ""} need fixing! Check carefully which words appear in Doc 1 and Doc 2.`;
+  }
+}
+
+/* ---------- Zone 4: Confusion Matrix Rescue ---------- */
+const Z4_CASES = [
+  {
+    title: "🔥 Forest Fire Alert AI (CBSE Board Pattern)",
+    story: "Over 100 days, a forest-fire AI model was evaluated. Fires actually broke out on 20 days (the model predicted Fire on 18 of them, and missed 2). On the 80 safe days, it raised 12 false alarms and correctly stayed quiet on 68 days.",
+    counts: { TP: 18, FN: 2, FP: 12, TN: 68 },
+    nums: [18, 2, 12, 68],
+    dangerQ: "Missing a real forest fire (FN = 2) can burn down a forest! Which metric should be prioritized?",
+    dangerOpts: ["Recall (TP ÷ [TP + FN])", "Precision (TP ÷ [TP + FP])", "True Negative Rate only", "Training Loss"],
+    dangerAns: 0,
+    calcQ: "Calculate Recall and F1 Score for this Forest Fire model (TP=18, FN=2, FP=12, TN=68):",
+    calcOpts: ["Recall = 90% · F1 = 72%", "Recall = 60% · F1 = 86%", "Recall = 86% · F1 = 90%", "Recall = 75% · F1 = 60%"],
+    calcAns: 0,
+    calcTip: "Precision = 18/(18+12) = 60%, Recall = 18/(18+2) = 90%, F1 = 2×0.6×0.9 / (0.6+0.9) = 72%."
+  },
+  {
+    title: "📧 Smart Email Spam Filter (CBSE 2024 Pattern)",
+    story: "Out of 100 incoming emails, 60 were real Spam (the filter caught 36 and missed 24). Out of 40 important personal emails, it wrongly marked 4 as spam and kept 36 safe in the inbox.",
+    counts: { TP: 36, FN: 24, FP: 4, TN: 36 },
+    nums: [36, 24, 4, 36],
+    dangerQ: "Flagging an important personal email as spam (FP = 4) is very costly here! Which metric keeps False Positives low?",
+    dangerOpts: ["Precision (TP ÷ [TP + FP])", "Recall (TP ÷ [TP + FN])", "Error Rate", "Word Count"],
+    dangerAns: 0,
+    calcQ: "Calculate Precision and Accuracy for this Spam Filter (TP=36, FN=24, FP=4, TN=36):",
+    calcOpts: ["Precision = 90% · Accuracy = 72%", "Precision = 60% · Accuracy = 80%", "Precision = 72% · Accuracy = 90%", "Precision = 80% · Accuracy = 60%"],
+    calcAns: 0,
+    calcTip: "Precision = 36/(36+4) = 90%, Accuracy = (36+36)/100 = 72%, Recall = 36/60 = 60%, F1 = 72%."
+  }
+];
+
+let Z4 = {};
+function startZone4() {
+  Z4 = { caseIdx: 0, step: 0, pickedNum: null, placed: { TP: null, FN: null, FP: null, TN: null }, usedNums: [] };
+  renderZ4();
+}
+
+function renderZ4() {
+  const cs = Z4_CASES[Z4.caseIdx];
+  if (!cs) {
+    zonesDone[3] = true;
+    renderZoneBar();
+    Portal.SFX.win();
+    Portal.confetti(28, ["🧮", "✅", "⭐"]);
+    $("stage").innerHTML = `
+      <div class="c">
+        <div style="font-size:3rem">🧮🏆</div>
+        <h2>Zone 4 Complete · Evaluation Case Studies Conquered!</h2>
+        <p class="mut">Every squad can now build Confusion Matrices and solve Precision / Recall / F1 questions!</p>
+        <div class="row"><button class="qbtn warm" onclick="enterZone(4)">⚔️ Enter Final Zone: Examiner Boss Raid ▶</button></div>
+      </div>
+    `;
+    return;
+  }
+
+  const sq = squads[activeSq];
+  if (Z4.step === 0) {
+    const avail = sh(cs.nums).map((n, idx) => ({ n, idx }));
+    if (!Z4.tray) Z4.tray = avail;
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="pyq-tag">CBSE 4-Mark Case Study (${Z4.caseIdx + 1}/${Z4_CASES.length}) · Step 1/3</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Case</div>
+        <h2 style="margin:6px 0">${cs.title}</h2>
+      </div>
+      <div class="ar-box">${esc(cs.story)}</div>
+      <p class="c mut">Tap a number below, then tap its matching cell (<b>TP, FN, FP, TN</b>) in the Confusion Matrix:</p>
+      <div class="num-tray">
+        ${Z4.tray.map((item, i) => Z4.usedNums.includes(i) ? "" : `<button class="num-pill ${Z4.pickedNum === i ? "sel" : ""}" onclick="Z4.pickedNum=${i};Portal.SFX.pop();renderZ4()">${item.n}</button>`).join("")}
+      </div>
+      <div class="cm-grid">
+        <div></div><div class="cm-hd">Predicted: YES</div><div class="cm-hd">Predicted: NO</div>
+        <div class="cm-hd">Reality: YES</div>
+        <div class="cm-slot ${Z4.placed.TP !== null ? "filled" : ""}" onclick="placeCM('TP')"><b>TP</b><div style="font-size:1.4rem;font-weight:900">${Z4.placed.TP ?? "?"}</div></div>
+        <div class="cm-slot ${Z4.placed.FN !== null ? "filled" : ""}" onclick="placeCM('FN')"><b>FN</b><div style="font-size:1.4rem;font-weight:900">${Z4.placed.FN ?? "?"}</div></div>
+        <div class="cm-hd">Reality: NO</div>
+        <div class="cm-slot ${Z4.placed.FP !== null ? "filled" : ""}" onclick="placeCM('FP')"><b>FP</b><div style="font-size:1.4rem;font-weight:900">${Z4.placed.FP ?? "?"}</div></div>
+        <div class="cm-slot ${Z4.placed.TN !== null ? "filled" : ""}" onclick="placeCM('TN')"><b>TN</b><div style="font-size:1.4rem;font-weight:900">${Z4.placed.TN ?? "?"}</div></div>
+      </div>
+      <div class="fb-box" id="z4-fb">Positive class = Reality YES (Fire / Spam).</div>
+    `;
+  } else {
+    const isCalc = Z4.step === 2;
+    const rawOpts = isCalc ? cs.calcOpts : cs.dangerOpts;
+    const ansIdx = isCalc ? cs.calcAns : cs.dangerAns;
+    const opts = sh(rawOpts.map((t, i) => ({ t, ok: i === ansIdx })));
+    Z4.curOpts = opts;
+    $("stage").innerHTML = `
+      <div class="c">
+        <span class="pyq-tag">CBSE 4-Mark Case Study · Step ${Z4.step + 1}/3</span>
+        <span class="xp-pill">+25 XP</span>
+        <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)}'s Turn</div>
+        <h3 style="margin:6px 0">${cs.title}</h3>
+      </div>
+      <div class="q-title">${esc(isCalc ? cs.calcQ : cs.dangerQ)}</div>
+      <div class="opts-grid" id="z4-opts">
+        ${opts.map((o, i) => `<button class="opt-btn" onclick="pickZ4Q(${i})"><span class="opt-k">${"ABCD"[i]}</span><span>${esc(o.t)}</span></button>`).join("")}
+      </div>
+      <div class="fb-box" id="z4-fb">Solve with your squad!</div>
+      <div id="z4-next"></div>
+    `;
+  }
+}
+
+function placeCM(slot) {
+  if (Z4.pickedNum === null || Z4.placed[slot] !== null) return;
+  const cs = Z4_CASES[Z4.caseIdx];
+  const val = Z4.tray[Z4.pickedNum].n;
+  if (cs.counts[slot] === val) {
+    Z4.placed[slot] = val;
+    Z4.usedNums.push(Z4.pickedNum);
+    Z4.pickedNum = null;
+    Portal.SFX.good();
+    renderZ4();
+    if (["TP", "FN", "FP", "TN"].every(k => Z4.placed[k] !== null)) {
+      const xp = awardXP(activeSq, 20);
+      $("z4-fb").className = "fb-box ok";
+      $("z4-fb").innerHTML = `✅ Matrix Complete! +${xp} XP! Advancing to Metric Selection…`;
+      setTimeout(() => { Z4.step = 1; nextSquad(); renderZ4(); }, 1300);
+    }
+  } else {
+    Portal.SFX.bad();
+    $("z4-fb").className = "fb-box bad";
+    $("z4-fb").innerHTML = `❌ ${val} does not belong in <b>${slot}</b>! Re-read Reality vs Prediction.`;
+  }
+}
+
+function pickZ4Q(i) {
+  const cs = Z4_CASES[Z4.caseIdx];
+  const chosen = Z4.curOpts[i];
+  document.querySelectorAll("#z4-opts button").forEach((b, j) => {
+    b.disabled = true;
+    if (Z4.curOpts[j].ok) b.classList.add("good");
+  });
+  const fb = $("z4-fb");
+  if (chosen.ok) {
+    const xp = awardXP(activeSq, 25);
+    Portal.SFX.good(); Portal.confetti(20);
+    fb.className = "fb-box ok";
+    fb.innerHTML = `✅ Brilliant! +${xp} XP! ${Z4.step === 2 ? `<br><span class="mut">📘 ${esc(cs.calcTip)}</span>` : ""}`;
+  } else {
+    document.querySelectorAll("#z4-opts button")[i].classList.add("bad", "shake");
+    breakStreak(activeSq);
+    Portal.SFX.bad();
+    fb.className = "fb-box bad";
+    fb.innerHTML = `❌ Not quite! ${Z4.step === 2 ? esc(cs.calcTip) : ""}`;
+  }
+  $("z4-next").innerHTML = `<div class="row"><button class="qbtn" onclick="advanceZ4()">Continue ▶</button></div>`;
+}
+
+function advanceZ4() {
+  nextSquad();
+  if (Z4.step === 1) { Z4.step = 2; }
+  else {
+    Z4.caseIdx++;
+    Z4.step = 0;
+    Z4.tray = null;
+    Z4.pickedNum = null;
+    Z4.placed = { TP: null, FN: null, FP: null, TN: null };
+    Z4.usedNums = [];
+  }
+  renderZ4();
+}
+
+/* ---------- Zone 5: Examiner Boss Raid ---------- */
+const BOSS_BANK = [
+  { q: "In an Artificial Neural Network, which layer receives raw input without performing any computation?", opts: ["Input Layer", "Hidden Layer", "Output Layer", "Activation Layer"], a: 0 },
+  { q: "Which AI domain powers Google Translate and Spam Email Detection?", opts: ["Natural Language Processing (NLP)", "Computer Vision", "Data Clustering", "Robotics Kinematics"], a: 0 },
+  { q: "A model gets 99% accuracy on training data but only 54% on test data. What happened?", opts: ["Overfitting", "Underfitting", "Perfect Generalisation", "Data Augmentation"], a: 0 },
+  { q: "A model performs poorly on BOTH training data and testing data. What is this called?", opts: ["Underfitting", "Overfitting", "Over-training", "Bagging"], a: 0 },
+  { q: "In Computer Vision, what is the full form of 'Pixel'?", opts: ["Picture Element", "Pixelated Index Level", "Photo Integration Cell", "Point Input Element"], a: 0 },
+  { q: "Which CBSE AI Project Cycle stage uses graphs and charts to spot trends, outliers, and missing values?", opts: ["Data Exploration", "Problem Scoping", "Deployment", "Rule Writing"], a: 0 },
+  { q: "If a dataset has 98% healthy patients and 2% sick patients, why is Accuracy misleading?", opts: ["Predicting 'Healthy' for everyone gives 98% accuracy while missing 100% of sick patients!", "Accuracy cannot exceed 50%", "Accuracy only works on images", "Accuracy ignores True Negatives"], a: 0 },
+  { q: "Which NLP model gives us a Vocabulary of unique words and their frequency counts while ignoring word order?", opts: ["Bag of Words (BoW)", "TF-IDF Matrix", "Word2Vec Sequence", "Decision Tree"], a: 0 },
+  { q: "In RGB [255, 0, 0], which colour channel is at full intensity?", opts: ["Red", "Green", "Blue", "Black"], a: 0 },
+  { q: "Which type of Supervised Learning predicts a continuous number like house price or temperature?", opts: ["Regression", "Classification", "Clustering", "Tokenisation"], a: 0 }
+];
+
+let Z5 = {};
+function startZone5() {
+  Z5 = { hp: 100, list: sh(BOSS_BANK), idx: 0, boosted: false, shielded: false };
+  renderZ5();
+}
+
+function renderZ5() {
+  if (Z5.hp <= 0) {
+    zonesDone[4] = true;
+    renderZoneBar();
+    Portal.unlockBadge("c9_boss");
+    Portal.unlockBadge("c9_pyq");
+    Portal.SFX.win();
+    Portal.confetti(55, ["🏆", "👾", "🎉", "⭐", "🔥"]);
+    const ranked = [...squads].sort((a, b) => b.xp - a.xp);
+    const champ = ranked[0];
+    Portal.recordC9Quest(`${champ.name} (${champ.xp} XP) defeated Prof. Perceptron!`, champ.xp);
+    $("stage").innerHTML = `
+      <div class="c">
+        <div style="font-size:4rem">🏆👾💥</div>
+        <h1>PROF. PERCEPTRON DEFEATED!</h1>
+        <p class="mut">Your Class 9 Squads conquered CBSE Class 10 AI (417) Previous Year Questions!</p>
+        <div class="ar-box" style="max-width:560px;text-align:center">
+          <h3>🥇 Final Squad Standings</h3>
+          ${ranked.map((s, i) => `<p style="font-size:1.15rem"><b>#${i + 1} ${s.ico} ${esc(s.name)}</b> — <span style="color:${s.col};font-weight:900">${s.xp} XP</span></p>`).join("")}
+        </div>
+        <div class="row">
+          <button class="qbtn" onclick="startZone5()">⚔️ Rematch Boss</button>
+          <button class="p-pill" onclick="showLobby()">🏠 Quest Lobby</button>
+          <a class="p-pill primary" href="index.html">🏫 Portal Hub</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if (Z5.idx >= Z5.list.length) {
+    Z5.list = sh(BOSS_BANK);
+    Z5.idx = 0;
+  }
+  const q = Z5.list[Z5.idx];
+  const sq = squads[activeSq];
+  const opts = sh(q.opts.map((t, i) => ({ t, ok: i === q.a })));
+  Z5.curOpts = opts;
+  Z5.boosted = false;
+  Z5.shielded = false;
+
+  $("stage").innerHTML = `
+    <div class="boss-banner">
+      <div class="boss-avatar">👾</div>
+      <div style="flex:1;min-width:220px">
+        <div style="display:flex;justify-content:space-between;font-weight:900;margin-bottom:5px">
+          <span>Prof. Perceptron · CBSE Board Boss</span>
+          <span>${Z5.hp} / 100 HP</span>
+        </div>
+        <div class="hp-track"><div class="hp-fill" style="width:${Z5.hp}%"></div></div>
+        <small style="opacity:0.85">Right answers deal 20+ Boss Damage! Wrong answers let Boss heal +10 HP!</small>
+      </div>
+    </div>
+    <div class="c">
+      <span class="pyq-tag">Final Boss Raid · Rapid PYQ</span>
+      <div style="margin-top:6px;font-weight:900;color:${sq.col}">${sq.ico} ${esc(sq.name)} Attacks!</div>
+      <div class="pwr-bar">
+        <button class="pwr-btn" id="b-boost" ${sq.pwr.boost ? "" : "disabled"} onclick="armBossBoost()">🔥 2× Damage (${sq.pwr.boost})</button>
+        <button class="pwr-btn" id="b-shield" ${sq.pwr.shield ? "" : "disabled"} onclick="armBossShield()">🛡️ Block Counter (${sq.pwr.shield})</button>
+      </div>
+    </div>
+    <div class="q-title">${esc(q.q)}</div>
+    <div class="opts-grid" id="z5-opts">
+      ${opts.map((o, i) => `<button class="opt-btn" onclick="hitBoss(${i})"><span class="opt-k">${"ABCD"[i]}</span><span>${esc(o.t)}</span></button>`).join("")}
+    </div>
+    <div class="fb-box" id="z5-fb">Pick fast to strike Prof. Perceptron!</div>
+  `;
+}
+
+function armBossBoost() {
+  if (Z5.boosted || !squads[activeSq].pwr.boost) return;
+  squads[activeSq].pwr.boost--;
+  Z5.boosted = true;
+  $("b-boost").classList.add("armed");
+  $("b-boost").disabled = true;
+  renderSquads();
+  Portal.SFX.box();
+}
+
+function armBossShield() {
+  if (Z5.shielded || !squads[activeSq].pwr.shield) return;
+  squads[activeSq].pwr.shield--;
+  Z5.shielded = true;
+  $("b-shield").classList.add("armed");
+  $("b-shield").disabled = true;
+  renderSquads();
+  Portal.SFX.pop();
+}
+
+function hitBoss(i) {
+  const chosen = Z5.curOpts[i];
+  document.querySelectorAll("#z5-opts button").forEach((b, j) => {
+    b.disabled = true;
+    if (Z5.curOpts[j].ok) b.classList.add("good");
+  });
+  const fb = $("z5-fb");
+  if (chosen.ok) {
+    const dmg = (20 + Math.min(10, squads[activeSq].streak * 5)) * (Z5.boosted ? 2 : 1);
+    Z5.hp = Math.max(0, Z5.hp - dmg);
+    const xp = awardXP(activeSq, dmg);
+    Portal.SFX.good(); Portal.confetti(18, ["💥", "⚡", "⭐"]);
+    fb.className = "fb-box ok";
+    fb.innerHTML = `💥 <b>DIRECT HIT! -${dmg} Boss HP!</b> (+${xp} XP)`;
+  } else {
+    document.querySelectorAll("#z5-opts button")[i].classList.add("bad", "shake");
+    breakStreak(activeSq, Z5.shielded);
+    Portal.SFX.bad();
+    if (!Z5.shielded) Z5.hp = Math.min(100, Z5.hp + 10);
+    fb.className = "fb-box bad";
+    fb.innerHTML = Z5.shielded ? "🛡️ Shield blocked Prof. Perceptron's counter-heal!" : "😈 Prof. Perceptron countered and healed +10 HP!";
+  }
+  setTimeout(() => { Z5.idx++; nextSquad(); renderZ5(); }, 1350);
+}
+
+/* ---------- Boot ---------- */
+initSquads(3);
+const hMatch = location.hash.match(/^#z([0-4])$/);
+if (hMatch) enterZone(Number(hMatch[1]));
+else showLobby();
+</script>
+</body>
+</html>
