@@ -38,21 +38,13 @@ export function getDefaultState() {
 export function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return getDefaultState();
-    const parsed = JSON.parse(raw);
     const def = getDefaultState();
+    if (!raw) return def;
+    const parsed = JSON.parse(raw);
+    // Keep teacher settings across refresh, but always start session scores at 0 points
     return {
       ...def,
-      ...parsed,
-      settings: { ...def.settings, ...(parsed.settings || {}) },
-      teams: {
-        blue: { ...def.teams.blue, ...(parsed.teams?.blue || {}) },
-        orange: { ...def.teams.orange, ...(parsed.teams?.orange || {}) }
-      },
-      curriculumCoverage: {
-        ai: parsed.curriculumCoverage?.ai || [],
-        ct: parsed.curriculumCoverage?.ct || []
-      }
+      settings: { ...def.settings, ...(parsed.settings || {}) }
     };
   } catch {
     return getDefaultState();
